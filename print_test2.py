@@ -6,7 +6,7 @@ draw = ImageDraw.Draw(image)
 draw.ellipse((0, 0, 500, 500), fill='Black')
 draw.ellipse((10, 10, 490, 490), fill='White')
 
-raster = StarTSPImage.imageToRaster(image, cut=True)
+raster = StarTSPImage.imageToRaster(image, cut=False)
 
 printer = open('/dev/usb/lp0', "wb")
 printer.write(raster)
