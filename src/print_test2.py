@@ -3,8 +3,12 @@ from PIL import Image, ImageDraw
 
 image = Image.new('RGB', (500, 500), color='White')
 draw = ImageDraw.Draw(image)
-draw.ellipse((0, 0, 500, 500), fill='Black')
-draw.ellipse((10, 10, 490, 490), fill='White')
+
+something = 480
+while something > 300:
+    draw.ellipse((490 - something, 490 - something, something, something), fill='White')
+    draw.ellipse((500 - something, 500- something, something - 10, something -10), fill='Red')
+    something = something - 20
 
 raster = StarTSPImage.imageToRaster(image, cut=False)
 
