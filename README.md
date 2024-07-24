@@ -5,4 +5,4 @@ python3 -m venv venv
 ./venv/bin/pip install . 
 
 # test printer
-./venv/bin/python3 print_test2.py
+./venv/bin/python3 src/print_test2.py

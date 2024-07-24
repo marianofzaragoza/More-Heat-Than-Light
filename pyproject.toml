@@ -120,7 +120,9 @@ classifiers = [
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [
   "StarTspImage",
-  "thread"
+  "thread",
+  "pycairo",
+  "PyGObject"
 ]
 
 # List additional groups of dependencies here (e.g. development
