@@ -47,7 +47,7 @@ class Player(Gtk.Window):
         '''
 
         self.playlist = Playlist()
-        Gtk.Window.__init__(self, title="Liveview")
+        Gtk.Window.__init__(self, title="More Heat Than Light")
         self.connect('destroy', self.quit)
         #self.set_default_size(800, 450)
         self.fullscreen()
