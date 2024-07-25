@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-#Mariano Comments:
-#verify gpio pin. D26 of raspberry 5 corresponds to gpio pin 26.
-#
-
 
 import os
 import time
@@ -33,7 +27,7 @@ def print_temperature(temperature):
     else:
         print("Failed to read the temperature.")
 
-totalcicles = 1
+totalcicles = 37
 
 while totalcicles > 0: 
     print(str(37 - totalcicles + 1))
