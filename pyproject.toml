@@ -122,7 +122,8 @@ dependencies = [
   "StarTspImage",
   "thread",
   "pycairo",
-  "PyGObject"
+  "PyGObject",
+  "socketserver",
 ]
 
 # List additional groups of dependencies here (e.g. development
