@@ -76,7 +76,7 @@ class Player(Gtk.Window):
         self.duration = Gst.CLOCK_TIME_NONE
 
         #overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! textoverlay deltay=300 halignment=1 name=text text=temperature ! videoconvert ! queue  ! xvimagesink", 'overlaysink')
-        overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! queue  ! autovideosink", 'overlaysink')
+        overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! queue  ! glimagesink", 'overlaysink')
 
 
 
