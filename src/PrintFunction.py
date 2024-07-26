@@ -28,27 +28,35 @@ def print_image(a_temp, b_temp, entanglement, broken_channel):
 
 
 #Testing script
-dontrepeat = False
-a=9
-b=9
+
+a=13
+b=15
 while True:
     #sure they dont go out of range
-
+    time.sleep(0.5)
     a = max(0, min(a, 499))
     b = max(0, min(b, 499))
 
     if a < 10 and b < 10 and a==b and dontrepeat == False:
         print_image(a, b, True, False)
-        dontrepeat = True
-        
-    elif abs(a-b)>10 and dontrepeat == False:
-        print_image(a, b, False, True)
-        dontrepeat = True
+        for i in range(20):
+            time.sleep(0.5)
+            a = a + random.randint(-1, 1)
+            b = b + random.randint(-1, 1)
 
+        
+    elif abs(a-b)>15 and dontrepeat == False:
+        print_image(a, b, False, True)
+        for i in range(20):
+            time.sleep(0.5)
+            a = a + random.randint(-1, 1)
+            b = b + random.randint(-1, 1)
+        
     else :
         print_image(a, b, False, False)
         if not (a < 10 and b < 10 and a==b) and not(abs(a-b)>10):
             dontrepeat = False
+
     a = a + random.randint(-1, 1)
     b = b + random.randint(-1, 1)
 
