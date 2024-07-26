@@ -19,17 +19,27 @@ class Playlist():
             'test5.mp4',
             ]
 
-    def __init__(self):
+    def __init__(self, testing, node):
+        self.testing=testing
+        self.node=node
         self.count=0
         self.max=len(self.playlist) - 1
+
     def next(self):
-        print('count: ' + str(self.count)  + 'max: ' + str(self.max))
-        self.count += 1
-        if self.count > self.max:
-            print("restarting playlist")
-            self.count = 0
-        filepath = self.playlist[self.count]
-        return os.path.realpath(self.videodir + filepath)
+        if self.testing:
+            print('count: ' + str(self.count)  + 'max: ' + str(self.max))
+            self.count += 1
+            if self.count > self.max:
+                print("restarting playlist")
+                self.count = 0
+            filepath = self.playlist[self.count]
+            return os.path.realpath(self.videodir + filepath)
+        else:
+            a_temp = 20
+            b_temp = 20
+            video_path, entanglement, broken_channel = next_video(self.node, 20, 20)
+            
+            return os.path.realpath(self.videodir + video_path)
 
     def choose_video(temp):
         if temp <= 20:
@@ -77,13 +87,15 @@ class Playlist():
             video = random.choice(cat_files)
             return os.path(video)
         
-    def next_video(name, a_temp, b_temp):
+    def next_video(self, name, a_temp, b_temp):
         entanglement = False
         broken_channel = False
         if a_temp < 20 and b_temp < 20 and abs(a_temp - b_temp) < 1:
             entanglement = True
+            video_path = '??'
         elif abs(a_temp - b_temp) > 10:
             broken_channel = True
+            video_path = '??'
         else: 
             if name == "alice":
                 video_path = choose_video(a_temp)
@@ -94,7 +106,7 @@ class Playlist():
 if __name__ == "__main__":
 
     print("Testing of the playlist happens here...")
-    playlist = Playlist()
+    playlist = Playlist(True,'A')
 
     print(playlist.next_video('A', 20.34, 123.111))
     print(playlist.next_video('B', 20.34, 123.111))
