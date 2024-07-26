@@ -85,6 +85,7 @@ if __name__ == "__main__":
  #   dir = "/home/agustina/More-Heat-Than-Light/testfile"
     dir = "testfile"
  
+
     playlist = Playlist(False,'a', dir)
     playlist.update_a_temp(20)
     playlist.update_b_temp(20)
@@ -99,11 +100,46 @@ if __name__ == "__main__":
     print(playlist.next()) 
     print(playlist.next()) 
 
+    # Entanglement
+    playlist = Playlist(False,'a', dir)
+    playlist.update_a_temp(9)
+    playlist.update_b_temp(9)
+    print(playlist.next())
+    print(playlist.next()) 
+    print(playlist.next()) 
+
+    #no entanglement but low temperatures
     playlist = Playlist(True,'b', dir)
-    playlist.update_a_temp(20)
+    playlist.update_a_temp(8)
+    playlist.update_b_temp(0)
+    print(playlist.next())
+    print(playlist.next()) 
+    print(playlist.next()) 
+
+    #Cold Broken Chanel
+    playlist = Playlist(False,'a', dir)
+    playlist.update_a_temp(0)
     playlist.update_b_temp(20)
     print(playlist.next())
     print(playlist.next()) 
     print(playlist.next()) 
+
+    #Hot Broken Chanel
+    playlist = Playlist(False,'a', dir)
+    playlist.update_a_temp(30)
+    playlist.update_b_temp(50)
+    print(playlist.next())
+    print(playlist.next()) 
+    print(playlist.next()) 
+
+    #Hot normal playing
+    playlist = Playlist(False,'a', dir)
+    playlist.update_a_temp(35)
+    playlist.update_b_temp(35)
+    print(playlist.next())
+    print(playlist.next()) 
+    print(playlist.next()) 
+
+
 
 
