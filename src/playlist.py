@@ -11,6 +11,7 @@ class Playlist():
         '3840x2160_1.mp4',
         '3840x2160_2.mp4',
             ]
+            
     playlist = [
             'test1.mp4',
             'test2.mp4',
@@ -19,11 +20,21 @@ class Playlist():
             'test5.mp4',
             ]
 
-    def __init__(self, testing, node):
+    def __init__(self, testing, node, vdir):
         self.testing=testing
-        self.node=node
+        self.nodename=node
+        self.videodir=vdir
         self.count=0
         self.max=len(self.playlist) - 1
+        self.a_temp = 0
+        self.b_temp = 0
+
+    def update_a_temp(self, temp):
+        self.a_temp = temp
+
+    def update_b_temp(self, temp):
+        self.b_temp = temp
+
 
     def next(self):
         if self.testing:
@@ -35,61 +46,27 @@ class Playlist():
             filepath = self.playlist[self.count]
             return os.path.realpath(self.videodir + filepath)
         else:
-            a_temp = 20
-            b_temp = 20
-            video_path, entanglement, broken_channel = next_video(self.node, 20, 20)
+            video_path, entanglement, broken_channel = self.next_video( self.a_temp, self.b_temp)
             
-            return os.path.realpath(self.videodir + video_path)
+            return os.path.realpath(video_path)
 
-    def choose_video(temp):
-        if temp <= 20:
-            cat_files = os.listdir("/cat1")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 20 < temp <= 22:
-            cat_files = os.listdir("/cat2")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 22 < temp <= 24:
-            cat_files = os.listdir("/cat3")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 24 < temp <= 26:
-            cat_files = os.listdir("/cat4")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 26 < temp <= 28:
-            cat_files = os.listdir("/cat5")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 28 < temp <= 30:
-            cat_files = os.listdir("/cat6")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 30 < temp <= 32:
-            cat_files = os.listdir("/cat7")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 32 < temp <= 34:
-            cat_files = os.listdir("/cat8")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 34 < temp <= 36:
-            cat_files = os.listdir("/cat9")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 36 < temp <= 38:
-            cat_files = os.listdir("/cat10")
-            video = random.choice(cat_files)
-            return os.path(video)
-        elif 38 < temp:
-            cat_files = os.listdir("/cat11")
-            video = random.choice(cat_files)
-            return os.path(video)
-        
-    def next_video(self, name, a_temp, b_temp):
+       
+    def choose_video(self, temp):
+        folder_index = 0
+        folders = [self.videodir + '/' + self.nodename + '_' + f"{i}" for i in range(11)]
+        print(folders)
+        if temp > 20:
+            folder_index = min((temp - 20) // 2, len(folders) - 1) #increases by two each time
+        video = random.choice(os.listdir(folders[folder_index]))
+        videopath = folders[folder_index] + '/' + video
+        print('choose_video: ' + videopath)
+        return videopath
+
+    def next_video(self, a_temp, b_temp):
+        videodir=self.videodir
         entanglement = False
         broken_channel = False
+        video_path = ""
         if a_temp < 20 and b_temp < 20 and abs(a_temp - b_temp) < 1:
             entanglement = True
             video_path = '??'
@@ -97,21 +74,36 @@ class Playlist():
             broken_channel = True
             video_path = '??'
         else: 
-            if name == "alice":
-                video_path = choose_video(a_temp)
+            if self.nodename == "a":
+                video_path = playlist.choose_video(a_temp)
             else:
-                video_path = choose_video(b_temp)    
+                video_path = playlist.choose_video(b_temp)    
         return video_path, entanglement, broken_channel
 
 if __name__ == "__main__":
-
     print("Testing of the playlist happens here...")
-    playlist = Playlist(True,'A')
-
-    print(playlist.next_video('A', 20.34, 123.111))
-    print(playlist.next_video('B', 20.34, 123.111))
-
-
+ #   dir = "/home/agustina/More-Heat-Than-Light/testfile"
+    dir = "testfile"
  
+    playlist = Playlist(False,'a', dir)
+    playlist.update_a_temp(20)
+    playlist.update_b_temp(20)
+    print(playlist.next())
+    print(playlist.next()) 
+    print(playlist.next()) 
+
+    playlist = Playlist(False,'b', dir)
+    playlist.update_a_temp(20)
+    playlist.update_b_temp(20)
+    print(playlist.next())
+    print(playlist.next()) 
+    print(playlist.next()) 
+
+    playlist = Playlist(True,'b', dir)
+    playlist.update_a_temp(20)
+    playlist.update_b_temp(20)
+    print(playlist.next())
+    print(playlist.next()) 
+    print(playlist.next()) 
 
 

@@ -11,9 +11,12 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GdkX11', '3.0')
 gi.require_version('GstVideo', '1.0')
 gi.require_version("GLib", "2.0")
+gi.require_version("GstNet", "1.0")
+
 
 from gi.repository import GLib
-from gi.repository import GObject, Gst, Gtk
+from gi.repository import GObject, Gst, Gtk, GstNet
+
 #
 
 import argparse
@@ -46,7 +49,7 @@ class Player(Gtk.Window):
         Gst.debug_set_default_threshold(6)
         '''
 
-        self.playlist = Playlist()
+        self.playlist = Playlist(True, 'A')
         Gtk.Window.__init__(self, title="More Heat Than Light")
         self.connect('destroy', self.quit)
         #self.set_default_size(800, 450)
@@ -62,20 +65,16 @@ class Player(Gtk.Window):
         self.drawingarea.set_hexpand(True)
         self.drawingarea.set_vexpand(True)
 
-        '''
-        # Quit button
-        quit = Gtk.Button(label="Quit")
-        quit.connect("clicked", Gtk.main_quit)
-        grid.attach(quit, 0, 0, 1, 1)
-        '''
-        # Create GStreamer pipeline
-       # self.pipeline = Gst.parse_launch("playbin name=playbin ! tee name=tee ! queue name=videoqueue ! videoconvert ! xvimagesink")
+        ############
+        # Gst setup
+        ############
+    # self.pipeline = Gst.parse_launch("playbin name=playbin ! tee name=tee ! queue name=videoqueue ! videoconvert ! xvimagesink")
         #self.pipeline = Gst.parse_launch("playbin name=playbin")
-        self.playbin = Gst.ElementFactory.make("playbin", "player")
-        vsink = Gst.ElementFactory.make('xvimagesink', 'videosink')
-        self.duration = Gst.CLOCK_TIME_NONE
+        #self.playbin = Gst.ElementFactory.make("playbin", "player")
+        self.playbin = Gst.parse_launch('playbin')
 
-        #overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! textoverlay deltay=300 halignment=1 name=text text=temperature ! videoconvert ! queue  ! xvimagesink", 'overlaysink')
+        vsink = Gst.ElementFactory.make('xvimagesink', 'videosink')
+                #overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! textoverlay deltay=300 halignment=1 name=text text=temperature ! videoconvert ! queue  ! xvimagesink", 'overlaysink')
         overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! queue  ! glimagesink", 'overlaysink')
 
 
@@ -86,7 +85,37 @@ class Player(Gtk.Window):
         asink = Gst.ElementFactory.make('autoaudiosink', 'audiosink')
         self.playbin.set_property('video-sink', overlaysink)
         self.playbin.set_property('audio-sink', asink)
+        ###########
+        # clock
+        #############
 
+        #pipeline.set_clock(gst.system_clock_obtain())
+        #pipeline.set_state(gst.STATE_PLAYING)
+        clock = Gst.SystemClockObtain()
+        #clock = self.playbin.get_clock()
+        print('Using clock: ', clock)
+        self.playbin.use_clock(clock)
+
+        # this will start a server listening on a UDP port
+        #clock_provider = GstNet.NetTimeProvider.new(clock, '0.0.0.0', 7123)
+        '''
+
+        client_clock = GstNet.NetClientClockNew(NULL,193.123.37.231,
+        client_clock = gst_net_client_clock_new (NULL, "192.168.1.42", clock_port, 0);
+        base_time = get_base_time ();
+        /* Set up synchronisation */
+        gst_pipeline_use_clock (GST_PIPELINE (playbin), client_clock);
+        gst_element_set_start_time (playbin, GST_CLOCK_TIME_NONE);
+        gst_element_set_base_time (playbin, base_time);
+---
+                                                '''
+        # we explicitly manage our base time
+        base_time = clock.get_time()
+        print ('Start slave as: python ./play-slave.py %s [IP] %d %d' % (uri, port, base_time))
+        
+        ############
+        # bus
+        ###############
         bus = self.playbin.get_bus()
         bus.add_signal_watch()
         #bus.connect('message::error', self._error)
@@ -141,7 +170,11 @@ class Player(Gtk.Window):
         self.show_all()
         self.xid = self.drawingarea.get_property('window').get_xid()
         self.pipeline.set_state(Gst.State.PLAYING)
+
         self.start()
+         
+       
+
         Gtk.main()
 
     def quit(self, window):
@@ -155,6 +188,7 @@ class Player(Gtk.Window):
 
     def on_msg(self, bus, msg):
         print('msg bus:' + str(bus)+ str(msg))
+
         pprint.pp(msg.type)
         pprint.pp(msg.src)
         if msg.type == Gst.MessageType.DURATION_CHANGED:
