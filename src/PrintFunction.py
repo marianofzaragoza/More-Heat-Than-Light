@@ -13,8 +13,10 @@ def image_temperatures(a_temp, b_temp):
 
 def print_image(a_temp, b_temp, entanglement, broken_channel):
     if entanglement:
+        #entanglement image
         image = Image.open("/home/agustina/More-Heat-Than-Light/src/single_photon.png")
     elif broken_channel:
+        #brokenn_Channel image
         image = Image.open("/home/agustina/More-Heat-Than-Light/src/broken_channel.png")
     else:
         image = image_temperatures(a_temp, b_temp)
@@ -25,6 +27,7 @@ def print_image(a_temp, b_temp, entanglement, broken_channel):
     printer.close()
 
 
+#Testing script
 dontrepeat = False
 a=9
 b=9
