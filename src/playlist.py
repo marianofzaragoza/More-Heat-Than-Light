@@ -69,10 +69,10 @@ class Playlist():
         video_path = ""
         if a_temp < 20 and b_temp < 20 and abs(a_temp - b_temp) < 1:
             entanglement = True
-            video_path = videodir + "entanglement.mp4" ## Put a valid video path
+            video_path = videodir + '/' + "entanglement.mp4" ## Put a valid video path
         elif abs(a_temp - b_temp) > 10:
             broken_channel = True
-            video_path = videodir + "broken_channel.mp4" ## Put a valid video path
+            video_path = videodir + '/' + "broken_channel.mp4" ## Put a valid video path
         else: 
             if self.nodename == "a":
                 video_path = playlist.choose_video(a_temp)

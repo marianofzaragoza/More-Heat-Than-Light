@@ -49,7 +49,7 @@ class Player(Gtk.Window):
         Gst.debug_set_default_threshold(6)
         '''
 
-        self.playlist = Playlist(True, 'A', 'testfile')
+        self.playlist = Playlist(False, 'A', 'testfile')
         Gtk.Window.__init__(self, title="More Heat Than Light")
         self.connect('destroy', self.quit)
         #self.set_default_size(800, 450)
