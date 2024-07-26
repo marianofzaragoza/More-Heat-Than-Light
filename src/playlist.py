@@ -44,7 +44,7 @@ class Playlist():
                 print("restarting playlist")
                 self.count = 0
             filepath = self.playlist[self.count]
-            return os.path.realpath(self.videodir + filepath)
+            return os.path.realpath(self.videodir + '/' + filepath)
         else:
             video_path, entanglement, broken_channel = self.next_video( self.a_temp, self.b_temp)
             

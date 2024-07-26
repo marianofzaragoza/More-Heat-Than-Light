@@ -49,7 +49,7 @@ class Player(Gtk.Window):
         Gst.debug_set_default_threshold(6)
         '''
 
-        self.playlist = Playlist(True, 'A')
+        self.playlist = Playlist(True, 'A', 'testfile')
         Gtk.Window.__init__(self, title="More Heat Than Light")
         self.connect('destroy', self.quit)
         #self.set_default_size(800, 450)
@@ -88,14 +88,14 @@ class Player(Gtk.Window):
         ###########
         # clock
         #############
-
+        '''
         #pipeline.set_clock(gst.system_clock_obtain())
         #pipeline.set_state(gst.STATE_PLAYING)
         clock = Gst.SystemClockObtain()
         #clock = self.playbin.get_clock()
         print('Using clock: ', clock)
         self.playbin.use_clock(clock)
-
+        '''
         # this will start a server listening on a UDP port
         #clock_provider = GstNet.NetTimeProvider.new(clock, '0.0.0.0', 7123)
         '''
@@ -110,8 +110,8 @@ class Player(Gtk.Window):
 ---
                                                 '''
         # we explicitly manage our base time
-        base_time = clock.get_time()
-        print ('Start slave as: python ./play-slave.py %s [IP] %d %d' % (uri, port, base_time))
+        #base_time = clock.get_time()
+        #print ('Start slave as: python ./play-slave.py %s [IP] %d %d' % (uri, port, base_time))
         
         ############
         # bus
