@@ -38,28 +38,23 @@ class Playlist():
 
     def next(self):
         if self.testing:
-            print('count: ' + str(self.count)  + 'max: ' + str(self.max))
             self.count += 1
             if self.count > self.max:
-                print("restarting playlist")
                 self.count = 0
             filepath = self.playlist[self.count]
             return os.path.realpath(self.videodir + '/' + filepath)
         else:
             video_path, entanglement, broken_channel = self.next_video( self.a_temp, self.b_temp)
-            
             return os.path.realpath(video_path)
 
        
     def choose_video(self, temp):
         folder_index = 0
         folders = [self.videodir + '/' + self.nodename + '_' + f"{i}" for i in range(11)]
-        print(folders)
         if temp > 20:
             folder_index = min((temp - 20) // 2, len(folders) - 1) #increases by two each time
         video = random.choice(os.listdir(folders[folder_index]))
         videopath = folders[folder_index] + '/' + video
-        print('choose_video: ' + videopath)
         return videopath
 
     def next_video(self, a_temp, b_temp):
@@ -100,7 +95,7 @@ if __name__ == "__main__":
     print(playlist.next()) 
     print(playlist.next()) 
 
-    # Entanglement
+    print("Entanglement")
     playlist = Playlist(False,'a', dir)
     playlist.update_a_temp(9)
     playlist.update_b_temp(9)
@@ -108,15 +103,15 @@ if __name__ == "__main__":
     print(playlist.next()) 
     print(playlist.next()) 
 
-    #no entanglement but low temperatures
-    playlist = Playlist(True,'b', dir)
+    print("no entanglement but low temperatures")
+    playlist = Playlist(False,'b', dir)
     playlist.update_a_temp(8)
     playlist.update_b_temp(0)
     print(playlist.next())
     print(playlist.next()) 
     print(playlist.next()) 
 
-    #Cold Broken Chanel
+    print("Cold Broken Chanel")
     playlist = Playlist(False,'a', dir)
     playlist.update_a_temp(0)
     playlist.update_b_temp(20)
@@ -124,7 +119,7 @@ if __name__ == "__main__":
     print(playlist.next()) 
     print(playlist.next()) 
 
-    #Hot Broken Chanel
+    print("Hot Broken Chanel")
     playlist = Playlist(False,'a', dir)
     playlist.update_a_temp(30)
     playlist.update_b_temp(50)
@@ -132,10 +127,18 @@ if __name__ == "__main__":
     print(playlist.next()) 
     print(playlist.next()) 
 
-    #Hot normal playing
+    print("Hot normal playing")
     playlist = Playlist(False,'a', dir)
     playlist.update_a_temp(35)
     playlist.update_b_temp(35)
+    print(playlist.next())
+    print(playlist.next()) 
+    print(playlist.next()) 
+
+    print("etanglement?")
+    playlist = Playlist(False,'a', dir)
+    playlist.update_a_temp(0)
+    playlist.update_b_temp(1)
     print(playlist.next())
     print(playlist.next()) 
     print(playlist.next()) 

@@ -27,10 +27,11 @@ def print_temperature(temperature):
     else:
         print("Failed to read the temperature.")
 
-totalcicles = 37
+totalcicles = 121
 
+#A los 61 apago
 while totalcicles > 0: 
-    print(str(37 - totalcicles + 1))
+    print(str(121 - totalcicles))
     temperature = read_temperature("28-00000f7650d5")
     print(f"{temperature:.2f}°C")
     time.sleep(10)
