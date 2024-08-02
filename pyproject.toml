@@ -123,6 +123,9 @@ dependencies = [
   "thread",
   "pycairo",
   "PyGObject",
+  "pyserial",
+  "netifaces"
+  
 ]
 
 # List additional groups of dependencies here (e.g. development
