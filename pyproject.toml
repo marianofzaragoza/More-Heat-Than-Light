@@ -124,7 +124,8 @@ dependencies = [
   "pycairo",
   "PyGObject",
   "pyserial",
-  "netifaces"
+  "netifaces",
+  "pillow",
   
 ]
 
