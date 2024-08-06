@@ -9,6 +9,7 @@ apt install -y  dh-exec dh-python fonts-font-awesome fonts-lato libblkid-dev lib
 
 sudo apt install -y gstreamer1.0-tools gstreamer1.0-plugins-base-apps gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-alsa   gstreamer1.0-gl gstreamer1.0-gl-dbgsym gstreamer1.0-gtk3 gstreamer1.0-gtk3-dbgsym libgraphene-1.0-0
 
+sudo usermod -aG lp user
 
 
 
@@ -16,5 +17,5 @@ sudo apt -y install autoconf automake autopoint autotools-dev debhelper dh-autor
 
 python3 -m venv venv
 #venv/bin/python3 -m pip install StarTspImage
-./venv/bin/pip install . 
+./venv/bin/python3 -m pip install . 
 
