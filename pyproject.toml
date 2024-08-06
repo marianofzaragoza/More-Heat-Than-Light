@@ -127,6 +127,9 @@ dependencies = [
   "netifaces",
   "pillow",
   "multicast_expert",
+  "pmul",
+  "google",
+  "protobuf"
   
 ]
 

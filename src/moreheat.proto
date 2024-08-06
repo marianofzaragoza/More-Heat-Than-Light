@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package moreheat;
+
+message Temperature {
+  optional string source = 1;
+  optional int32 temperature = 2;
+}

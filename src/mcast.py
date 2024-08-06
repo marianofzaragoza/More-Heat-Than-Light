@@ -1,3 +1,8 @@
+'''
+for some reason multicast make sproblems
+so using broadcast
+'''
+
 import sys
 import re
 import socket
@@ -9,7 +14,8 @@ from netifaces import interfaces, ifaddresses, AF_INET
 
 class Mcast():
     host = 'A'
-    addr = '239.192.1.100'
+    #addr = '239.192.1.100'
+    addr = '255.255.255.255'
     port = 50000
     testdata = b'hello'
     blocking = True
@@ -105,30 +111,31 @@ class Mcast():
         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         
         # set multicast interface to local_ip
-        my_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(local_ip))
+        #my_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(local_ip))
 
         # Set multicast time-to-live to 2...should keep our multicast packets from escaping the local network
-        my_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+        #my_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
 
         # Construct a membership request...tells router what multicast group we want to subscribe to
         membership_request = socket.inet_aton(multicast_ip) + socket.inet_aton(local_ip)
 
         # Send add membership request to socket
         # See http://www.tldp.org/HOWTO/Multicast-HOWTO-6.html for explanation of sockopts
-        my_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, membership_request)
+        #my_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, membership_request)
 
-        if self.blocking == False:
-            my_socket.setblocking(0)
+        #if self.blocking == False:
+        #    my_socket.setblocking(0)
 
 
         # Bind the socket to an interface.
         # If you bind to a specific interface on the Mac, no multicast data will arrive.
         # If you try to bind to all interfaces on Windows, no multicast data will arrive.
         # Hence the following.
-        if sys.platform.startswith("darwin"):
-            my_socket.bind(('0.0.0.0', port))
-        else:
-            my_socket.bind((local_ip, port))
+        #if sys.platform.startswith("darwin"):
+        #    my_socket.bind(('0.0.0.0', port))
+        #else:
+        #    my_socket.bind((local_ip, port))
+        my_socket.bind(('', port))
 
         return my_socket
 

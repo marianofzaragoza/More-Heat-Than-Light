@@ -1,0 +1,13 @@
+* video play related to temperature
+* video sync
+* multicast protocol
+* sound player
+* reliability / boot
+* network
+* printer charly
+* logging (temperatures)
+* remote control
+* 2 thermometers on 1-wire bus
+* testing with actual videos
+* config file
+* lightbox (only send)
