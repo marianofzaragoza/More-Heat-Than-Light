@@ -126,6 +126,7 @@ dependencies = [
   "pyserial",
   "netifaces",
   "pillow",
+  "multicast_expert",
   
 ]
 
