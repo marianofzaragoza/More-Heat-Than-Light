@@ -9,18 +9,24 @@ import socket
 import time
 import struct
 from netifaces import interfaces, ifaddresses, AF_INET
+from config import DynamicConfigIni
+
 
 
 
 class Mcast():
     host = 'A'
     #addr = '239.192.1.100'
-    addr = '255.255.255.255'
-    port = 50000
     testdata = b'hello'
-    blocking = True
+    blocking = False
 
-    def __init__(self, blocking=True):
+    def __init__(self, blocking=False):
+
+        self.config = DynamicConfigIni()
+        print(self.config.network.test)
+        self.addr = self.config.network.addr
+        self.port = int(self.config.network.port)
+
         self.blocking = blocking
         self.msocket = self.create_socket(self.addr, self.port)
         #time.sleep(1)
@@ -42,12 +48,12 @@ class Mcast():
 
     def recv(self):
         data = b''
-        print('rf')
+        #print('rf')
         try:
             data, address = self.msocket.recvfrom(4096)
-            print("%s says the time is %s" % (address, data))
+            #print("%s says the time is %s" % (address, data))
         except BlockingIOError:
-            print('blocking')
+            data = None
         return data
 
     def testloop(self):
@@ -123,8 +129,11 @@ class Mcast():
         # See http://www.tldp.org/HOWTO/Multicast-HOWTO-6.html for explanation of sockopts
         #my_socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, membership_request)
 
-        #if self.blocking == False:
-        #    my_socket.setblocking(0)
+        if self.blocking == False:
+            my_socket.setblocking(0)
+        else:
+            my_socket.setblocking(1)
+
 
 
         # Bind the socket to an interface.

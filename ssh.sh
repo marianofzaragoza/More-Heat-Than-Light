@@ -2,6 +2,7 @@
 #
 # ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no agustina@192.168.178.96
 #
+set -eux
 CMD="ssh -o PubKeyAuthentication=no "
 case $1 in
 
@@ -14,8 +15,9 @@ case $1 in
     ;;
 
   carol)
-     ${CMD}agustina@10.147.18.55
-    ;;
+     #${CMD}agustina@10.147.18.55
+     ${CMD}user@10.147.18.208
+     ;;
 
   *)
     echo -n "unknown"
