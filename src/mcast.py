@@ -57,8 +57,8 @@ class Mcast():
         Uses a regex to determine if the input ip is on a local network. Returns a boolean.
         It's safe here, but never use a regex for IP verification if from a potentially dangerous source.
         """
-        #combined_regex = "(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)"
-        combined_regex = "(^192\.168\.)"
+        combined_regex = "(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)"
+        #combined_regex = "(^192\.168\.)"
         
         return re.match(combined_regex, ip_string) is not None # is not None is just a sneaky way of converting to a bool
 
@@ -99,7 +99,11 @@ class Mcast():
 
         # allow reuse of addresses
         my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+        my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        
+        # Enable broadcasting mode
+        my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        
         # set multicast interface to local_ip
         my_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(local_ip))
 

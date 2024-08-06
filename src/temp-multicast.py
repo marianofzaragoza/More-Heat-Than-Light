@@ -29,6 +29,7 @@ if len(sys.argv) > 1 and sys.argv[1] == "recv":
     while True:
         print('receiving')
         print(ts.socket.recv())
+        #time.sleep(1)
 
 else:
     while True:
@@ -38,6 +39,7 @@ else:
         print('adsf')
         ts.socket.send(b"hello2")
         #ts.socket.recv()
+        time.sleep(1)
 
 
 
