@@ -16,5 +16,5 @@ sudo apt -y install autoconf automake autopoint autotools-dev debhelper dh-autor
 
 python3 -m venv venv
 #venv/bin/python3 -m pip install StarTspImage
-./venv/bin/pip install . 
+./venv/bin/python3 -m pip install . 
 
