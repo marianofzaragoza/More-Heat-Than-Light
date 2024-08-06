@@ -1,6 +1,11 @@
-
+from config import DynamicConfigIni
 import os
 import time
+
+config = DynamicConfigIni()
+print(config.DEFAULT.test)
+
+
 
 def read_temperature(sensor_id):
     base_dir = "/sys/bus/w1/devices/"
