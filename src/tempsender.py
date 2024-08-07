@@ -30,7 +30,10 @@ import moreheat_pb2
 class Tempsender():
     def __init__(self):
         self.testtemp = 21.9
+        # incoming messages (whatever is in the udp packet)
         self.rxqueue = deque([])
+
+        # outgoing messages for app (python dict with values)
         self.appqueue = deque([])
         self.socket = Mcast()
         print(self.socket)
