@@ -9,7 +9,8 @@ class Printer():
         self.config = DynamicConfigIni()
         self.text_scale = int(self.config.printer.text_scale)
         self.margin_text = self.config.printer.margin_text
-        
+        self.last_print_time_stamp = time.time()
+        self.counter = 0
         
     font_height_5 = {
         'A': [
@@ -251,15 +252,19 @@ class Printer():
             if text_matrix[i][length - (counter%length) - 1]:
                 img.putpixel((556 -height + i, 0), (0, 0, 0))
 
-    def print_pixel_line(self, a_temp, b_temp, ENTANGLEMENT, BROKEN_CHANNEL, text_matrix, counter):
+    def print_pixel_line(self, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
         img = Image.new('RGB', (576, 1), "white")
-        if ENTANGLEMENT:
+        if entanglement:
+            print(int(a_temp) + 273)
+            print(int(a_temp))
+            print(int(b_temp) + 273)
+            print(int(b_temp))
             img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
             img.putpixel((int(b_temp) + 273, 0), (0, 0, 0))
-        elif BROKEN_CHANNEL:
+        elif broken_channel:
             for t in range (576):
-                img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
-                img.putpixel((int(b_temp) + 273, 0), (0, 0, 0))
+                if t < min(a_temp, b_temp) or t > max(a_temp, b_temp):
+                    img.putpixel((t, 0), (0, 0, 0))
         else:
             img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
             img.putpixel((int(b_temp) + 273, 0), (0, 0, 0))
@@ -269,21 +274,26 @@ class Printer():
         printer.write(raster) 
         printer.close()
 
+    def check_time_and_print(self, last_print_time_stamp, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
+        check_time = time.time()
+        if check_time - last_print_time_stamp > 3:
+            printer.print_pixel_line(a_temp, b_temp, entanglement, broken_channel, text_matrix, counter)
+            printer.last_print_time_stamp = check_time
+            self.counter = self.counter + 1
+
     def test(self):
         a_temp = 20
-        b_temp = 45
+        b_temp = 40
 
-        counter = 0
         text_matrix = self.text_to_matrix(self.margin_text, self.font_height_5, self.text_scale)
-
         for i in range(2000):
-            if abs(a_temp - b_temp) > 30:
-                self.print_pixel_line(a_temp, b_temp, False, False, text_matrix, counter)
+            time.sleep(0.1)
+            if abs(a_temp - b_temp) > 25:
+                self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, True, text_matrix, self.counter)
             else: 
-                self.print_pixel_line(a_temp, b_temp, False, True, text_matrix, counter)
-            counter = counter + 1
-            a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
-            b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
+                self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, False, text_matrix, self.counter)
+            #a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
+            #b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
 
 
 
