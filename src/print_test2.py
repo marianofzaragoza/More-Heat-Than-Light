@@ -188,33 +188,50 @@ FONT_height_5 = {
     [1, 1, 1, 1]
     ],
     ' ': [
+    [1, 1, 1, 0],
+    [1, 0, 1, 0],
+    [1, 1, 1, 1],
+    [1, 0, 1, 0],
+    [1, 1, 1, 1]
+    ],
+    ' ': [
     [0, 0],
     [0, 0],
     [0, 0],
     [0, 0],
     [0, 0]
     ],
+
     }
 
-def text_to_matrix(text, font):
+def text_to_matrix(text, font, scale=1):
     # Determine the height of the font
     height = len(next(iter(font.values())))
     
     # Create an empty list to hold the result
-    result = [[] for _ in range(height)]
+    result = [[] for _ in range(height * scale)]
     
     for char in text:
         # Get the matrix for the current character, or use a space if character is not found
         char_matrix = font.get(char.upper(), font[' '])
         
-        # Append each row of the character matrix to the result
-        for i in range(height):
-            result[i].extend(char_matrix[i])
-            result[i].append(0)  # Add a space between characters
+        # Scale the character matrix
+        scaled_matrix = []
+        for row in char_matrix:
+            scaled_row = []
+            for pixel in row:
+                scaled_row.extend([pixel] * scale)
+            for _ in range(scale):
+                scaled_matrix.append(scaled_row)
+        
+        # Append each row of the scaled character matrix to the result
+        for i in range(height * scale):
+            result[i].extend(scaled_matrix[i])
+            result[i].extend([0] * scale)  # Add a space between characters scaled by scale
     
     # Remove the trailing space in each row
-    for i in range(height):
-        result[i] = result[i][:-1]
+    for i in range(height * scale):
+        result[i] = result[i][:-scale]
     
     return result
 
@@ -224,17 +241,14 @@ def sidetext(img, counter, text_matrix):
     for i in range(height):
         if text_matrix[i][counter%length] == 1:
             img.putpixel((height - i, 0), (0, 0, 0))
-            img.putpixel((556 -i, 0), (0, 0, 0))
+        if text_matrix[i][length - (counter%length) - 1]:
+            img.putpixel((556 -height + i, 0), (0, 0, 0))
 
 def print_pixel_line(a_temp, b_temp, ENTANGLEMENT, BROKEN_CHANNEL, text_matrix, counter):
     img = Image.new('RGB', (576, 1), "white")
     if ENTANGLEMENT:
         img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
-        img.putpixel((int(a_temp) + 273 + 1, 0), (0, 0, 0))
-        img.putpixel((int(a_temp) + 273 - 1, 0), (0, 0, 0))
         img.putpixel((int(b_temp) + 273, 0), (0, 0, 0))
-        img.putpixel((int(b_temp) + 273 + 1, 0), (0, 0, 0))
-        img.putpixel((int(b_temp) + 273 - 1, 0), (0, 0, 0))
     elif BROKEN_CHANNEL:
         for t in range (576):
             img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
@@ -248,14 +262,14 @@ def print_pixel_line(a_temp, b_temp, ENTANGLEMENT, BROKEN_CHANNEL, text_matrix, 
     printer.write(raster) 
     printer.close()
 
-text = "ALICE AND BOB AND"
-text_matrix = text_to_matrix(text, FONT_height_5)
 
+scale = 2
 a_temp = 20
 b_temp = 45
+text = "ALICE AND BOB AND "
 
 counter = 0
-
+text_matrix = text_to_matrix(text, FONT_height_5, scale)
 for i in range(2000):
     if abs(a_temp - b_temp) > 30:
         print_pixel_line(a_temp, b_temp, False, False, text_matrix, counter)
