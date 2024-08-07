@@ -33,6 +33,8 @@ from datetime import datetime
 #GObject.threads_init()
 Gst.init(None)
 from playlist import Playlist
+from tempsender import Tempsender, TempSource
+
 
 class Player(Gtk.Window):
     def __init__(self):
@@ -49,6 +51,8 @@ class Player(Gtk.Window):
         Gst.debug_set_default_threshold(6)
         '''
 
+        self.tempsender = Tempsender()
+
         self.playlist = Playlist(False, 'A', 'testfile')
         Gtk.Window.__init__(self, title="More Heat Than Light")
         self.connect('destroy', self.quit)
@@ -60,7 +64,13 @@ class Player(Gtk.Window):
         # Create a grid for the DrawingArea and buttons
         grid = Gtk.Grid()
         self.add(grid)
-        grid.attach(self.drawingarea, 0, 1, 2, 1)
+
+        self.text_tempa = Gtk.Button(label="temp A")
+        self.text_tempb = Gtk.Button(label="temp B")
+        grid.attach(self.text_tempa, 0, 0, 1, 1)
+        grid.attach(self.text_tempb, 1, 0, 1, 1)
+
+        grid.attach(self.drawingarea, 0, 1, 2, 4)
         # Needed or else the drawing area will be really small (1px)
         self.drawingarea.set_hexpand(True)
         self.drawingarea.set_vexpand(True)
@@ -139,7 +149,7 @@ class Player(Gtk.Window):
     def interrupt_next(self):
         self.pipeline.set_state(Gst.State.NULL)
         nextfile = self.playlist.next()
-        print('huh' + nextfile)
+        #print('huh' + nextfile)
         self.playbin.set_property("uri", "file://" + nextfile) 
         self.pipeline.set_state(Gst.State.PLAYING)
         return True
@@ -148,13 +158,13 @@ class Player(Gtk.Window):
     def next(self):
         #self.pipeline.set_state(Gst.State.NULL)
         nextfile = self.playlist.next()
-        print('huh' + nextfile)
+        #print('huh' + nextfile)
         self.playbin.set_property("uri", "file://" + nextfile) 
         #self.pipeline.set_state(Gst.State.PLAYING)
         return True
 
     def update(self):
-        print('testing')
+        #print('testing')
         appmsg = Gst.Structure.new_empty('user_text')
         appmsg.set_value('text', 'testing')
 
@@ -164,17 +174,31 @@ class Player(Gtk.Window):
 
         GLib.timeout_add(1000, self.update)
 
+    def onnetmessage(self):
+
+        while (msg := self.tempsender.retrieve_one()) is not None: 
+            print('got message from net: ' + msg)
+            self.text_tempa.set_label(msg)
+
+
     def run(self):
 
         GLib.timeout_add(200, self.update)
         self.show_all()
         self.xid = self.drawingarea.get_property('window').get_xid()
         self.pipeline.set_state(Gst.State.PLAYING)
+        
 
+        #start the player
         self.start()
-         
+        
+        print("creating msgsource")
+        msgsource = TempSource(self.tempsender, self.onnetmessage)
+        #simple.ircobj.fn_to_add_socket = source.add_socket
+        #simple.ircobj.fn_to_remove_socket = source.rm_socket
+        msgsource.attach()
        
-
+        print("starting gtk mainloop")
         Gtk.main()
 
     def quit(self, window):
@@ -183,14 +207,14 @@ class Player(Gtk.Window):
 
     def on_sync_message(self, bus, msg):
         if msg.get_structure().get_name() == 'prepare-window-handle':
-            print('prepare-window-handle')
+            #print('prepare-window-handle')
             msg.src.set_window_handle(self.xid)
 
     def on_msg(self, bus, msg):
-        print('msg bus:' + str(bus)+ str(msg))
+        #print('msg bus:' + str(bus)+ str(msg))
 
-        pprint.pp(msg.type)
-        pprint.pp(msg.src)
+        #pprint.pp(msg.type)
+        #pprint.pp(msg.src)
         if msg.type == Gst.MessageType.DURATION_CHANGED:
             print("DURATION CHANGED")
         if msg.type == Gst.MessageType.ERROR:
@@ -199,11 +223,11 @@ class Player(Gtk.Window):
             if dbg:
                 print("Debug info:", dbg)
         if msg.type == Gst.MessageType.APPLICATION:
-            print("application msg")
+            #print("application msg")
             #if msg.get_structure().get_name() == 'user_text':
             structn = msg.get_structure().get_name()
             structv = msg.get_structure().get_value('text') 
-            print('appmsg: ' + str(structn) + ' v: ' + str(structv))
+            #print('appmsg: ' + str(structn) + ' v: ' + str(structv))
                 #overlay.set_property('text', struct['text'])
             #overlay.set_property('text','asdfasdf')
 
@@ -219,7 +243,7 @@ class Player(Gtk.Window):
         print('on_error():', msg.parse_error())
     
     def probe_block(self, pad, buf):
-        print("blocked")
+        print("probe blocked")
         return True
 
 p = Player()
