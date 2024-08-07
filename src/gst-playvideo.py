@@ -35,6 +35,7 @@ Gst.init(None)
 from playlist import Playlist
 from tempsender import Tempsender, TempSource
 
+notemp = True
 
 class Player(Gtk.Window):
     def __init__(self):
@@ -46,12 +47,11 @@ class Player(Gtk.Window):
         os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir)
         os.putenv('GST_DEBUG_NO_COLOR', "1")
         os.putenv('GST_DEBUG_FILE', current_dir + '/debug.log')
-        '''
         Gst.debug_set_active(True)
         Gst.debug_set_default_threshold(6)
-        '''
 
-        self.tempsender = Tempsender()
+        if not notemp:
+            self.tempsender = Tempsender()
 
         self.playlist = Playlist(False, 'A', 'testfile')
         Gtk.Window.__init__(self, title="More Heat Than Light")
@@ -191,12 +191,12 @@ class Player(Gtk.Window):
 
         #start the player
         self.start()
-        
-        print("creating msgsource")
-        msgsource = TempSource(self.tempsender, self.onnetmessage)
-        #simple.ircobj.fn_to_add_socket = source.add_socket
-        #simple.ircobj.fn_to_remove_socket = source.rm_socket
-        msgsource.attach()
+        if not notemp: 
+            print("creating msgsource")
+            msgsource = TempSource(self.tempsender, self.onnetmessage)
+            #simple.ircobj.fn_to_add_socket = source.add_socket
+            #simple.ircobj.fn_to_remove_socket = source.rm_socket
+            msgsource.attach()
        
         print("starting gtk mainloop")
         Gtk.main()
