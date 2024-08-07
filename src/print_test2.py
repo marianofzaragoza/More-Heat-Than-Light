@@ -248,11 +248,7 @@ def print_pixel_line(a_temp, b_temp, ENTANGLEMENT, BROKEN_CHANNEL, text_matrix, 
     img = Image.new('RGB', (576, 1), "white")
     if ENTANGLEMENT:
         img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
-        img.putpixel((int(a_temp) + 273 + 1, 0), (0, 0, 0))
-        img.putpixel((int(a_temp) + 273 - 1, 0), (0, 0, 0))
         img.putpixel((int(b_temp) + 273, 0), (0, 0, 0))
-        img.putpixel((int(b_temp) + 273 + 1, 0), (0, 0, 0))
-        img.putpixel((int(b_temp) + 273 - 1, 0), (0, 0, 0))
     elif BROKEN_CHANNEL:
         for t in range (576):
             img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
