@@ -130,7 +130,8 @@ dependencies = [
   "pmul",
   "google",
   "protobuf",
-  "numpy"
+  "numpy",
+  "pycairo"
   
 ]
 
