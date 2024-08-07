@@ -1,11 +1,14 @@
 Thermometer DS18B20:
 
+Connect Thermometer to ports D26 and D24
+
 sudo nano /boot/firmware/config.txt
 
 You must change a line so that you have this line in config:
 This must be added at the end:
 [all]
-# Enable 1-Wire interface on GPIO 26
+# Enable 1-Wire interface on GPIO 26 and GPIO 24
+dtoverlay=w1-gpio,gpiopin=24
 dtoverlay=w1-gpio,gpiopin=26
 
 The whole document would be seen like this:
@@ -62,7 +65,10 @@ otg_mode=1
 
 [all]
 # Enable 1-Wire interface on GPIO 26
+dtoverlay=w1-gpio,gpiopin=24
 dtoverlay=w1-gpio,gpiopin=26
+
+
 
 
 ----------------------------
