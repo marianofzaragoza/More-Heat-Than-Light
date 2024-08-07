@@ -95,12 +95,15 @@ class Player(Gtk.Window):
 #        overlaysink = Gst.parse_bin_from_description("cairooverlay name=coverlay ! timeoverlay name=t1 ! videoconvert ! timeoverlay name=t2 text=hello halignment=2 ! timeoverlay text=lala ! queue ! videoconvert ! queue  ! glimagesink", 'overlaysink')
         #overlaysink = Gst.parse_launch("timeoverlay name=t1 ! videoconvert ! timeoverlay name=t2 text=hello halignment=2 ! timeoverlay text=lala ! queue ! videoconvert ! queue  ! glimagesink")
  #       overlaysink = Gst.parse_bin_from_description("cairooverlay name=coverlay ! queue ! glimagesink", 'overlaysink')
-        overlaysink = Gst.parse_bin_from_description("cairooverlay name=coverlay ! queue ! glimagesink", 'overlaysink')
- 
-        cairo_overlay = overlaysink.get_by_name('coverlay')
-        
-        cairo_overlay.connect('draw', self.on_draw)
- 
+
+        cairo = False
+        if cairo:
+            print("USING CAIRO OVERLAY")
+            overlaysink = Gst.parse_bin_from_description("cairooverlay name=coverlay ! queue ! glimagesink", 'overlaysink')
+            cairo_overlay = overlaysink.get_by_name('coverlay')
+            cairo_overlay.connect('draw', self.on_draw)
+        else: 
+            overlaysink = Gst.parse_bin_from_description("videoconvert ! queue ! timeoverlay ! queue ! videoconvert ! queue ! glimagesink", 'overlaysink')
 
         asink = Gst.ElementFactory.make('fakesink', 'audiosink')
         self.playbin.set_property('video-sink', overlaysink)
@@ -163,7 +166,7 @@ class Player(Gtk.Window):
         t.start()
 
         
-        self.notemp = False
+        self.notemp = True
         #debug
         if not self.notemp:
             self.tempsender = Tempsender()
