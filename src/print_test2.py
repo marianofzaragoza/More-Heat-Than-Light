@@ -290,10 +290,13 @@ class Printer():
             time.sleep(0.1)
             if abs(a_temp - b_temp) > 25:
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, True, text_matrix, self.counter)
+                a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
+                b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
+
             else: 
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, False, text_matrix, self.counter)
-            #a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
-            #b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
+                a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
+                b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
 
 
 
