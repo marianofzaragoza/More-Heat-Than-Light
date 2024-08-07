@@ -199,7 +199,7 @@ class Player(Gtk.Window):
         if not self.notemp:
             self.tempsender = Tempsender()
 
-        self.playlist = Playlist(False, 'A', 'testfile')
+        self.playlist = Playlist(False, 'A', 'videos')
         
         self.init_gst()
 

@@ -24,7 +24,7 @@ class Playlist():
         self.testing=testing
         self.nodename=node
         self.videodir=vdir
-        self.videoext="ts"
+        self.videoext="mp4"
         self.count=0
         self.max=len(self.playlist) - 1
         self.a_temp = 0
