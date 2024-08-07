@@ -21,7 +21,7 @@ from gi.repository import GObject, Gst, Gtk, GstNet
 
 import argparse
 import codecs
-
+import threading
 import socket
 import threading
 import socketserver
@@ -30,30 +30,20 @@ import socketserver
 from gi.repository import GdkX11, GstVideo
 
 from datetime import datetime
-#GObject.threads_init()
-Gst.init(None)
+import time
 from playlist import Playlist
 from tempsender import Tempsender, TempSource
 
-notemp = True
 
 class Player(Gtk.Window):
-    def __init__(self):
-
-        #debug
-
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-        os.environ["GST_DEBUG_DUMP_DOT_DIR"] = current_dir
-        os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir)
-        os.putenv('GST_DEBUG_NO_COLOR', "1")
-        os.putenv('GST_DEBUG_FILE', current_dir + '/debug.log')
-        Gst.debug_set_active(True)
-        Gst.debug_set_default_threshold(6)
-
-        if not notemp:
-            self.tempsender = Tempsender()
-
-        self.playlist = Playlist(False, 'A', 'testfile')
+    def th_test(self):
+        while True:
+            print("+++++++++++++++++= \n hello +++++++++++++++++++++++++++")
+            time.sleep(1)
+        Glib.idle_add(lambda: self.th_test())
+        Glib.timeout_add(300, lambda: self.th_test())
+    
+    def init_gui(self):
         Gtk.Window.__init__(self, title="More Heat Than Light")
         self.connect('destroy', self.quit)
         #self.set_default_size(800, 450)
@@ -75,7 +65,18 @@ class Player(Gtk.Window):
         self.drawingarea.set_hexpand(True)
         self.drawingarea.set_vexpand(True)
 
-        ############
+    def init_gst(self):
+        Gst.init(None)
+
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        os.environ["GST_DEBUG_DUMP_DOT_DIR"] = current_dir
+        os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir)
+        os.putenv('GST_DEBUG_NO_COLOR', "1")
+        os.putenv('GST_DEBUG_FILE', current_dir + '/debug.log')
+        Gst.debug_set_active(True)
+        Gst.debug_set_default_threshold(1)
+
+       ############
         # Gst setup
         ############
     # self.pipeline = Gst.parse_launch("playbin name=playbin ! tee name=tee ! queue name=videoqueue ! videoconvert ! xvimagesink")
@@ -85,14 +86,14 @@ class Player(Gtk.Window):
 
         vsink = Gst.ElementFactory.make('xvimagesink', 'videosink')
                 #overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! textoverlay deltay=300 halignment=1 name=text text=temperature ! videoconvert ! queue  ! xvimagesink", 'overlaysink')
-        overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! queue  ! glimagesink", 'overlaysink')
+        overlaysink = Gst.parse_bin_from_description("videoconvert ! timeoverlay ! queue ! videoconvert ! queue  ! glimagesink", 'overlaysink')
 
 
 
         #self.pipeline.get_by_name("tee").link(self.recordpipe)
  
 
-        asink = Gst.ElementFactory.make('autoaudiosink', 'audiosink')
+        asink = Gst.ElementFactory.make('fakesink', 'audiosink')
         self.playbin.set_property('video-sink', overlaysink)
         self.playbin.set_property('audio-sink', asink)
         ###########
@@ -143,27 +144,70 @@ class Player(Gtk.Window):
         bus.enable_sync_message_emission()
         bus.connect('sync-message::element', self.on_sync_message)
 
-    def start(self):
-        self.interrupt_next()
+
  
+    def __init__(self):
+        GObject.threads_init()
+        self.init_gui()
+        t = threading.Thread(target=self.th_test)
+        t.daemon = True
+        t.start()
+
+        
+        self.notemp = True
+        #debug
+        if not self.notemp:
+            self.tempsender = Tempsender()
+
+        self.playlist = Playlist(False, 'A', 'testfile')
+        
+        self.init_gst()
+
+    def start(self):
+        print('called: start()')
+        self.interrupt_next()
+   
+    def pl_set_state(self,state):
+        GLib.idle_add(lambda: self.pipeline.set_state(state))
+
+    def state_change(self,state):
+        self.pipeline.set_state(Gst.State.PLAYING)
+
     def interrupt_next(self):
+        print('called: interrupt_next()')
+        self.mt_interrupt_next()
+        #GLib.idle_add(lambda: mt_interrupt_next())
+
+
+
+    def mt_interrupt_next(self):
+        print('called: MT_interrupt_next()')
         self.pipeline.set_state(Gst.State.NULL)
+        #self.pl_set_state(Gst.State.NULL)
         nextfile = self.playlist.next()
         #print('huh' + nextfile)
         self.playbin.set_property("uri", "file://" + nextfile) 
         self.pipeline.set_state(Gst.State.PLAYING)
+        #self.pl_set_state(Gst.State.PLAYING)
+
         return True
 
        
     def next(self):
+        print('called: next()')
+        print('next() state: ' + str(self.pipeline.get_state(Gst.CLOCK_TIME_NONE)))
+
         #self.pipeline.set_state(Gst.State.NULL)
         nextfile = self.playlist.next()
+        print('next() nextfile: ' + nextfile)
         #print('huh' + nextfile)
         self.playbin.set_property("uri", "file://" + nextfile) 
         #self.pipeline.set_state(Gst.State.PLAYING)
         return True
 
     def update(self):
+        print('called: update()')
+
         #print('testing')
         appmsg = Gst.Structure.new_empty('user_text')
         appmsg.set_value('text', 'testing')
@@ -191,7 +235,7 @@ class Player(Gtk.Window):
 
         #start the player
         self.start()
-        if not notemp: 
+        if not self.notemp: 
             print("creating msgsource")
             msgsource = TempSource(self.tempsender, self.onnetmessage)
             #simple.ircobj.fn_to_add_socket = source.add_socket
@@ -211,12 +255,17 @@ class Player(Gtk.Window):
             msg.src.set_window_handle(self.xid)
 
     def on_msg(self, bus, msg):
-        #print('msg bus:' + str(bus)+ str(msg))
+        print('msg bus:' + str(bus)+ str(msg))
 
-        #pprint.pp(msg.type)
-        #pprint.pp(msg.src)
+        pprint.pp(msg.type)
+        pprint.pp(msg.src)
         if msg.type == Gst.MessageType.DURATION_CHANGED:
             print("DURATION CHANGED")
+        if msg.type == Gst.MessageType.STATE_CHANGED:
+            print("STATE CHANGED")
+            if isinstance(message.src, Gst.Pipeline):
+                old_state, new_state, pending_state = message.parse_state_changed()
+                print(("Pipeline state changed from %s to %s." % (old_state.value_nick, new_state.value_nick)))
         if msg.type == Gst.MessageType.ERROR:
             err, dbg = msg.parse_error()
             print("ERROR:", msg.src.get_name(), ":", err)
