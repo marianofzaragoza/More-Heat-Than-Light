@@ -129,7 +129,8 @@ dependencies = [
   "multicast_expert",
   "pmul",
   "google",
-  "protobuf"
+  "protobuf",
+  "numpy"
   
 ]
 

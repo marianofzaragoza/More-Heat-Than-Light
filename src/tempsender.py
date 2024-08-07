@@ -60,9 +60,9 @@ class Tempsender():
             try:
                 msg = self.rxqueue.popleft()
                 # decode, update temperature, reject broken, keep stats
-                msglen = len(msg.SerializeToString())
-                print("length bits: " + str(msglen * 8))
-                self.appqueue.append(msg.temperature)
+                #msglen = len(msg.SerializeToString())
+                #print("length bits: " + str(msglen * 8))
+                #self.appqueue.append(msg.temperature)
                 print(str(msg))
             except IndexError:
                 return True
@@ -83,7 +83,7 @@ class Tempsender():
  
     def random_walk(y):
         # put some stuff here to make it stay within normal range
-           y += np.random.normal(scale=1)
+        y += np.random.normal(scale=1)
         return y
 
 
