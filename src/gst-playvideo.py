@@ -13,12 +13,12 @@ gi.require_version('GstVideo', '1.0')
 gi.require_version("GLib", "2.0")
 gi.require_version("GstNet", "1.0")
 
-
+import cairo
 from gi.repository import GLib
 from gi.repository import GObject, Gst, Gtk, GstNet
 
 #
-
+import random
 import argparse
 import codecs
 import threading
@@ -36,13 +36,7 @@ from tempsender import Tempsender, TempSource
 
 
 class Player(Gtk.Window):
-    def th_test(self):
-        while True:
-            print("+++++++++++++++++= \n hello +++++++++++++++++++++++++++")
-            time.sleep(1)
-        Glib.idle_add(lambda: self.th_test())
-        Glib.timeout_add(300, lambda: self.th_test())
-    
+   
     def init_gui(self):
         Gtk.Window.__init__(self, title="More Heat Than Light")
         self.connect('destroy', self.quit)
@@ -65,32 +59,47 @@ class Player(Gtk.Window):
         self.drawingarea.set_hexpand(True)
         self.drawingarea.set_vexpand(True)
 
+
+    def on_draw(self, _overlay, context, _timestamp, _duration):
+        """Each time the 'draw' signal is emitted"""
+        context.select_font_face('Open Sans', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+        context.set_font_size(40)
+        context.move_to(100, 100)
+        context.text_path('HELLO')
+        context.set_source_rgb(0.5, 0.5, 1)
+        context.fill_preserve()
+        context.set_source_rgb(0, 0, 0)
+        context.set_line_width(1)
+        context.stroke()
+
     def init_gst(self):
-        Gst.init(None)
 
         current_dir = os.path.dirname(os.path.realpath(__file__))
         os.environ["GST_DEBUG_DUMP_DOT_DIR"] = current_dir
         os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir)
         os.putenv('GST_DEBUG_NO_COLOR', "1")
         os.putenv('GST_DEBUG_FILE', current_dir + '/debug.log')
+        print('debug: ' + current_dir)
+        Gst.init(None)
+
         Gst.debug_set_active(True)
-        Gst.debug_set_default_threshold(1)
+        Gst.debug_set_default_threshold(4)
 
        ############
         # Gst setup
         ############
-    # self.pipeline = Gst.parse_launch("playbin name=playbin ! tee name=tee ! queue name=videoqueue ! videoconvert ! xvimagesink")
-        #self.pipeline = Gst.parse_launch("playbin name=playbin")
-        #self.playbin = Gst.ElementFactory.make("playbin", "player")
         self.playbin = Gst.parse_launch('playbin')
 
         vsink = Gst.ElementFactory.make('xvimagesink', 'videosink')
                 #overlaysink = Gst.parse_bin_from_description("timeoverlay ! queue ! videoconvert ! textoverlay deltay=300 halignment=1 name=text text=temperature ! videoconvert ! queue  ! xvimagesink", 'overlaysink')
-        overlaysink = Gst.parse_bin_from_description("videoconvert ! timeoverlay ! queue ! videoconvert ! queue  ! glimagesink", 'overlaysink')
-
-
-
-        #self.pipeline.get_by_name("tee").link(self.recordpipe)
+#        overlaysink = Gst.parse_bin_from_description("cairooverlay name=coverlay ! timeoverlay name=t1 ! videoconvert ! timeoverlay name=t2 text=hello halignment=2 ! timeoverlay text=lala ! queue ! videoconvert ! queue  ! glimagesink", 'overlaysink')
+        #overlaysink = Gst.parse_launch("timeoverlay name=t1 ! videoconvert ! timeoverlay name=t2 text=hello halignment=2 ! timeoverlay text=lala ! queue ! videoconvert ! queue  ! glimagesink")
+ #       overlaysink = Gst.parse_bin_from_description("cairooverlay name=coverlay ! queue ! glimagesink", 'overlaysink')
+        overlaysink = Gst.parse_bin_from_description("cairooverlay name=coverlay ! queue ! glimagesink", 'overlaysink')
+ 
+        cairo_overlay = overlaysink.get_by_name('coverlay')
+        
+        cairo_overlay.connect('draw', self.on_draw)
  
 
         asink = Gst.ElementFactory.make('fakesink', 'audiosink')
@@ -132,9 +141,9 @@ class Player(Gtk.Window):
         #bus.connect('message::error', self._error)
         self.playbin.connect('about-to-finish', self.on_about_to_finish) 
         bus.connect('message::eos', self.on_eos)
-        bus.connect('message::application', self.on_msg)
-        bus.connect('message::state_changed', self.on_msg)
-        bus.connect('message::duration_changed', self.on_msg)
+        #bus.connect('message::application', self.on_msg)
+        #bus.connect('message::state_changed', self.on_msg)
+        #bus.connect('message::duration_changed', self.on_msg)
  
         #bus.connect('message::async-done', self._async_done)
         self.pipeline = self.playbin 
@@ -154,7 +163,7 @@ class Player(Gtk.Window):
         t.start()
 
         
-        self.notemp = True
+        self.notemp = False
         #debug
         if not self.notemp:
             self.tempsender = Tempsender()
@@ -164,7 +173,7 @@ class Player(Gtk.Window):
         self.init_gst()
 
     def start(self):
-        print('called: start()')
+        #print('called: start()')
         self.interrupt_next()
    
     def pl_set_state(self,state):
@@ -173,50 +182,51 @@ class Player(Gtk.Window):
     def state_change(self,state):
         self.pipeline.set_state(Gst.State.PLAYING)
 
+    def th_test(self):
+        time.sleep(10)
+        while True:
+            print("interrupting.............")
+
+            self.interrupt_next()
+            time.sleep(random.uniform(1,20))
+        #Glib.idle_add(lambda: self.th_test())
+        #Glib.timeout_add(300, lambda: self.th_test())
+ 
     def interrupt_next(self):
-        print('called: interrupt_next()')
-        self.mt_interrupt_next()
-        #GLib.idle_add(lambda: mt_interrupt_next())
+        #print('called: interrupt_next()')
+
+        # gstreamer stuff needs to be called from main thread, but this function can be called from any
+        GLib.idle_add(lambda: self.mt_interrupt_next())
 
 
 
     def mt_interrupt_next(self):
-        print('called: MT_interrupt_next()')
+        #print('called: MT_interrupt_next()')
         self.pipeline.set_state(Gst.State.NULL)
-        #self.pl_set_state(Gst.State.NULL)
         nextfile = self.playlist.next()
-        #print('huh' + nextfile)
         self.playbin.set_property("uri", "file://" + nextfile) 
         self.pipeline.set_state(Gst.State.PLAYING)
-        #self.pl_set_state(Gst.State.PLAYING)
 
-        return True
-
+        # returning False  removes it from the glib event loop
+        return False
        
     def next(self):
-        print('called: next()')
-        print('next() state: ' + str(self.pipeline.get_state(Gst.CLOCK_TIME_NONE)))
-
-        #self.pipeline.set_state(Gst.State.NULL)
+        #print('called: next()')
         nextfile = self.playlist.next()
         print('next() nextfile: ' + nextfile)
-        #print('huh' + nextfile)
         self.playbin.set_property("uri", "file://" + nextfile) 
-        #self.pipeline.set_state(Gst.State.PLAYING)
         return True
 
-    def update(self):
-        print('called: update()')
+    #def update(self):
+    #    #print('called: update()')
 
-        #print('testing')
-        appmsg = Gst.Structure.new_empty('user_text')
-        appmsg.set_value('text', 'testing')
+     #   #print('testing')
+     #   appmsg = Gst.Structure.new_empty('user_text')
+     #   appmsg.set_value('text', 'testing')
 
-        bus = self.pipeline.get_bus()
-        bus.post(Gst.Message.new_application(self.pipeline, appmsg))
-
-
-        GLib.timeout_add(1000, self.update)
+      #  bus = self.pipeline.get_bus()
+      #  bus.post(Gst.Message.new_application(self.pipeline, appmsg))
+      #  GLib.timeout_add(1000, self.update)
 
     def onnetmessage(self):
 
@@ -227,7 +237,7 @@ class Player(Gtk.Window):
 
     def run(self):
 
-        GLib.timeout_add(200, self.update)
+        #GLib.timeout_add(200, self.update)
         self.show_all()
         self.xid = self.drawingarea.get_property('window').get_xid()
         self.pipeline.set_state(Gst.State.PLAYING)
@@ -249,6 +259,7 @@ class Player(Gtk.Window):
         self.pipeline.set_state(Gst.State.NULL)
         Gtk.main_quit()
 
+    # for playing in a gtk window
     def on_sync_message(self, bus, msg):
         if msg.get_structure().get_name() == 'prepare-window-handle':
             #print('prepare-window-handle')
