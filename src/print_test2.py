@@ -253,10 +253,8 @@ class Printer():
         for i in range(height):
             if text_matrix[i][counter%length] == 1:
                 img.putpixel((556 - i, 0), (0, 0, 0))
-                #img.putpixel((height - i, 0), (0, 0, 0))
             if text_matrix[i][length - (counter%length) - 1] == 1:
                 img.putpixel((i, 0), (0, 0, 0))
-                #img.putpixel(((556 -height) + i, 0), (0, 0, 0))
 
     def print_pixel_line(self, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
         img = Image.new('RGB', (576, 1), "white")

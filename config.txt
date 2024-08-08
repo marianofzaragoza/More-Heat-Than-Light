@@ -1,0 +1,66 @@
+# For more options and information see
+# http://rptl.io/configtxt
+# Some settings may impact device functionality. See link above for details
+
+# Uncomment some or all of these to enable the optional hardware interfaces
+#dtparam=i2c_arm=on
+#dtparam=i2s=on
+#dtparam=spi=on
+
+# Enable audio (loads snd_bcm2835)
+dtparam=audio=on
+
+# Additional overlays and parameters are documented
+# /boot/firmware/overlays/README
+
+# Automatically load overlays for detected cameras
+camera_auto_detect=1
+
+# Automatically load overlays for detected DSI displays
+display_auto_detect=1
+
+# Automatically load initramfs files, if found
+#dtoverlay=w1-gpio
+auto_initramfs=1
+
+# Enable DRM VC4 V3D driver
+#GL with Full KMS ("dtoverlay=vc4-kms-v3d" in config.txt)
+dtoverlay=vc4-kms-v3d
+
+#GL with "Fake" (or "Firmware") KMS (FKMS) ("dtoverlay=vc4-fkms-v3d" in config.txt)
+#dtoverlay=vc4-fkms-v3d
+max_framebuffers=2
+
+
+#Hardware H.264 de/compression up to 1080p (not 4K) is supported through MMAL, OMX, and "stateful" V4L2 APIs.
+#Hardware H.265 (aka HEVC) decompression up to 4K/30Hz is supported through "stateless" V4L2 APIs only. (No legacy proprietary MMAL/OMX!) As of Nov 2021 this decoder needs to be enabled in Raspberry Pi OS (dtoverlay=rpivid-v4l2), but is on by default in the LibreELEC OS for the Kodi media player.
+#Kernel interfaces and especially the stateless V4L2 interfaces are not for the faint of heart. Use a friendly framework like gstreamer or ffmpeg (RPi branch) if at all possible.
+#See hello_drmprime for example code to decode H.264/H.265 (via ffmpeg using V4L2) with zero-copy display via DRM/KMS.
+dtoverlay=rpivid-v4l2
+
+# Don't have the firmware create an initial video= setting in cmdline.txt.
+# Use the kernel's default instead.
+disable_fw_kms_setup=1
+
+# Run in 64-bit mode
+arm_64bit=1
+
+# Disable compensation for displays with overscan
+disable_overscan=1
+
+# Run as fast as firmware / board allows
+arm_boost=1
+
+[cm4]
+# Enable host mode on the 2711 built-in XHCI USB controller.
+# This line should be removed if the legacy DWC2 controller is required
+# (e.g. for USB device mode) or if USB support is not required.
+otg_mode=1
+
+[cm5]
+#dtoverlay=dwc2,dr_mode=host
+#dtoverlay=w1-gpio
+
+[all]
+dtoverlay=w1-gpio,gpiopin=24
+dtoverlay=w1-gpio,gpiopin=26
