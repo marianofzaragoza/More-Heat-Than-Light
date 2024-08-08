@@ -131,7 +131,9 @@ dependencies = [
   "google",
   "protobuf",
   "numpy",
-  "pycairo"
+  "pycairo",
+  "python-osc",
+  "aalink"
   
 ]
 
