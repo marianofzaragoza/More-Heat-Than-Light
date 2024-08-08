@@ -4,7 +4,6 @@ import time
 import random
 from config import DynamicConfigIni
 
-#MAKE SURE EVERYTHING IS IN INT!!
 
 class Printer():
     def __init__(self):
@@ -304,19 +303,6 @@ class Printer():
                     #   img.putpixel((t, 0), (0, 0, 0))
                     #else:
                     #    img.putpixel((t, 0), (255, 255, 255))
-        """
-        else:
-            img.putpixel((int(a_temp)*10, 0), (0, 0, 0))
-            img.putpixel((int(b_temp)*10, 0), (0, 0, 0))
-            img.putpixel((int(a_temp)*10 + 1, 0), (0, 0, 0))
-            img.putpixel((int(a_temp)*10 - 1, 0), (0, 0, 0))
-            img.putpixel((int(b_temp)*10 + 1, 0), (0, 0, 0))  
-            img.putpixel((int(b_temp)*10 - 1, 0), (0, 0, 0))
-            img.putpixel((int(a_temp) + 273 + 1, 0), (0, 0, 0))
-            img.putpixel((int(a_temp) + 273 - 1, 0), (0, 0, 0))
-            img.putpixel((int(b_temp) + 273 + 1, 0), (0, 0, 0))  
-            img.putpixel((int(b_temp) + 273 - 1, 0), (0, 0, 0)) 
-        """
         raster = StarTSPImage.imageToRaster(img, cut=False)
         printer = open('/dev/usb/lp0', "wb")
         printer.write(raster) 
@@ -348,8 +334,6 @@ class Printer():
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, False, text_matrix, self.counter)
                 a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
                 b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
-
-
 
 
 if __name__ == "__main__":
