@@ -259,23 +259,16 @@ class Printer():
     def print_pixel_line(self, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
         img = Image.new('RGB', (576, 1), "white")
         self.write_margin_text(img, counter, text_matrix)
-        
+        #Baseline
+        img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
+        img.putpixel((int(b_temp) + 273, 0), (0, 0, 0))
+        img.putpixel((int(a_temp) + 273 + 1, 0), (0, 0, 0))
+        img.putpixel((int(a_temp) + 273 - 1, 0), (0, 0, 0))
+        img.putpixel((int(b_temp) + 273 + 1, 0), (0, 0, 0))  
+        img.putpixel((int(b_temp) + 273 - 1, 0), (0, 0, 0)) 
         if entanglement:
-            img.putpixel((int(a_temp)*10, 0), (0, 0, 0))
-            img.putpixel((int(b_temp)*10, 0), (0, 0, 0))
-            img.putpixel((int(a_temp)*10 + 1, 0), (0, 0, 0))
-            img.putpixel((int(a_temp)*10 - 1, 0), (0, 0, 0))
-            img.putpixel((int(b_temp)*10 + 1, 0), (0, 0, 0))  
-            img.putpixel((int(b_temp)*10 - 1, 0), (0, 0, 0))
-            """
-            #Base
-            img.putpixel((int(a_temp) + 273, 0), (0, 0, 0))
-            img.putpixel((int(b_temp) + 273, 0), (0, 0, 0))
-            img.putpixel((int(a_temp) + 273 + 1, 0), (0, 0, 0))
-            img.putpixel((int(a_temp) + 273 - 1, 0), (0, 0, 0))
-            img.putpixel((int(b_temp) + 273 + 1, 0), (0, 0, 0))  
-            img.putpixel((int(b_temp) + 273 - 1, 0), (0, 0, 0)) 
-        
+            #DOUBLE SLIT
+
             #FIRST LINE 
             img.putpixel((int(a_temp) + 273 + 30, 0), (0, 0, 0))
             img.putpixel((int(a_temp) + 273 + 31, 0), (0, 0, 0))
@@ -301,26 +294,17 @@ class Printer():
             img.putpixel((int(b_temp) + 273 + 120, 0), (150, 150, 150))
             img.putpixel((int(a_temp) + 273 - 120, 0), (150, 150, 150))
             img.putpixel((int(b_temp) + 273 - 120, 0), (150, 150, 150))
-            """
-            
-            
-            #for t in range (576):
-            #    if img.getpixel((t, 0)) == (255, 255, 255):
-            #        img.putpixel((t, 0), (0, 0, 0))
-            #    else:
-            #        img.putpixel((t, 0), (255, 255, 255))
-            #   #if t < min(a_temp, b_temp) or t > max(a_temp, b_temp):
-            #    #    img.putpixel((t, 0), (0, 0, 0))
+        
         elif broken_channel:
             for t in range (576):
-                #if t>min(a_temp + 273, b_temp + 273) and t<=max(a_temp + 273, b_temp + 273):
-                if t>min(a_temp*10, b_temp*10) and t<=max(a_temp*10, b_temp*10):
-                    if img.getpixel((t, 0)) == (255, 255, 255):
-                        img.putpixel((t, 0), (0, 0, 0))
-                    else:
-                        img.putpixel((t, 0), (255, 255, 255))
-                    #if t < min(a_temp, b_temp) or t > max(a_temp, b_temp):
-                    #    img.putpixel((t, 0), (0, 0, 0))
+                if t>min(a_temp + 273, b_temp + 273) and t<=max(a_temp + 273, b_temp + 273):
+                #if (min(a_temp + 273, b_temp + 273)-30)<t<min(a_temp + 273, b_temp + 273) or max(a_temp + 273, b_temp + 273)<t<(30 + max(a_temp + 273, b_temp + 273)):
+                    img.putpixel((t, 0), (0, 0, 0))
+                    #if img.getpixel((t, 0)) == (255, 255, 255):
+                    #   img.putpixel((t, 0), (0, 0, 0))
+                    #else:
+                    #    img.putpixel((t, 0), (255, 255, 255))
+        """
         else:
             img.putpixel((int(a_temp)*10, 0), (0, 0, 0))
             img.putpixel((int(b_temp)*10, 0), (0, 0, 0))
@@ -328,13 +312,11 @@ class Printer():
             img.putpixel((int(a_temp)*10 - 1, 0), (0, 0, 0))
             img.putpixel((int(b_temp)*10 + 1, 0), (0, 0, 0))  
             img.putpixel((int(b_temp)*10 - 1, 0), (0, 0, 0))
-            """
             img.putpixel((int(a_temp) + 273 + 1, 0), (0, 0, 0))
             img.putpixel((int(a_temp) + 273 - 1, 0), (0, 0, 0))
             img.putpixel((int(b_temp) + 273 + 1, 0), (0, 0, 0))  
             img.putpixel((int(b_temp) + 273 - 1, 0), (0, 0, 0)) 
-            """
-
+        """
         raster = StarTSPImage.imageToRaster(img, cut=False)
         printer = open('/dev/usb/lp0', "wb")
         printer.write(raster) 
@@ -352,20 +334,20 @@ class Printer():
         b_temp = 40
 
         text_matrix = self.text_to_matrix(self.margin_text, self.font_height_5, self.text_scale)
-        for i in range(5000):
+        while True:
             time.sleep(0.1)
             if abs(a_temp - b_temp) > 25:
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, True, text_matrix, self.counter)
-                a_temp = min(max(0, a_temp + 0.1*random.randint(-2, 2)), 50)
-                b_temp = min(max(0, b_temp + 0.1*random.randint(-2, 2)), 50)
+                a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
+                b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
             elif abs(a_temp - b_temp)<= 3:
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, True, False, text_matrix, self.counter)
-                a_temp = min(max(0, a_temp + 0.1*random.randint(-2, 2)), 50)
-                b_temp = min(max(0, b_temp + 0.1*random.randint(-2, 2)), 50)
+                a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
+                b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
             else: 
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, False, text_matrix, self.counter)
-                a_temp = min(max(0, a_temp + 0.1*random.randint(-2, 2)), 50)
-                b_temp = min(max(0, b_temp + 0.1*random.randint(-2, 2)), 50)
+                a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
+                b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
 
 
 
