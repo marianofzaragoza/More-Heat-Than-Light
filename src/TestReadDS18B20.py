@@ -38,7 +38,6 @@ class Thermometer():
     def test(self):
         #print for a minute
         for i in range(60):
-            time.sleep(1)
             temperature_out = self.read_one_temperature(self.sensor_id_out)
             temperature_radiator = self.read_one_temperature(self.sensor_id_radiator)
             temperature_avarage = self.read_total_temperature()
