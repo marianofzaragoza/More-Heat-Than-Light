@@ -4,7 +4,6 @@ import time
 import random
 from config import DynamicConfigIni
 
-
 class Printer():
     def __init__(self):
         self.config = DynamicConfigIni()

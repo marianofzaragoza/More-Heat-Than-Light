@@ -2,11 +2,15 @@ import StarTSPImage
 from PIL import Image, ImageDraw
 import time
 import random
+import os
 from config import DynamicConfigIni
+
 #from thermometer import Thermometer
 
-sensor_out_id = "28-00000f7650d5"
+sensor_out_id = "28-00000f726e9e"
 sensor_radiator_id = "28-00000f730979"
+
+
 
 def read_one_temperature(sensor_id):
     base_dir = "/sys/bus/w1/devices/"
@@ -329,7 +333,7 @@ class Printer():
 
     def check_time_and_print(self, last_print_time_stamp, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
         check_time = time.time()
-        if check_time - last_print_time_stamp > 1:
+        if check_time - last_print_time_stamp > 0:
             printer.print_pixel_line(a_temp, b_temp, entanglement, broken_channel, text_matrix, counter)
             printer.last_print_time_stamp = check_time
             self.counter = self.counter + 1
@@ -337,9 +341,9 @@ class Printer():
     def test(self):
         text_matrix = self.text_to_matrix(self.margin_text, self.font_height_5, self.text_scale)
         while True:
-            a_temp = read_one_temperature(sensor_id_out)
-            b_temp = read_one_temperature(sensor_id_radiator)
-            time.sleep(0.1)
+            time.sleep(1)
+            a_temp = read_one_temperature(sensor_out_id)
+            b_temp = read_one_temperature(sensor_radiator_id)
             if abs(a_temp - b_temp) > 25:
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, True, text_matrix, self.counter)
             elif abs(a_temp - b_temp)<= 3: #Not real
