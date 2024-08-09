@@ -8,10 +8,11 @@ print(config.DEFAULT.test)
 class Thermometer():
     def __init__(self):
         self.config = DynamicConfigIni()
-        self.nodename = self.config.DEFAULT.nodename  # Access the nodename correctly
+        self.nodename = self.config.DEFAULT.nodename  # Access the nodename
         self.weight_of_outside_thermometer = self.config.thermometer.weight_of_outside_thermometer
-        self.sensor_id_out = getattr(self.config, self.nodename).thermometer_out_id  # Access the sensor ID for the specified node
-        self.sensor_id_radiator = getattr(self.config, self.nodename).thermometer_radiator_id  # Access the sensor ID for the radiator
+        self.sensor_id_out = getattr(self.config, self.nodename).thermometer_out_id  # sensor_id of radiator
+        self.sensor_id_radiator = getattr(self.config, self.nodename).thermometer_radiator_id  # sensor_id of outside
+
 
     def read_one_temperature(self, sensor_id):
         base_dir = "/sys/bus/w1/devices/"

@@ -3,7 +3,26 @@ from PIL import Image, ImageDraw
 import time
 import random
 from config import DynamicConfigIni
+#from thermometer import Thermometer
 
+sensor_out_id = "28-00000f7650d5"
+sensor_radiator_id = "28-00000f730979"
+
+def read_one_temperature(sensor_id):
+    base_dir = "/sys/bus/w1/devices/"
+    device_folder = os.path.join(base_dir, sensor_id)
+    device_file = os.path.join(device_folder, "w1_slave")
+
+    with open(device_file, "r") as f:
+        lines = f.readlines()
+        
+    if lines[0].strip().endswith("YES"):
+        equals_pos = lines[1].find("t=")
+        if equals_pos != -1:
+            temp_string = lines[1][equals_pos + 2:]
+            temp_c = round(float(temp_string) / 1000.0, 2)
+            return temp_c
+    return None
 
 class Printer():
     def __init__(self):
@@ -310,30 +329,23 @@ class Printer():
 
     def check_time_and_print(self, last_print_time_stamp, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
         check_time = time.time()
-        if check_time - last_print_time_stamp > 0:
+        if check_time - last_print_time_stamp > 1:
             printer.print_pixel_line(a_temp, b_temp, entanglement, broken_channel, text_matrix, counter)
             printer.last_print_time_stamp = check_time
             self.counter = self.counter + 1
 
     def test(self):
-        a_temp = 20
-        b_temp = 40
-
         text_matrix = self.text_to_matrix(self.margin_text, self.font_height_5, self.text_scale)
         while True:
+            a_temp = read_one_temperature(sensor_id_out)
+            b_temp = read_one_temperature(sensor_id_radiator)
             time.sleep(0.1)
             if abs(a_temp - b_temp) > 25:
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, True, text_matrix, self.counter)
-                a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
-                b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
-            elif abs(a_temp - b_temp)<= 3:
+            elif abs(a_temp - b_temp)<= 3: #Not real
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, True, False, text_matrix, self.counter)
-                a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
-                b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
             else: 
                 self.check_time_and_print(self.last_print_time_stamp, a_temp, b_temp, False, False, text_matrix, self.counter)
-                a_temp = min(max(0, a_temp + random.randint(-2, 2)), 50)
-                b_temp = min(max(0, b_temp + random.randint(-2, 2)), 50)
 
 
 if __name__ == "__main__":
