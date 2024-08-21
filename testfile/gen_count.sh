@@ -24,7 +24,6 @@ ffmpeg  -r 30 -t 5\
   " -f $TYPE broken_channel.$EXT
 
 
-exit 0
 
 
 for node in a b
