@@ -20,6 +20,9 @@ class Playlist():
             'test3.mp4',
             'test4.mp4',
             'test5.mp4',
+            '../quality/HD\ PRORESS.mov',
+            '../quality/NINJA_S001_S001_T114.mxf',
+            '../quality/4k-prores.mov',
             ]
 
     def __init__(self, testing, node, vdir):
