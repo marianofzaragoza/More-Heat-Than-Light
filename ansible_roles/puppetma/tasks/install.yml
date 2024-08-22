@@ -1,0 +1,10 @@
+- name: Install puppet packages
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - puppet
+      - git
+
+

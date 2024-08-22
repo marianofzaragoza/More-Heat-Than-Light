@@ -133,7 +133,8 @@ dependencies = [
   "numpy",
   "pycairo",
   "python-osc",
-  "aalink"
+  "aalink",
+  "gst"
   
 ]
 

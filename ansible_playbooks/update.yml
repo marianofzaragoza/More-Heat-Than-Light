@@ -1,0 +1,22 @@
+---
+  - hosts: all
+    remote_user: user
+    tasks:
+      - command:
+          chdir: "/home/user/src/More-Heat-Than-Light/"
+          cmd: "git pull"
+        become: true
+        become_user: "user"
+ 
+      - command:
+          chdir: "/home/user/src/More-Heat-Than-Light/"
+          cmd: "git push"
+        become: true
+        become_user: "user"
+ 
+      - command:
+          chdir: "/home/user/src/More-Heat-Than-Light/"
+          cmd: "./up.sh"
+        become: true
+        become_user: "user"
+          

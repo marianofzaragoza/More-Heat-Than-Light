@@ -25,3 +25,6 @@
 * time sync protocol (ntp or ptp)
 * sync communnication on ableton live sync
 * logfile to recreate the printout (avideo#, bvideo#, atemp, btemp, state )
+* triggering scenes in ableton
+* logging / graphing temperatures and videos
+* weird resolution / aspect ratio

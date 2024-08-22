@@ -1,3 +1,10 @@
+'''
+
+sync printer with ableton, or other things with https://github.com/rncbc/jack_link
+
+'''
+
+
 import asyncio
 from PIL import Image, ImageDraw
 from aalink import Link
@@ -11,7 +18,11 @@ async def main():
     await asyncio.sleep(0.5)
 
     link.enabled = True
+    '''
+    In order to enable the desired bar and loop alignment, an application provides a quantum value to Link that specifies, in beats, the desired unit of phase synchronization. Link guarantees that session participants with the same quantum value will be phase aligned, meaning that if two participants have a 4 beat quantum, beat 3 on one participant’s timeline could correspond to beat 11 on another’s, but not beat 12. It also guarantees the expected relationship between sessions in which one participant has a multiple of another’s quantum. So if one app has an 8-beat loop with a quantum of 8 and another has a 4-beat loop with a quantum of 4, then the beginning of an 8-beat loop will always correspond to the beginning of a 4-beat loop, whereas a 4-beat loop may align with the beginning or the middle of an 8-beat loop.
+    '''
     #link.quantum = 4
+    
     print(dir(link))
  
     while True:

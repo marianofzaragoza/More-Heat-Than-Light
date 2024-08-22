@@ -1,0 +1,28 @@
+---
+
+- include_tasks: install.yml
+
+- name: clone puppet code
+  git:
+    repo: "{{ puppet_code_repo }}"
+    depth: 1
+    #  gpg_whitelist: []
+    #  verify_commit: yes
+    recursive: yes
+    track_submodules: no
+    version: "{{ puppet_code_branch }}"
+    dest: /etc/puppet/code
+    force: True
+  when: "manage_puppet_code | default(False)"
+  #when: False
+
+    #- include_tasks: hiera.yml
+    #when: "enable_puppet | default(False)"
+
+- name: "Running puppet for host"
+  command:
+    chdir: /etc/puppet/code/
+    argv:
+      - ./update_and_apply.sh
+
+

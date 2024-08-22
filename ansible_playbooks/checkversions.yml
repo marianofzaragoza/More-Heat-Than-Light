@@ -1,0 +1,12 @@
+---
+  - hosts: all
+    tasks:
+      - name: check for versions installed
+        register: installed_version
+        command: "{{item}}"
+        with_items:
+          - /usr/bin/python3 --version
+        ignore_errors: true
+      - debug:
+          var: installed_version.results[0].stdout
+

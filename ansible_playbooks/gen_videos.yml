@@ -1,0 +1,10 @@
+---
+  - hosts: all
+    remote_user: user
+    tasks:
+      - command:
+          chdir: "/home/user/src/More-Heat-Than-Light/testfile"
+          cmd: "./gen_count.sh"
+        become: true
+        become_user: "user"
+

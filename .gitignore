@@ -9,3 +9,7 @@ src/old
 debug
 *.mxf
 *.crdownload
+keys
+video
+*.zip
+*.log

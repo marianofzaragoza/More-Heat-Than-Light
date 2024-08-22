@@ -26,13 +26,23 @@ from netifaces import interfaces, ifaddresses, AF_INET
 from mcast import Mcast  
 from collections import deque
 import moreheat_pb2
+from thermometer import Thermometer
+from config import DynamicConfigIni
 
 class Tempsender():
     def __init__(self):
-        self.testtemp = 21.9
+
+        self.confla = DynamicConfigIni()
+        self.nodename = self.confla.DEFAULT.nodename  # Access the nodename
+ 
+        if self.nodename == 'alice' or self.nodename == 'bob':
+            self.thermometer = Thermometer()
+        else:
+            self.thermometer = Thermometer(testing=True)
+
         # incoming messages (whatever is in the udp packet)
         self.rxqueue = deque([])
-
+        
         # outgoing messages for app (python dict with values)
         self.appqueue = deque([])
         self.socket = Mcast()
@@ -143,7 +153,7 @@ if __name__ == "__main__":
         count = 0
         while True:
             #print('testing')         
-            msg =  "counting: " + str(count)
+            msg =  "temp: " + str(ts.thermometer.read_total_temperature())
 
             ts.socket.send(msg.encode(encoding='utf-8'))
             count += 1

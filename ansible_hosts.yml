@@ -1,0 +1,24 @@
+---
+
+all: # keys must be unique, i.e. only one 'hosts' per group
+    hosts:
+      alice:
+        ansible_host: 10.147.18.197  
+      alice-vid:
+        ansible_host: 10.147.18.205  
+      bob:
+        ansible_host: 10.147.18.60
+      bob-vid:
+        ansible_host: 10.147.18.4
+        ansible_user: root
+        host_var: hallo
+      carol:
+        ansible_host: 10.147.18.208
+
+        test1:
+        test2:
+            host_var: value
+    vars:
+        group_all_var: value
+        ansible_user: root
+    

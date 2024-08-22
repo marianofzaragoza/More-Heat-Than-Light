@@ -29,7 +29,9 @@ class Playlist():
         self.max=len(self.playlist) - 1
         self.a_temp = 0
         self.b_temp = 0
-
+        if testing:
+            self.videodir = "testfile"
+ 
     def update_a_temp(self, temp):
         self.a_temp = temp
 
@@ -43,6 +45,7 @@ class Playlist():
             if self.count > self.max:
                 self.count = 0
             filepath = self.playlist[self.count]
+            print("next: " + os.path.realpath(self.videodir + '/' + filepath))
             return os.path.realpath(self.videodir + '/' + filepath)
         else:
             video_path, entanglement, broken_channel = self.next_video( self.a_temp, self.b_temp)

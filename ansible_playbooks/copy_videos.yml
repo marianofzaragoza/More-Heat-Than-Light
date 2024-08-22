@@ -1,0 +1,11 @@
+---
+  - hosts: all
+    remote_user: user
+    tasks:
+      - name: Copy videos
+        ansible.builtin.copy:
+          src: /home/user/src/More-Heat-Than-Light/video/
+          dest: /home/user/src/More-Heat-Than-Light/video/
+          owner: user
+          group: user
+          mode: '0644'
