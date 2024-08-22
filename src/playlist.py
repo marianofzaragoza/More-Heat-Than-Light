@@ -1,5 +1,7 @@
 import os
 import random
+from config import DynamicConfigIni
+
 
 class Playlist():
     videodir = 'testfile/'
@@ -21,16 +23,21 @@ class Playlist():
             ]
 
     def __init__(self, testing, node, vdir):
-        self.testing=testing
-        self.nodename=node
-        self.videodir=vdir
-        self.videoext="mp4"
+
+        self.conf = DynamicConfigIni()
+        self.nodename = self.conf.DEFAULT.nodename
+        self.videodir = self.conf.playlist.videodir
+
+        self.testing = self.conf.playlist.testing 
+        self.videoext = self.conf.playlist.videoext 
+
         self.count=0
         self.max=len(self.playlist) - 1
         self.a_temp = 0
         self.b_temp = 0
         if testing:
-            self.videodir = "testfile"
+            self.videodir = self.conf.playlist.videodir_testing
+
  
     def update_a_temp(self, temp):
         self.a_temp = temp
