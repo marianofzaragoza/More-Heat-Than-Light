@@ -13,7 +13,7 @@ sudo apt install -y  dh-exec dh-python fonts-font-awesome fonts-lato libblkid-de
 
 
 
-sudo apt install -y gstreamer1.0-tools gstreamer1.0-plugins-base-apps gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-alsa   gstreamer1.0-gl gstreamer1.0-gl-dbgsym gstreamer1.0-gtk3 gstreamer1.0-gtk3-dbgsym libgraphene-1.0-0
+sudo apt install -y gstreamer1.0-tools gstreamer1.0-plugins-base-apps gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-alsa   gstreamer1.0-gl gstreamer1.0-gtk3 libgraphene-1.0-0
 sudo apt install vlc -y
 
 sudo usermod -aG lp user
