@@ -16,13 +16,17 @@ class Playlist():
             
     playlist = [
             'test1.mp4',
+            '../quality/HD\ PRORESS.mov',
             'test2.mp4',
+            '../quality/HD\ PRORESS.mov',
+            #'../quality/NINJA_S001_S001_T114.mxf',
             'test3.mp4',
+            '../quality/HD\ PRORESS.mov',
+            #'../quality/4k-prores.mov',
             'test4.mp4',
+            '../quality/HD\ PRORESS.mov',
             'test5.mp4',
             '../quality/HD\ PRORESS.mov',
-            '../quality/NINJA_S001_S001_T114.mxf',
-            '../quality/4k-prores.mov',
             ]
 
     def __init__(self, testing, node, vdir):
