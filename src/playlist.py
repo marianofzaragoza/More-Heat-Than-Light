@@ -13,7 +13,7 @@ class Playlist():
         '3840x2160_1.mp4',
         '3840x2160_2.mp4',
             ]
-            
+    interruptfilepath = '../quality/NINJA_S001_S001_T114.mxf'  
     playlist = [
             'test1.mp4',
             '../quality/HD PRORESS.mov',
@@ -53,8 +53,10 @@ class Playlist():
         self.b_temp = temp
 
 
-    def next(self):
+    def next(self, interrupt=False):
         if self.testing:
+            if interrupt:
+                return os.path.realpath(self.videodir + '/' + self.interruptfilepath)
             self.count += 1
             if self.count > self.max:
                 self.count = 0

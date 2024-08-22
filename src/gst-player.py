@@ -250,7 +250,7 @@ class Player(Gtk.Window):
 
     def start(self):
         #print('called: start()')
-        self.interrupt_next()
+        self.interrupt_next(start=True)
    
     def pl_set_state(self,state):
         GLib.idle_add(lambda: self.pipeline.set_state(state))
@@ -259,27 +259,31 @@ class Player(Gtk.Window):
         self.pipeline.set_state(Gst.State.PLAYING)
 
     def th_test(self):
-        time.sleep(random.randint(3,20))
+        time.sleep(random.randint(3,9))
         while True:
+            time.sleep(random.randint(20,300))
             print("interrupting.............")
-
             self.interrupt_next()
-            time.sleep(random.uniform(1,20))
         #Glib.idle_add(lambda: self.th_test())
         #Glib.timeout_add(300, lambda: self.th_test())
  
-    def interrupt_next(self):
+    def interrupt_next(self, start=False):
         #print('called: interrupt_next()')
 
         # gstreamer stuff needs to be called from main thread, but this function can be called from any
-        GLib.idle_add(lambda: self.mt_interrupt_next())
+        GLib.idle_add(lambda: self.mt_interrupt_next(start=start))
 
 
 
-    def mt_interrupt_next(self):
+    def mt_interrupt_next(self, start=False):
         #print('called: MT_interrupt_next()')
         self.pipeline.set_state(Gst.State.NULL)
-        nextfile = self.playlist.next()
+        
+        if start:
+            nextfile = self.playlist.next(interrupt=False)
+        else: 
+            nextfile = self.playlist.next(interrupt=True)
+        
         self.playbin.set_property("uri", "file://" + nextfile) 
         self.pipeline.set_state(Gst.State.PLAYING)
 
@@ -370,7 +374,7 @@ class Player(Gtk.Window):
 
     def on_eos(self, bus, msg):
         print("EOS")
-        self.interrupt_next()
+        #self.interrupt_next()
 
     def on_about_to_finish(self,*args):
         self.next()
