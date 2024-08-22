@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #
-
+sudo usermod -aG lp user
 sudo apt install -y vim git cmake libgirepository1.0-dev   gir1.2-gst-plugins-bad-1.0 gir1.2-gst-plugins-base-1.0 gir1.2-gst-rtsp-server-1.0 gir1.2-gstreamer-1.0 libgstrtspserver-1.0-0
 
 sudo apt install -y screen tshark tcpdump protobuf-compiler
