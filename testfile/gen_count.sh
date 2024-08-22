@@ -3,14 +3,14 @@ set -eux
 TYPE='mpegts'
 EXT='ts'
 
-ffmpeg  -r 30 -t 5 \
+ffmpeg -y -r 30 -t 5 \
       -f lavfi -i "
     color=white:1920x1080:d=5,
   format=rgb24,
   trim=end=30,
   drawtext=fontcolor=black:fontsize=60:text=\'entanglement seconds: %{eif\:t\:d}\':x=(w-text_w)/2:y=(h-text_h)/2" -f $TYPE entanglement.$EXT
 
-ffmpeg  -r 30 -t 5\
+ffmpeg -y -r 30 -t 5\
       -f lavfi -i "
     color=white:1920x1080:d=5,
   format=rgb24,
@@ -24,7 +24,6 @@ ffmpeg  -r 30 -t 5\
   " -f $TYPE broken_channel.$EXT
 
 
-exit 0
 
 
 for node in a b
@@ -39,7 +38,7 @@ do
  
     fname="testfile_${node}_${ca}_${i}.mp4"     
     echo $fname
-      ffmpeg  -r 30 -t 5\
+      ffmpeg -y  -r 30 -t 5\
         -f lavfi -i "
 
       color=white:1920x1080:d=5,

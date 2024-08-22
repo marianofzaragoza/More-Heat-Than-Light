@@ -14,7 +14,7 @@ import StarTSPImage
 async def main():
     loop = asyncio.get_running_loop()
 
-    link = Link(220, loop)
+    link = Link(60, loop)
     await asyncio.sleep(0.5)
 
     link.enabled = True
@@ -26,7 +26,7 @@ async def main():
     print(dir(link))
  
     while True:
-        await link.sync(2)
+        await link.sync(3)
         print('bang!')
         #time.sleep(0)
         img = Image.new('RGB', (576, 1), "white")
