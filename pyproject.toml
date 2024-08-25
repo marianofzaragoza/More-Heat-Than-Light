@@ -134,7 +134,16 @@ dependencies = [
   "pycairo",
   "python-osc",
   "aalink",
-  "gst"
+  "gst",
+  "matplotlib",
+  "aiosqlite",
+  "mpld3",
+  "ipykernel",
+  "jupyter",
+  "pandas",
+  "bqplot",
+  "ibis-framework[duckdb,examples]",
+
   
 ]
 
