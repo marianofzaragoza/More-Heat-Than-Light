@@ -74,22 +74,26 @@ class Thermometer():
         else:
             step = self.tempstep
             if self.last_temp_outside > 30:
-                self.last_temp_outside = self.last_temp_outside + random.uniform(-step, step)
+                self.last_temp_outside = self.last_temp_outside + random.uniform(-step, 0)
             elif self.last_temp_outside < -10:
                 self.last_temp_outside = self.last_temp_outside + random.uniform(0, step) 
             else:
                 self.last_temp_outside = self.last_temp_outside + random.uniform(-step, step)
              
-            if self.last_temp_radiator > 30:
-                self.last_temp_radiator = self.last_temp_radiator + random.uniform(-step, step)
-            elif self.last_temp_radiator < -10:
+            if self.last_temp_radiator > 80:
+                self.last_temp_radiator = self.last_temp_radiator + random.uniform(-step, 0)
+            elif self.last_temp_radiator <  20:
                 self.last_temp_radiator = self.last_temp_radiator + random.uniform(0, step) 
             else:
                 self.last_temp_radiator = self.last_temp_radiator + random.uniform(-step, step)
-            
+ 
+        
 
+        #self.log.warning("too high" + str(-step) + ' ' + str(step) + ' ' + str(random.uniform( -1, 1)))
+        self.log.warning("temps: " + str(self.last_temp_outside) + ' ' + str(self.last_temp_radiator) + ' ' + str(round((self.last_temp_outside + self.last_temp_radiator) / 2)))
+           
             #self.last_temp_radiator = self.last_temp_outside + random.uniform(-2.0, 2.0)
-        return round(self.last_temp_outside + self.last_temp_radiator, 2)
+        return round((self.last_temp_outside + self.last_temp_radiator) / 2)
 
     def test(self):
         #print for a minute

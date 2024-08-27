@@ -17,6 +17,7 @@ import gi
 gi.require_version('Gst', '1.0')
 import cairo
 from gi.repository import GLib, GObject, Gst, Gtk, GstNet
+from aalink import Link
 
 #
 # https://github.com/patrickkidd/pksampler/blob/master/pk/gst/gstsample.py
@@ -38,6 +39,11 @@ import time
 from playlist import Playlist
 from tempsender import Tempsender, TempSource
 
+from config import DynamicConfigIni
+import logging
+import mhlog 
+
+import asyncio
 
 class PlayerUi(Gtk.Window):
    
@@ -77,9 +83,10 @@ class PlayerUi(Gtk.Window):
         context.stroke()
     
     def on_fps_measurements(self, element, fps, droprate, avg, videosink):
-        caps = videosink.get_static_pad('sink').get_current_caps()
-        print('fps: {:.2f} avg: {:.2f} droprate: {:.2f} caps: {}'.format(fps, avg, droprate, caps))
-        self.print_caps(caps)
+        self.log.info("fps: ", str(fps) + "droprate: " + str(droprate))
+        #caps = videosink.get_static_pad('sink').get_current_caps()
+        #print('fps: {:.2f} avg: {:.2f} droprate: {:.2f} caps: {}'.format(fps, avg, droprate, caps))
+        #self.print_caps(caps)
 
     def print_field(self, field, value, pfx):
         str = Gst.value_serialize(value)
@@ -232,6 +239,20 @@ class PlayerUi(Gtk.Window):
 
 
     def __init__(self):
+        self.config = DynamicConfigIni()
+        self.nodename = self.config.DEFAULT.nodename  # Access the nodename
+
+        logging.setLoggerClass(mhlog.Logger)
+        self.log = mhlog.getLog("playerui", self)
+        self.log.setLevel(logging.WARN)
+ 
+        self.notemp = False
+        #debug
+        if not self.notemp:
+            self.tempsender = Tempsender()
+
+
+
         GObject.threads_init()
         self.init_gui()
         t = threading.Thread(target=self.th_test)
@@ -239,11 +260,6 @@ class PlayerUi(Gtk.Window):
         t.start()
 
         
-        self.notemp = True
-        #debug
-        if not self.notemp:
-            self.tempsender = Tempsender()
-
         self.playlist = Playlist(True, 'A', 'videos')
         
         self.init_gst()
@@ -258,12 +274,55 @@ class PlayerUi(Gtk.Window):
     def state_change(self,state):
         self.pipeline.set_state(Gst.State.PLAYING)
 
-    def th_test(self):
-        time.sleep(random.randint(3,9))
+    # this is where we compare state, and 
+    async def beat_test(self):
+        loop = asyncio.get_running_loop()
+
+        link = Link(int(self.config.sync.bpm), loop)
+        link.quantum = int(self.config.sync.quantum) 
+        link.enabled = True
+
+        #async def sequence(name):
+        #    for i in range(4):
+        #        await link.sync(1)
+        #        self.log.critical('bang! ' + name)
         while True:
-            time.sleep(random.randint(20,300))
-            print("interrupting.............")
-            self.interrupt_next()
+            beatno = await link.sync(float(self.config.sync.syncbeat), float(self.config.sync.offset))
+            print('last from debian: ' + str(self.tempsender.get_stats("debian", "temperature", "last")))
+            print('last from alice: ' + str(self.tempsender.get_stats("alice", "temperature", "last")))
+            print(beatno % int(self.config.sync.modulo))
+
+            bm = beatno % int(self.config.sync.modulo)
+            #check
+            if bm == 1:
+                self.log.warning("check  ")
+
+            #send
+            if bm == 2:
+                self.log.warning("send  ")
+
+            #receive
+            if bm == 3:
+                self.log.warning("receive ")
+
+            #play
+            if bm == 4:
+                self.log.warning("interrupting.............")
+
+                self.interrupt_next()
+
+            self.log.critical('bang! ' + str(beatno))
+
+
+
+    def th_test(self):
+        #time.sleep(random.randint(3,9))
+        self.log.critical("hello from th_test")
+        asyncio.run(self.beat_test())
+        #while True:
+        #    time.sleep(random.randint(20,300))
+        #    self.log.warning("interrupting.............")
+        #    self.interrupt_next()
         #Glib.idle_add(lambda: self.th_test())
         #Glib.timeout_add(300, lambda: self.th_test())
  
@@ -293,7 +352,7 @@ class PlayerUi(Gtk.Window):
     def next(self):
         #print('called: next()')
         nextfile = self.playlist.next()
-        print('next() nextfile: ' + nextfile)
+        self.log.warning('next() nextfile: ' + nextfile)
         self.playbin.set_property("uri", "file://" + nextfile) 
         return True
 
@@ -309,10 +368,14 @@ class PlayerUi(Gtk.Window):
       #  GLib.timeout_add(1000, self.update)
 
     def onnetmessage(self):
+         atemp = self.tempsender.get_stats(self.config.playlist.tempa_node , "temperature", "last")
+         btemp = self.tempsender.get_stats(self.config.playlist.tempb_node , "temperature", "last")
+         self.text_tempa.set_label(str(atemp))
+         self.text_tempb.set_label(str(btemp))
 
-        while (msg := self.tempsender.retrieve_one()) is not None: 
-            print('got message from net: ' + msg)
-            self.text_tempa.set_label(msg)
+        #while (msg := self.tempsender.retrieve_one()) is not None: 
+        #    print('got message from net: ' + msg)
+        #    self.text_tempa.set_label(msg)
 
 
     def run(self):
@@ -370,7 +433,7 @@ class PlayerUi(Gtk.Window):
             #print('appmsg: ' + str(structn) + ' v: ' + str(structv))
                 #overlay.set_property('text', struct['text'])
             #overlay.set_property('text','asdfasdf')
-
+##
 
     def on_eos(self, bus, msg):
         print("EOS")

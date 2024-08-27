@@ -1,6 +1,6 @@
 * video play related to temperature
 * video sync
-* multicast protocol
+* DONE multicast protocol
 * sound player
 * reliability / boot
 * network
@@ -28,3 +28,4 @@
 * triggering scenes in ableton
 * logging / graphing temperatures and videos
 * weird resolution / aspect ratio
+* updaterate temperature in video player

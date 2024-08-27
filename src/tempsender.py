@@ -58,7 +58,7 @@ class Tempsender():
         # incoming messages (whatever is in the udp packet)
         self.rxqueue = deque([])
         
-        # outgoing messages for app (python dict with values)
+        # outgoing messages for app (python dict with values), not used atm. is for logging all messages eventually
         if self.enable_appqueue:
             self.appqueue = deque([])
 
@@ -70,7 +70,9 @@ class Tempsender():
             self.stats[node] = dict()
         if mtype not in self.stats[node]:
             self.stats[node][mtype] = dict()
- 
+        
+        #TODO: check here if we have to switch states
+
         self.stats[node][mtype]["last"] = value
 
     def get_stats(self, node, mtype, stype):
@@ -79,7 +81,7 @@ class Tempsender():
             try:
                 return self.stats[node][mtype][stype]
             except KeyError:
-                self.log.warning("no STATS for: " + node + ' ' + mtype)
+                self.log.info("no STATS for: " + node + ' ' + mtype)
                 return 232323
         else:
             return 232323
@@ -101,21 +103,28 @@ class Tempsender():
             return None
 
     def process_messages(self):
-        ql = len(self.rxqueue)
-        while ql > 0:
-            try:
-                msg = self.rxqueue.popleft()
-                # decode, update temperature, reject broken, keep stats
-                decoded = moreheat_pb2.MhMessage()
-                decoded.ParseFromString(msg)
-                #msglen = len(msg)
-                self.update_stats(decoded.source, decoded.type, decoded.value)
+        #ql = len(self.rxqueue)
+        self.log.debug("quelenght in process_messages" + str(len(self.rxqueue)))
+        while len(self.rxqueue) > 1:
+            #try:
+            #if True:
+            #self.log.critical("quel before" + str(len(self.rxqueue)))
 
-                self.log.debug(str(decoded.source) + ' ' + str(decoded.type) + ' ' + str(decoded.value))
-                if self.enable_appqueue: 
-                    self.appqueue.append(decoded.value)
-            except IndexError:
-                return True
+            msg = self.rxqueue.popleft()
+            #self.log.critical("quel after" + str(len(self.rxqueue)))
+
+            # decode, update temperature, reject broken, keep stats
+            decoded = moreheat_pb2.MhMessage()
+            decoded.ParseFromString(msg)
+            #msglen = len(msg)
+            self.update_stats(decoded.source, decoded.type, decoded.value)
+
+            self.log.debug(str(decoded.source) + ' ' + str(decoded.type) + ' ' + str(decoded.value))
+            if self.enable_appqueue: 
+                self.appqueue.append(decoded.value)
+            #except IndexError:
+            #    self.log.critical("indexerror in process_messages")
+            #    return True
         
     def send_temp(self):
         msg = moreheat_pb2.MhMessage()
@@ -210,7 +219,7 @@ if __name__ == "__main__":
             #print('adsf')
             #ts.socket.send(b"hello2")
             #ts.socket.recv()
-            #time.sleep(0.5)
+            time.sleep(0.5)
 
 
 
