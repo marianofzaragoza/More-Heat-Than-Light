@@ -1,12 +1,30 @@
 from config import DynamicConfigIni
+import logging
+import mhlog
 import os
 import time
 import random
-config = DynamicConfigIni()
-print(config.DEFAULT.test)
+import mhlog
+
 
 class Thermometer():
     def __init__(self, testing=False):
+
+        logging.setLoggerClass(mhlog.Logger)
+        self.log = mhlog.getLog("thermomether", self)
+
+        assert isinstance(self.log, mhlog.Logger)
+        self.log.setLevel(logging.INFO)
+        
+        self.log.debug('hello debug')
+        self.log.info('hello info')
+        self.log.warning('hello warning')
+        self.log.error('hello error')
+        self.log.critical('hello critical')
+        
+
+
+
         self.testing = testing
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
@@ -16,9 +34,15 @@ class Thermometer():
         self.tick = 0
 
         self.weight_of_outside_thermometer = self.config.thermometer.weight_of_outside_thermometer 
+        
+        if not testing:
+            self.sensor_id_out = getattr(self.config, self.nodename).thermometer_out_id  # sensor_id of radiator
+            self.sensor_id_radiator = getattr(self.config, self.nodename).thermometer_radiator_id  # sensor_id of outside
+        else:
+            self.sensor_id_out = False
+            self.sensor_id_radiator = False
 
-        self.sensor_id_out = getattr(self.config, self.nodename).thermometer_out_id  # sensor_id of radiator
-        self.sensor_id_radiator = getattr(self.config, self.nodename).thermometer_radiator_id  # sensor_id of outside
+
 
     def gen_test_temperature(self):
         return 23.0
@@ -73,9 +97,9 @@ class Thermometer():
             temperature_out = self.read_one_temperature(self.sensor_id_out)
             temperature_radiator = self.read_one_temperature(self.sensor_id_radiator)
             temperature_avarage = self.read_total_temperature()
-            print(f"OUT:{temperature_out}")
-            print(f"RADIATOR:{temperature_radiator}")
-            print(f"WEIGHTED AVARAGE:{temperature_avarage}")
+            self.log.debug(f"OUT:{temperature_out}")
+            self.log.debug(f"RADIATOR:{temperature_radiator}")
+            self.log.debug(f"WEIGHTED AVARAGE:{temperature_avarage}")
 
 
 if __name__ == "__main__":

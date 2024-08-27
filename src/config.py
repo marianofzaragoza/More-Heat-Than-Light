@@ -1,6 +1,8 @@
 import configparser
-
+import socket
 import os
+import logging
+import mhlog
 
 class DynamicConfig:
     def __init__(self, conf):
@@ -15,12 +17,17 @@ class DynamicConfigIni:
     def __init__(self):
         #if not isinstance(conf, configparser.ConfigParser):
         #    raise TypeError(f'ConfigParser expected, found {type(conf).__name__}')
-        cwd = os.getcwd()
-        print(cwd)
+
+        logging.setLoggerClass(mhlog.Logger)
+        self.log = mhlog.getLog("config", self)
+
+        #cwd = os.getcwd()
+        #print(cwd)
         conf = configparser.ConfigParser()
 
         conf.read('moreheat.ini')
 
+        conf['DEFAULT']['nodename'] = socket.gethostname()
         #print(config.sections())
         #print(config['DEFAULT']['alice_outdoorweight'])
         #print(config['DEFAULT']['bob_outdoorweight'])
@@ -36,7 +43,9 @@ class DynamicConfigIni:
 
         #print('server:', config.server.host, config.server.port, config.server.timeout)
         #print('user:', config.user.username, config.user.level)
-
+        #print(conf["DEFAULT"]['nodename'])
         self._raw = conf
         for key, value in self._raw.items():
+        #    for v in value.items():
+        #        print("conf: " + key + " " +str(value) + " " + str(v))
             setattr(self, key, DynamicConfig(dict(value.items())))

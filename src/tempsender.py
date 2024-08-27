@@ -28,26 +28,62 @@ from collections import deque
 import moreheat_pb2
 from thermometer import Thermometer
 from config import DynamicConfigIni
+import logging
+import mhlog 
 
+'''
+* encodeds / decodes temp messages
+* sends receives udp messages with temperatures
+* keeps track of last termperature received
+'''
 class Tempsender():
-    def __init__(self):
-
-        self.confla = DynamicConfigIni()
-        self.nodename = self.confla.DEFAULT.nodename  # Access the nodename
+    def __init__(self, enable_appqueue=False):
+        self.enable_appqueue=enable_appqueue
+        logging.setLoggerClass(mhlog.Logger)
+        self.log = mhlog.getLog("tempsender", self)
+        self.log.setLevel(logging.WARN)
+ 
+        self.config = DynamicConfigIni()
+        self.nodename = self.config.DEFAULT.nodename  # Access the nodename
  
         if self.nodename == 'alice' or self.nodename == 'bob':
             self.thermometer = Thermometer()
         else:
             self.thermometer = Thermometer(testing=True)
 
+        # stats (last / avg)
+        # [node].type.value
+        self.stats = dict()
+    
         # incoming messages (whatever is in the udp packet)
         self.rxqueue = deque([])
         
         # outgoing messages for app (python dict with values)
-        self.appqueue = deque([])
+        if self.enable_appqueue:
+            self.appqueue = deque([])
+
         self.socket = Mcast()
-        print(self.socket)
         #self.socket.send(b'test')
+
+    def update_stats(self, node, mtype, value):
+        if node not in self.stats:
+            self.stats[node] = dict()
+        if mtype not in self.stats[node]:
+            self.stats[node][mtype] = dict()
+ 
+        self.stats[node][mtype]["last"] = value
+
+    def get_stats(self, node, mtype, stype):
+        self.process_messages()
+        if stype == "last":
+            try:
+                return self.stats[node][mtype][stype]
+            except KeyError:
+                self.log.warning("no STATS for: " + node + ' ' + mtype)
+                return 232323
+        else:
+            return 232323
+
 
     def poll(self):
         gotdata = False
@@ -70,33 +106,36 @@ class Tempsender():
             try:
                 msg = self.rxqueue.popleft()
                 # decode, update temperature, reject broken, keep stats
-                #msglen = len(msg.SerializeToString())
-                #print("length bits: " + str(msglen * 8))
-                #self.appqueue.append(msg.temperature)
-                print(str(msg))
+                decoded = moreheat_pb2.MhMessage()
+                decoded.ParseFromString(msg)
+                #msglen = len(msg)
+                self.update_stats(decoded.source, decoded.type, decoded.value)
+
+                self.log.debug(str(decoded.source) + ' ' + str(decoded.type) + ' ' + str(decoded.value))
+                if self.enable_appqueue: 
+                    self.appqueue.append(decoded.value)
             except IndexError:
                 return True
         
-
-
-    def get_last_temperature(self):
-        self.process_messages()
-
-        return temperature
-
     def send_temp(self):
-        msg = moreheat_pb2.Temperature()
-        msg.source = "alice"
-        self.testtemp = random_walk(self.testtemp)
-        msg.temperature = self.testtemp
-        ts.socket.send(msg.encode(encoding='utf-8'))
+        msg = moreheat_pb2.MhMessage()
+        msg.source = self.nodename
+        msg.type = "temperature"
+        msg.value = self.thermometer.read_total_temperature()
+
+        msglen = len(msg.SerializeToString())
+        self.log.debug("length bits: " + str(msglen * 8))
+        
+        self.log.debug(msg.SerializeToString())
+
+        ts.socket.send(msg.SerializeToString())
  
     def random_walk(y):
         # put some stuff here to make it stay within normal range
         y += np.random.normal(scale=1)
         return y
 
-
+# glib socketsource
 class TempSource(GLib.Source):
     def __init__(self, tempsender, callback):
         self.tempsender = tempsender
@@ -131,37 +170,47 @@ class TempSource(GLib.Source):
 
 
 if __name__ == "__main__":
-    print("testing tempsender")
      
-    ts = Tempsender()
+    aq = False
+    ts = Tempsender(enable_appqueue=aq)
 
-    print(sys.argv)
+    ts.log.info("testing tempsender" + str(sys.argv))
     time.sleep(1)
     if len(sys.argv) > 1 and sys.argv[1] == "recv":
 
         while True:
-            #print('receiving')
+            #ts.log.debug('receiving')
+            ts.poll()
             #data = ts.socket.recv()
             #while data is not None:
             # read until empty
-            while (data := ts.socket.recv()) is not None:
-                print('received: ' + str(data))
-            print('socket empty')
-            time.sleep(10)
+
+            # test appqueue
+            if aq:
+                while (data := ts.retrieve_one()) is not None:
+                    ts.log.info('received: ' + str(data))
+            
+    
+            print('last from debian: ' + str(ts.get_stats("debian", "temperature", "last")))
+            print('last from alice: ' + str(ts.get_stats("alice", "temperature", "last")))
+
+
+            #ts.log.debug('socket empty')
+            time.sleep(1)
 
     else:
         count = 0
         while True:
             #print('testing')         
-            msg =  "temp: " + str(ts.thermometer.read_total_temperature())
-
-            ts.socket.send(msg.encode(encoding='utf-8'))
+            #msg =  "temp: " + str(ts.thermometer.read_total_temperature())
+            ts.send_temp()
+            #ts.socket.send(msg.encode(encoding='utf-8'))
             count += 1
             #ts.socket.recv()
             #print('adsf')
             #ts.socket.send(b"hello2")
             #ts.socket.recv()
-            time.sleep(0.5)
+            #time.sleep(0.5)
 
 
 

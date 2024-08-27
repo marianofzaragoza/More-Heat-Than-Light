@@ -39,7 +39,7 @@ from playlist import Playlist
 from tempsender import Tempsender, TempSource
 
 
-class Player(Gtk.Window):
+class PlayerUi(Gtk.Window):
    
     def init_gui(self):
         Gtk.Window.__init__(self, title="More Heat Than Light")
@@ -386,5 +386,5 @@ class Player(Gtk.Window):
         print("probe blocked")
         return True
 
-p = Player()
+p = PlayerUi()
 p.run()

@@ -2,7 +2,9 @@ syntax = "proto2";
 
 package moreheat;
 
-message Temperature {
-  optional string source = 1;
-  optional int32 temperature = 2;
+message MhMessage {
+  required string source = 1;
+  required string type = 2;
+  required float value = 3;
 }
+

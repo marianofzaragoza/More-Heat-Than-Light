@@ -13,13 +13,13 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emoreheat.proto\x12\x08moreheat\"2\n\x0bTemperature\x12\x0e\n\x06source\x18\x01 \x01(\t\x12\x13\n\x0btemperature\x18\x02 \x01(\x05')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emoreheat.proto\x12\x08moreheat\"8\n\tMhMessage\x12\x0e\n\x06source\x18\x01 \x02(\t\x12\x0c\n\x04type\x18\x02 \x02(\t\x12\r\n\x05value\x18\x03 \x02(\x02')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'moreheat_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _TEMPERATURE._serialized_start=28
-  _TEMPERATURE._serialized_end=78
+  _MHMESSAGE._serialized_start=28
+  _MHMESSAGE._serialized_end=84
 # @@protoc_insertion_point(module_scope)
