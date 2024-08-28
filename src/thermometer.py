@@ -57,13 +57,22 @@ class Thermometer():
 
             with open(device_file, "r") as f:
                 lines = f.readlines()
-            
-            if lines[0].strip().endswith("YES"):
-                equals_pos = lines[1].find("t=")
-                if equals_pos != -1:
-                    temp_string = lines[1][equals_pos + 2:]
-                    temp_c = round(float(temp_string) / 1000.0, 2)
-                    return temp_c
+                #print(lines)
+           
+            try:
+                if lines[0].strip().endswith("YES"):
+                    equals_pos = lines[1].find("t=")
+                    if equals_pos != -1:
+                        temp_string = lines[1][equals_pos + 2:]
+                        #temp_c = round(float(temp_string) / 1000.0, 2)
+                        temp_c = float(temp_string) / 1000
+                        #print("sensor: " + sensor_id + " temp_c= " + str(temp_c))
+                        return temp_c
+
+            #FIXME this should not happen, also should return last measurement
+            except IndexError as e:
+                self.log.critical("temp reading error " + str(e))
+                return 0.0
         return None
 
     #this is the important 
@@ -71,6 +80,12 @@ class Thermometer():
         if not self.testing:
             self.last_temp_outside = float(self.read_one_temperature(self.sensor_id_out))*float(self.weight_of_outside_thermometer) 
             self.last_temp_radiator = float(self.read_one_temperature(self.sensor_id_radiator))*(1-float(self.weight_of_outside_thermometer))
+            #print("tem out: " + str(self.last_temp_outside) + "rad: " + str(self.last_temp_radiator))
+
+            self.log.warning("temps: " + str(self.last_temp_outside) + ' ' + str(self.last_temp_radiator) + ' ' + str(round((self.last_temp_outside + self.last_temp_radiator) )))
+
+            return (self.last_temp_outside + self.last_temp_radiator)
+
         else:
             step = self.tempstep
             if self.last_temp_outside > 30:
@@ -87,13 +102,10 @@ class Thermometer():
             else:
                 self.last_temp_radiator = self.last_temp_radiator + random.uniform(-step, step)
  
-        
-
-        #self.log.warning("too high" + str(-step) + ' ' + str(step) + ' ' + str(random.uniform( -1, 1)))
-        self.log.warning("temps: " + str(self.last_temp_outside) + ' ' + str(self.last_temp_radiator) + ' ' + str(round((self.last_temp_outside + self.last_temp_radiator) / 2)))
+            #self.log.warning("too high" + str(-step) + ' ' + str(step) + ' ' + str(random.uniform( -1, 1)))
+            self.log.warning("temps: " + str(self.last_temp_outside) + ' ' + str(self.last_temp_radiator) + ' ' + str(round((self.last_temp_outside + self.last_temp_radiator) / 2)))
            
-            #self.last_temp_radiator = self.last_temp_outside + random.uniform(-2.0, 2.0)
-        return round((self.last_temp_outside + self.last_temp_radiator) / 2)
+            return (self.last_temp_outside + self.last_temp_radiator) / 2
 
     def test(self):
         #print for a minute
