@@ -1,0 +1,7 @@
+bob-vid	192.168.172.235	E0:D5:5E:28:ED:C1	11h 45m 40s	Set Static
+alice-vid	192.168.172.185	30:9C:23:45:A0:37	11h 44m 30s	Set Static
+bob	192.168.172.153	2C:CF:67:74:A8:95	11h 41m 54s	Set Static
+carol	192.168.172.111	D8:3A:DD:84:2B:6F	11h 41m 54s	Set Static
+alice	192.168.172.101	2C:CF:67:32:F3:CA	11h 41m 54s	Set Static
+strooms-Mini	192.168.172.249	14:98:77:3A:28:DA	11h 41m 55s	Set Static
+
