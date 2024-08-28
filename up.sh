@@ -25,5 +25,5 @@ sudo apt install -y autoconf automake autopoint autotools-dev debhelper dh-autor
 python3 -m venv venv
 #venv/bin/python3 -m pip install StarTspImage
 ./venv/bin/python3 -m pip install . 
-./ven/bin/python3 -m ipykernel install --user --name=moreheat
+./venv/bin/python3 -m ipykernel install --user --name=moreheat
 
