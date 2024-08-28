@@ -1,5 +1,6 @@
 import logging
-
+#https://betterstack.com/community/guides/logging/python/python-logging-best-practices/
+# https://github.com/keeprocking/pygelf
 class CustomFormatter(logging.Formatter):
 
     grey = "\x1b[38;20m"
@@ -37,6 +38,7 @@ class Logger(logging.Logger):
   def info(self, msg, *args, xtra=None, **kwargs):
     extra_info = xtra if xtra is not None else self.extra_info
     super().info(msg, *args, extra=extra_info, **kwargs)
+
 '''
 ####
 class MhBaseLog(logging.getLoggerClass()):
@@ -51,7 +53,10 @@ class MhBaseLog(logging.getLoggerClass()):
         self.addHandler(ch)
         
 '''
+#########
+import logging, sys, traceback
 
+#########3
 def getLog(name, srcobject):
     """ Like logging.getLogger"""
     #if ident is not None:
@@ -67,10 +72,25 @@ if __name__ == "__main__":
 
     assert isinstance(log, Logger)
     log.setLevel(logging.DEBUG)
+    
+    def default_excepthook(exctype, value, tb):
+        if issubclass(exctype, KeyboardInterrupt):
+            sys.__excepthook__(exctype, value, tb)
+            return
+        #log.exception("Uncaught exception: {0}".format(str(value)))
+        log.exception(''.join(traceback.format_exception(exctype, value, tb)), exc_info=(exctype, value, tb))
+        log.critical("Uncaught exception", exc_info=(exctype, value, tb))
+        log.exception(''.join(traceback.format_exception(exctype, value, tb)))
 
+
+
+
+    # Install exception handler
+    sys.excepthook = default_excepthook
     log.debug('hello debug')
     log.info('hello info')
     log.warning('hello warning')
     log.error('hello error')
     log.critical('hello critical')
+    raise RuntimeError("Test unhandled")
 
