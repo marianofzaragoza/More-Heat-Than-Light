@@ -173,7 +173,10 @@ class PlayerUi(Gtk.Window):
             if bm == 4:
                 self.log.warning("interrupting.............")
 
-                self.player.interrupt_next()
+                if eval(self.config.playlist.interrupting + ' == True'):
+                    self.player.interrupt_next()
+                else:
+                    self.log.critical("playlist interruption disabled")
 
             #self.log.critical('bang! ' + str(beatno))
 
@@ -181,20 +184,8 @@ class PlayerUi(Gtk.Window):
 
     def th_test(self):
         #time.sleep(random.randint(3,9))
-        self.log.critical("hello from th_test")
-        
-        if eval(self.config.playlist.interrupting + ' == True'):
-            self.log.critical("playlist interruption disabled")
-
-            asyncio.run(self.beat_test())
-        else:
-            while True:
-               time.sleep(10) 
-               self.log.critical("hello from th_test")
-
-        #    time.sleep(random.randint(20,300))
-        #    self.log.warning("interrupting.............")
-        #    self.interrupt_next()
+        #self.log.critical("hello from th_test")
+        asyncio.run(self.beat_test())
         #Glib.idle_add(lambda: self.th_test())
         #Glib.timeout_add(300, lambda: self.th_test())
  
@@ -221,8 +212,8 @@ class PlayerUi(Gtk.Window):
 
 
 
-        self.text_tempa.set_label('d: ' + str(atemp) + ' s: ' + str(adt))
-        self.text_tempb.set_label('d: ' + str(btemp) + ' s: ' + str(bdt))
+        self.text_tempa.set_label(self.config.playlist.tempa_node + ' temp: ' + str(atemp) + ' : ' + str(adt))
+        self.text_tempb.set_label(self.config.playlist.tempb_node + ' temp: ' + str(btemp) + ' : ' + str(bdt))
 
         #while (msg := self.tempsender.retrieve_one()) is not None: 
         #    print('got message from net: ' + msg)

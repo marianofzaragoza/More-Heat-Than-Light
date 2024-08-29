@@ -89,11 +89,12 @@ class Playlist():
         return realpath
 
        
-    def choose_video(self, temp):
+    def choose_video(self, t):
         folder_index = 0
         folders = [self.playlist_category + '_' + f"{i}" for i in range(11)]
 
         #FIXME
+        temp = int(t)
         if temp > 20:
             folder_index = min((temp - 20) // 2, len(folders) - 1) #increases by two each time
 
