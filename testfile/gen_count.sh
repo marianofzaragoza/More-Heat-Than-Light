@@ -3,7 +3,7 @@ set -eu
 TYPE='mov'
 EXT='mov'
 RATE=24
-DURATION=1
+DURATION=15
 RES="1920x1080"
 GEN=0
 function generate () {
@@ -19,8 +19,8 @@ function generate () {
     -vf drawtext="fontcolor=black:fontsize=100 \
     :text=\'${1}\'\
     :x=(w-text_w)/2:y=(h-text_h)/2" \
-    -vf drawtext="fontcolor=black:fontsize=160 \
-    :text=\'s: %{eif\:t\:d} f: %{frame_num}\'\
+    -vf drawtext="fontcolor=black:fontsize=100 \
+    :text=\'s: ${1} %{eif\:t\:d} f: %{frame_num}\'\
     :x=2:y=(h-text_h)/4" \
     -codec prores_ks \
     -pix_fmt yuva444p10le \
