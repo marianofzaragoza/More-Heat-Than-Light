@@ -122,6 +122,14 @@ class MhGstPlayer():
         print("EOS")
         #self.interrupt_next()
 
+    def next(self):
+        #print('called: next()')
+        nextfile = self.playlist.next()
+        self.log.warning('next() nextfile: ' + nextfile)
+        self.playbin.set_property("uri", "file://" + nextfile) 
+        return True
+
+
     def on_about_to_finish(self,*args):
         self.next()
 

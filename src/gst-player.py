@@ -100,7 +100,7 @@ class PlayerUi(Gtk.Window):
         #gtk stuff
         self.init_gui()
         
-        self.playlist = Playlist(True, 'A', 'videos')
+        self.playlist = Playlist()
         
         #GLib.timeout_add(200, self.update)
         self.show_all()
@@ -123,10 +123,17 @@ class PlayerUi(Gtk.Window):
 
          
     def pl_set_state(self,state):
-        GLib.idle_add(lambda: self.pipeline.set_state(state))
+        GLib.idle_add(lambda: self.player.pipeline.set_state(state))
 
     def state_change(self,state):
-        self.pipeline.set_state(Gst.State.PLAYING)
+        self.player.pipeline.set_state(Gst.State.PLAYING)
+
+    def update_playlist_temp(self, which, temp):
+        #self.log.warning('called: update_temp ' + which + str(temp))
+
+        # gstreamer stuff needs to be called from main thread, but this function can be called from any
+        GLib.idle_add(lambda: self.playlist.update_temp(which=which, temp=temp))
+
 
     # this is where we compare state, and 
     async def beat_test(self):
@@ -141,10 +148,13 @@ class PlayerUi(Gtk.Window):
         #        await link.sync(1)
         #        self.log.critical('bang! ' + name)
         while True:
-            beatno = await link.sync(float(self.config.sync.syncbeat), float(self.config.sync.offset))
-            print('last from debian: ' + str(self.tempsender.get_stats("debian", "temperature", "last")))
-            print('last from alice: ' + str(self.tempsender.get_stats("alice", "temperature", "last")))
-            print(beatno % int(self.config.sync.modulo))
+            beatno = await link.sync(float(eval(self.config.sync.syncbeat)), float(self.config.sync.offset))
+            self.update_playlist_temp('A', self.tempsender.get_stats(self.config.playlist.tempa_node, "temperature", "last"))
+            self.update_playlist_temp('B', self.tempsender.get_stats(self.config.playlist.tempb_node, "temperature", "last"))
+
+            #print('last from debian: ' + str(self.tempsender.get_stats("debian", "temperature", "last")))
+            #print('last from alice: ' + str(self.tempsender.get_stats("alice", "temperature", "last")))
+            self.log.info(beatno % int(self.config.sync.modulo))
 
             bm = beatno % int(self.config.sync.modulo)
             #check
@@ -165,7 +175,7 @@ class PlayerUi(Gtk.Window):
 
                 self.player.interrupt_next()
 
-            self.log.critical('bang! ' + str(beatno))
+            #self.log.critical('bang! ' + str(beatno))
 
 
 
@@ -181,13 +191,6 @@ class PlayerUi(Gtk.Window):
         #Glib.timeout_add(300, lambda: self.th_test())
  
       
-    def next(self):
-        #print('called: next()')
-        nextfile = self.playlist.next()
-        self.log.warning('next() nextfile: ' + nextfile)
-        self.playbin.set_property("uri", "file://" + nextfile) 
-        return True
-
     #def update(self):
     #    #print('called: update()')
 
@@ -200,7 +203,7 @@ class PlayerUi(Gtk.Window):
       #  GLib.timeout_add(1000, self.update)
 
     def onnetmessage(self):
-        self.log.critical("net message")
+        self.log.debug("net message")
         atemp = self.tempsender.get_stats(self.config.playlist.tempa_node , "temperature", "last")
         btemp = self.tempsender.get_stats(self.config.playlist.tempb_node , "temperature", "last")
         self.text_tempa.set_label(str(atemp))
@@ -212,7 +215,7 @@ class PlayerUi(Gtk.Window):
 
 
     def quit(self, window):
-        self.pipeline.set_state(Gst.State.NULL)
+        self.player.pipeline.set_state(Gst.State.NULL)
         Gtk.main_quit()
 
     def fullscreen_at_monitor(self, window, n):

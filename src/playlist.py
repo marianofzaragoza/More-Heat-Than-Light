@@ -1,10 +1,12 @@
 import os
 import random
 from config import DynamicConfigIni
+import logging
+import mhlog 
+
 
 
 class Playlist():
-    videodir = 'testfile/'
 
     playlist_la = [
         #'testfile/test.mp4',
@@ -14,7 +16,7 @@ class Playlist():
         '3840x2160_2.mp4',
             ]
     interruptfilepath = '../quality/NINJA_S001_S001_T114.mxf'  
-    playlist = [
+    testlist = [
             'test1.mp4',
             '../quality/HD PRORESS.mov',
             'test2.mp4',
@@ -29,29 +31,45 @@ class Playlist():
             '../quality/HD PRORESS.mov',
             ]
 
-    def __init__(self, testing, node, vdir):
+    def __init__(self):
 
         self.conf = DynamicConfigIni()
         self.nodename = self.conf.DEFAULT.nodename
+
+        self.playlist_category = eval('self.conf.' + self.nodename + '.playlist_category')
+
+
+
         self.videodir = self.conf.playlist.videodir
 
-        self.testing = self.conf.playlist.testing 
+        logging.setLoggerClass(mhlog.Logger)
+        self.log = mhlog.getLog("playlist", self)
+        self.log.setLevel(logging.WARN)
+ 
+
+        self.testing = self.conf.playlist.testing == 'True'
+
         self.videoext = self.conf.playlist.videoext 
 
-        self.count=0
-        self.max=len(self.playlist) - 1
         self.a_temp = 0
         self.b_temp = 0
-        if testing:
+        if self.testing:
+            self.log.critical("playlist in testing mode !")
+            self.count=0
+            self.max=len(self.testlist) - 1
+
             self.videodir = self.conf.playlist.videodir_testing
+        else:
+            self.videodir = self.conf.playlist.videodir
 
- 
-    def update_a_temp(self, temp):
-        self.a_temp = temp
 
-    def update_b_temp(self, temp):
-        self.b_temp = temp
 
+    def update_temp(self, which, temp):
+        #self.log.warning('temp_update ' + which + ' ' + str(temp))
+        if which == 'A':
+            self.a_temp = temp
+        elif which == 'B':
+            self.b_temp = temp
 
     def next(self, interrupt=False):
         if self.testing:
@@ -60,17 +78,18 @@ class Playlist():
             self.count += 1
             if self.count > self.max:
                 self.count = 0
-            filepath = self.playlist[self.count]
+            filepath = self.testlist[self.count]
             print("next: " + os.path.realpath(self.videodir + '/' + filepath))
             return os.path.realpath(self.videodir + '/' + filepath)
         else:
+            self.log.warning("next: ")
             video_path, entanglement, broken_channel = self.next_video( self.a_temp, self.b_temp)
             return os.path.realpath(video_path)
 
        
     def choose_video(self, temp):
         folder_index = 0
-        folders = [self.videodir + '/' + self.nodename + '_' + f"{i}" for i in range(11)]
+        folders = [self.videodir + '/' + self.playlist_category + '_' + f"{i}" for i in range(11)]
         if temp > 20:
             folder_index = min((temp - 20) // 2, len(folders) - 1) #increases by two each time
         video = random.choice(os.listdir(folders[folder_index]))
@@ -81,6 +100,8 @@ class Playlist():
         videodir=self.videodir
         entanglement = False
         broken_channel = False
+
+        '''
         video_path = ""
         if a_temp < 20 and b_temp < 20 and abs(a_temp - b_temp) < 1:
             entanglement = True
@@ -88,11 +109,16 @@ class Playlist():
         elif abs(a_temp - b_temp) > 10:
             broken_channel = True
             video_path = videodir + '/' + "broken_channel." + self.videoext ## Put a valid video path
-        else: 
-            if self.nodename == "a":
-                video_path = playlist.choose_video(a_temp)
-            else:
-                video_path = playlist.choose_video(b_temp)    
+        else:
+        '''
+    
+        if self.playlist_category == "a":
+            video_path = self.choose_video(a_temp)
+        elif self.playlist_category == "b":
+            video_path = self.choose_video(b_temp)    
+        else:
+            self.log.critical("no valid playlist category")
+        self.log.warning( "next video return: " + str(video_path))
         return video_path, entanglement, broken_channel
 
 if __name__ == "__main__":
