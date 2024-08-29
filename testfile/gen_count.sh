@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-set -eux
+set -eu
 TYPE='mov'
 EXT='mov'
 RATE=24
 DURATION=1
 RES="1920x1080"
-
+GEN=0
 function generate () {
 
 #ffmpeg -f lavfi -i testsrc=duration=5:size=800x600:rate=30 -vf drawtext=
@@ -31,24 +31,40 @@ function generate () {
 
 }
 
-generate entanglement
-generate broken_channel
+if [ $GEN == 0 ]
+then
+  echo "generating files"
+  generate entanglement
+  generate broken_channel
 
+
+else
+  echo "listing files"
+fi
 
 
 for node in a b
 do
+  # 11 categories
   for ca in $(seq 0 11)
   do
-  dirn="${node}_${ca}"
-  mkdir -p $dirn
-  cd $dirn
+    dirn="${node}_${ca}"
+    mkdir -p $dirn
+    cd $dirn
+    pwd
 
+    # 2 testfiles per cat
     for i in $(seq 1 2)
     do 
-    generate "testfile_${node}_${ca}_${i}"   
-
+      echo "$dirn/testfile_${node}_${ca}_${i}" 
+      if [ $GEN == 0 ]
+      then
+        generate "testfile_${node}_${ca}_${i}"   
+      fi
     done
+
+
+    cd ..
   done
 done
 
