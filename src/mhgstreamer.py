@@ -50,12 +50,31 @@ class MhGstPlayer():
        ############
         # Gst setup
         ############
+        #video/x-raw,format=AYUV,framerate=\(fraction\)5/1,width=320,height=240
+
+    #glvideomixer name=videomix latency=1000 sink_1::alpha=0.5 message-forward=false start-time-selection=2  ! glimagesink sync=false\
+    #uridecodebin uri="file://${SRC}" name=demux1 ! queue leaky=0 ! videoconvert ! videorate ! queue ! glupload !glcolorconvert ! glcolorscale ! videomix. \
+    #uridecodebin uri="file://${SRC2}" name=demux2 ! \
+    #queue leaky=0 ! decodebin ! queue  ! videoconvert ! queue ! videorate ! glupload ! glcolorconvert  ! glcolorscale ! videomix.
+
+
+
+        ############## old
         self.playbin = Gst.parse_launch('playbin3')
         self.playbin.set_property('instant-uri', True)
  
         vsink = Gst.ElementFactory.make('xvimagesink', 'videosink')
         overlaysink = Gst.parse_bin_from_description('videoconvert ! queue ! fpsdisplaysink name=fps video-sink="glimagesink name=glsink"', 'overlaysink')
         fps = overlaysink.get_by_name('fps')
+        glsink = overlaysink.get_by_name('glsink')
+
+        #glist = Gst.ValueList([0,0,1920,1080])
+        #array = Gst.ValueArray (glist)
+        # https://github.com/GStreamer/gst-python/blob/master/testsuite/test_types.py
+        #a = Gst.ValueArray((1,2,3))
+        #rect = Gst.ValueArray((0,0,1920,1080))
+        #glsink.set_property('render-rectangle', rect)
+
         videosink = overlaysink.get_by_name('glsink')
         fps.set_property('text-overlay', True)
         fps.set_property('signal-fps-measurements', True)

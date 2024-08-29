@@ -214,8 +214,15 @@ class PlayerUi(Gtk.Window):
         self.log.debug("net message")
         atemp = self.tempsender.get_stats(self.config.playlist.tempa_node , "temperature", "last")
         btemp = self.tempsender.get_stats(self.config.playlist.tempb_node , "temperature", "last")
-        self.text_tempa.set_label(str(atemp))
-        self.text_tempb.set_label(str(btemp))
+        atime = self.tempsender.get_stats(self.config.playlist.tempa_node , "temperature", "last_seconds")
+        adt = datetime.utcfromtimestamp(atime).strftime('%Y-%m-%d %H:%M:%S')
+        btime = self.tempsender.get_stats(self.config.playlist.tempb_node , "temperature", "last_seconds")
+        bdt = datetime.utcfromtimestamp(btime).strftime('%Y-%m-%d %H:%M:%S')
+
+
+
+        self.text_tempa.set_label('d: ' + str(atemp) + ' s: ' + str(adt))
+        self.text_tempb.set_label('d: ' + str(btemp) + ' s: ' + str(bdt))
 
         #while (msg := self.tempsender.retrieve_one()) is not None: 
         #    print('got message from net: ' + msg)

@@ -134,7 +134,7 @@ class Playlist():
             video_path = self.choose_video(b_temp)    
         else:
             self.log.critical("no valid playlist category")
-        self.log.warning( "next video return: " + str(video_path))
+        self.log.warning( "next video return: " + str(video_path) + ' ' + str(a_temp) + ' ' + str(b_temp))
         return video_path, entanglement, broken_channel
 
 if __name__ == "__main__":

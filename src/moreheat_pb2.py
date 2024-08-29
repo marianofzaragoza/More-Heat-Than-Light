@@ -13,13 +13,21 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emoreheat.proto\x12\x08moreheat\"8\n\tMhMessage\x12\x0e\n\x06source\x18\x01 \x02(\t\x12\x0c\n\x04type\x18\x02 \x02(\t\x12\r\n\x05value\x18\x03 \x02(\x02')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emoreheat.proto\x12\x08moreheat\"A\n\x06google\x1a\x37\n\x08protobuf\x1a+\n\tTimestamp\x12\x0f\n\x07seconds\x18\x01 \x01(\x03\x12\r\n\x05nanos\x18\x02 \x01(\x05\">\n\x04lala\x12\x36\n\ttimestamp\x18\x01 \x01(\x0b\x32#.moreheat.google.protobuf.Timestamp\"X\n\tMhMessage\x12\x0f\n\x07seconds\x18\x04 \x01(\x03\x12\r\n\x05nanos\x18\x05 \x01(\x05\x12\x0e\n\x06source\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x02\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'moreheat_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _MHMESSAGE._serialized_start=28
-  _MHMESSAGE._serialized_end=84
+  _GOOGLE._serialized_start=28
+  _GOOGLE._serialized_end=93
+  _GOOGLE_PROTOBUF._serialized_start=38
+  _GOOGLE_PROTOBUF._serialized_end=93
+  _GOOGLE_PROTOBUF_TIMESTAMP._serialized_start=50
+  _GOOGLE_PROTOBUF_TIMESTAMP._serialized_end=93
+  _LALA._serialized_start=95
+  _LALA._serialized_end=157
+  _MHMESSAGE._serialized_start=159
+  _MHMESSAGE._serialized_end=247
 # @@protoc_insertion_point(module_scope)

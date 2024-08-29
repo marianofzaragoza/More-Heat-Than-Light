@@ -14,7 +14,8 @@ from gi.repository import GLib
 from gi.repository import GObject, Gst, Gtk, GstNet
 
 import numpy as np
-
+import datetime
+from google.protobuf.timestamp_pb2 import Timestamp
 
 ###
 import sys
@@ -65,26 +66,27 @@ class Tempsender():
         self.socket = Mcast()
         #self.socket.send(b'test')
 
-    def update_stats(self, node, mtype, value):
+    def update_stats(self, node, mtype, value, seconds, nanos):
         if node not in self.stats:
             self.stats[node] = dict()
         if mtype not in self.stats[node]:
             self.stats[node][mtype] = dict()
         
         #TODO: check here if we have to switch states
-
+        self.stats[node][mtype]["last_seconds"] = seconds
+        self.stats[node][mtype]["last_nanos"] = nanos
         self.stats[node][mtype]["last"] = value
 
     def get_stats(self, node, mtype, stype):
         self.process_messages()
-        if stype == "last":
-            try:
-                return self.stats[node][mtype][stype]
-            except KeyError:
-                self.log.info("no STATS for: " + node + ' ' + mtype)
-                return 232323
-        else:
+        #if stype == "last":
+        try:
+            return round(self.stats[node][mtype][stype], 2)
+        except KeyError as e:
+            self.log.critical("no STATS: node: " + node + ' mtype: ' + mtype + ' stype: ' + stype + ' err: '+ str(e))
             return 232323
+        #else:
+        #    return 232323
 
 
     def poll(self):
@@ -117,7 +119,7 @@ class Tempsender():
             decoded = moreheat_pb2.MhMessage()
             decoded.ParseFromString(msg)
             #msglen = len(msg)
-            self.update_stats(decoded.source, decoded.type, decoded.value)
+            self.update_stats(decoded.source, decoded.type, decoded.value, decoded.seconds, decoded.nanos)
 
             self.log.debug(str(decoded.source) + ' ' + str(decoded.type) + ' ' + str(decoded.value))
             if self.enable_appqueue: 
@@ -128,6 +130,13 @@ class Tempsender():
         
     def send_temp(self):
         msg = moreheat_pb2.MhMessage()
+        t = datetime.datetime.now().timestamp()
+        seconds = int(t)
+        nanos = int(t % 1 * 1e9)
+        #proto_timestamp = Timestamp(seconds=seconds, nanos=nanos)
+
+        msg.seconds = seconds
+        msg.nanos = nanos
         msg.source = self.nodename
         msg.type = "temperature"
         msg.value = self.thermometer.read_total_temperature()

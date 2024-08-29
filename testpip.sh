@@ -1,5 +1,5 @@
-#export GST_DEBUG_DUMP_DOT_DIR=./debug/ 
-#export GST_DEBUG=4 
+export GST_DEBUG_DUMP_DOT_DIR=./debug/ 
+export GST_DEBUG=4 
 export DISPLAY=:0 
 #gst-launch-1.0 uridecodebin uri=file:///home/user/src/More-Heat-Than-Light/videos/entanglement.mp4 ! videoconvert ! kmssink
 
