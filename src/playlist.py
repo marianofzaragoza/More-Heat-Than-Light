@@ -79,21 +79,37 @@ class Playlist():
             if self.count > self.max:
                 self.count = 0
             filepath = self.testlist[self.count]
-            print("next: " + os.path.realpath(self.videodir + '/' + filepath))
-            return os.path.realpath(self.videodir + '/' + filepath)
+            realpath = os.path.realpath(self.videodir + '/' + filepath)
         else:
             self.log.warning("next: ")
             video_path, entanglement, broken_channel = self.next_video( self.a_temp, self.b_temp)
-            return os.path.realpath(video_path)
+            realpath = os.path.realpath(self.videodir + '/' + video_path)
+        
+        self.log.critical("next() " + realpath)
+        return realpath
 
        
     def choose_video(self, temp):
         folder_index = 0
-        folders = [self.videodir + '/' + self.playlist_category + '_' + f"{i}" for i in range(11)]
+        folders = [self.playlist_category + '_' + f"{i}" for i in range(11)]
+
+        #FIXME
         if temp > 20:
             folder_index = min((temp - 20) // 2, len(folders) - 1) #increases by two each time
-        video = random.choice(os.listdir(folders[folder_index]))
+
+        folder_contents = os.listdir(self.videodir + '/' + folders[folder_index])
+        #only_mov = list(filter(lambda k: 'ab' in k, lst))
+        only_mov = list(filter(lambda x: x.endswith('.mov'), folder_contents))
+    
+        try:
+            video = random.choice(only_mov)
+        except IndexError:
+            self.log.critical("no mov files found !")
+            video = random.choice(folder_contents)
+
         videopath = folders[folder_index] + '/' + video
+
+        self.log.critical("choose_video return: " + videopath)
         return videopath
 
     def next_video(self, a_temp, b_temp):

@@ -182,8 +182,16 @@ class PlayerUi(Gtk.Window):
     def th_test(self):
         #time.sleep(random.randint(3,9))
         self.log.critical("hello from th_test")
-        asyncio.run(self.beat_test())
-        #while True:
+        
+        if eval(self.config.playlist.interrupting + ' == True'):
+            self.log.critical("playlist interruption disabled")
+
+            asyncio.run(self.beat_test())
+        else:
+            while True:
+               time.sleep(10) 
+               self.log.critical("hello from th_test")
+
         #    time.sleep(random.randint(20,300))
         #    self.log.warning("interrupting.............")
         #    self.interrupt_next()
