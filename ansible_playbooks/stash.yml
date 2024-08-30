@@ -1,0 +1,10 @@
+---
+  - hosts: all
+    remote_user: user
+    tasks:
+      - command:
+          chdir: "/home/user/src/More-Heat-Than-Light/"
+          cmd: "git stash"
+        become: true
+        become_user: "user"
+
