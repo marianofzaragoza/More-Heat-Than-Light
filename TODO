@@ -6,23 +6,22 @@
 * network
 * printer charly
 * logging (temperatures)
-* remote control
-* 2 thermometers on 1-wire bus
+* DONE remote control 
+* DONE 2 thermometers on 1-wire bus 
 * testing with actual videos
-* config file
+* DONE config file
 * lightbox (only send)
 * plymouth-reboot splash screen
 
 * use live sync for timing video interruption
-  - make sure video is ready to play
-  - start playing on beat
-  * interruption
+  * is the beat count the same on all machines???? check in aalink
+  * interruption state machine
     - both nodes timestamp beats (keep track of last 2 beat timestamps)
-    - 1 node sends interrupt message (after checking both temperatures)
+    - 1 node sends interrupt message (after checking both temperatures) (with a proposal to start playing on beat # (2 beats in future))
     - both nodes start loading video
     - video starts playing on 2nd next full beat (based on message timestamp??) ( so there is always enough time)
 
-* time sync protocol (ntp or ptp)
+* DONE time sync protocol (ntp or ptp)
 * sync communnication on ableton live sync
 * logfile to recreate the printout (avideo#, bvideo#, atemp, btemp, state )
 * triggering scenes in ableton
@@ -30,3 +29,7 @@
 * weird resolution / aspect ratio
 * updaterate temperature in video player
 * black bar projector under video
+* DONE google sheet import
+
+#BLOCK
+* videos (and corresponding filenames in google sheet)

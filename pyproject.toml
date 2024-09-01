@@ -144,7 +144,10 @@ dependencies = [
   "bqplot",
   "ibis-framework[duckdb,examples]",
   "gspread",
-  "influxdb"
+  "influxdb",
+  "janus",
+  "ansible_runner",
+  "gbulb"
 
   
 ]

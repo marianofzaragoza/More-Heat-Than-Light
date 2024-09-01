@@ -104,7 +104,7 @@ class MhGstPlayer():
             bus.enable_sync_message_emission()
             bus.connect('sync-message::element', self.on_sync_message)
 
-    def interrupt_next(self, start=False):
+    def interrupt_next(self, start=False, almostfinished=False):
         #print('called: interrupt_next()')
 
         # gstreamer stuff needs to be called from main thread, but this function can be called from any
@@ -142,11 +142,13 @@ class MhGstPlayer():
         #self.interrupt_next()
 
     def next(self):
-        #print('called: next()')
-        nextfile = self.playlist.next()
-        self.log.warning('next() nextfile: ' + nextfile)
-        self.playbin.set_property("uri", "file://" + nextfile) 
-        return True
+
+        print('called: next()')
+        self.interrupt_next(almostfinished=True)
+        #nextfile = self.playlist.next()
+        #self.log.warning('next() nextfile: ' + nextfile)
+        #self.playbin.set_property("uri", "file://" + nextfile) 
+        #return True
 
 
     def on_about_to_finish(self,*args):
