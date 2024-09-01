@@ -195,7 +195,7 @@ class PlayerUi(Gtk.Window):
 
 
             GLib.idle_add(lambda: self.text_clock.set_label('beatcl: ' + nowt))
-            GLib.idle_add(lambda: self.text_beatno.set_label('beat: ' + str(round(beatno,0)) + 'ph: ' + str(round(link.phase,0)) + 'time: ' + str(link.time)))
+            GLib.idle_add(lambda: self.text_beatno.set_label('P: ' + str(link.num_peers) + 'tempo: ' + str(int(link.tempo)) + ' ' + 'beat: ' + str(int(beatno)) + 'ph: ' + str(int(link.phase)) + 'time: ' + str(link.time)))
 
             self.update_playlist_temp('A', self.tempsender.get_stats(self.config.playlist.tempa_node, "temperature", "last"))
             self.update_playlist_temp('B', self.tempsender.get_stats(self.config.playlist.tempb_node, "temperature", "last"))
@@ -203,36 +203,41 @@ class PlayerUi(Gtk.Window):
             #print('last from debian: ' + str(self.tempsender.get_stats("debian", "temperature", "last")))
             #print('last from alice: ' + str(self.tempsender.get_stats("alice", "temperature", "last")))
             self.log.info(beatno % int(self.config.sync.modulo))
-
+            
+            # we need to be on the whole beat, but also in the right phase (beat numbers are not the same on each node.....)
             bm = beatno % int(self.config.sync.modulo)
+            bp = int(link.phase)
+            
+
+            #print(str(beatno) + ' ' + str(int(link.phase)))
             #check
-            if bm == 1:
-                cstate = "check"
+            if bm == 1 and bp == 1:
+                self.cstate = "check"
                 self.log.warning("check  ")
             
             #send
-            elif bm == 2:
-                cstate = "send"
+            elif bm == 2 and bp == 2:
+                self.cstate = "send"
                 self.log.warning("send  ")
 
             #receive
-            elif bm == 3:
-                cstate = "receive"
+            elif bm == 3 and bp == 3:
+                self.cstate = "receive"
                 self.log.warning("receive ")
 
             #play
-            elif bm == 4:
-                cstate = "interrupt"
+            elif bm == 4 and bp == 4:
+                self.cstate = "interrupt"
                 self.log.warning("interrupting.............")
 
                 if eval(self.config.playlist.interrupting + ' == True'):
                     self.player.interrupt_next()
                 else:
                     self.log.critical("playlist interruption disabled")
-            elif bm == 5:
-                cstate = "sleep"
+            elif bm == 5 and bp == 5:
+                self.cstate = "sleep"
 
-            GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + cstate))
+            GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate))
 
             #self.log.critical('bang! ' + str(beatno))
 

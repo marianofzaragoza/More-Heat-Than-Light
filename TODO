@@ -28,8 +28,11 @@
 * logging / graphing temperatures and videos
 * weird resolution / aspect ratio
 * updaterate temperature in video player
-* black bar projector under video
+* black bar projector under video ( in gtk?)
 * DONE google sheet import
+* disable notifications (for example about updates)
+* disable unnattended upgrades
+* quit program properly (quit doesn't work with the async / glib integration)
 
 #BLOCK
 * videos (and corresponding filenames in google sheet)
