@@ -27,9 +27,8 @@ from gi.repository import GLib, GObject, Gst, Gtk, GstNet, GdkX11, GstVideo, Gdk
 import random
 import argparse
 import codecs
-import threading
 import socket
-import threading
+#import threading
 import socketserver
 #
 # Needed for get_xid(), set_window_handle()
@@ -119,6 +118,7 @@ class PlayerUi(Gtk.Window):
         gbulb.install(gtk=True)
 
         self.notemp = False
+        self.cstate = 'sleep'
         #debug
         if not self.notemp:
             self.tempsender = Tempsender()
@@ -129,7 +129,7 @@ class PlayerUi(Gtk.Window):
             msgsource.attach()
        
 
-        GObject.threads_init()
+        #GObject.threads_init()
         
         #gtk stuff
         self.init_gui() 
@@ -142,9 +142,9 @@ class PlayerUi(Gtk.Window):
 
         self.player = MhGstPlayer(playlist=self.playlist,xid=self.xid)
 
-        t = threading.Thread(target=self.th_test)
-        t.daemon = True
-        t.start()
+        #t = threading.Thread(target=self.th_test)
+        #t.daemon = True
+        #t.start()
 
       
         #TODO start the player
@@ -195,7 +195,7 @@ class PlayerUi(Gtk.Window):
 
 
             GLib.idle_add(lambda: self.text_clock.set_label('beatcl: ' + nowt))
-            GLib.idle_add(lambda: self.text_beatno.set_label('P: ' + str(link.num_peers) + 'tempo: ' + str(int(link.tempo)) + ' ' + 'beat: ' + str(int(beatno)) + 'ph: ' + str(int(link.phase)) + 'time: ' + str(link.time)))
+            GLib.idle_add(lambda: self.text_beatno.set_label('P: ' + str(link.num_peers) + ' bpm: ' + str(int(link.tempo)) + ' bt: ' + str(int(beatno)) + ' ph: ' + str(int(link.phase)) + ' time: ' + str(link.time)))
 
             self.update_playlist_temp('A', self.tempsender.get_stats(self.config.playlist.tempa_node, "temperature", "last"))
             self.update_playlist_temp('B', self.tempsender.get_stats(self.config.playlist.tempb_node, "temperature", "last"))
@@ -213,22 +213,22 @@ class PlayerUi(Gtk.Window):
             #check
             if bm == 1 and bp == 1:
                 self.cstate = "check"
-                self.log.warning("check  ")
+                #self.log.warning("check  ")
             
             #send
             elif bm == 2 and bp == 2:
                 self.cstate = "send"
-                self.log.warning("send  ")
+                #self.log.warning("send  ")
 
             #receive
             elif bm == 3 and bp == 3:
                 self.cstate = "receive"
-                self.log.warning("receive ")
+                #self.log.warning("receive ")
 
             #play
             elif bm == 4 and bp == 4:
                 self.cstate = "interrupt"
-                self.log.warning("interrupting.............")
+                #self.log.warning("interrupting.............")
 
                 if eval(self.config.playlist.interrupting + ' == True'):
                     self.player.interrupt_next()

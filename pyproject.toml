@@ -147,7 +147,8 @@ dependencies = [
   "influxdb",
   "janus",
   "ansible_runner",
-  "gbulb"
+  "gbulb",
+  "pylive"
 
   
 ]
