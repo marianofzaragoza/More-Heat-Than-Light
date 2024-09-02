@@ -231,6 +231,8 @@ class PlayerUi(Gtk.Window):
                 #self.log.warning("interrupting.............")
 
                 if eval(self.config.playlist.interrupting + ' == True'):
+                    self.log.critical("interrupting!")
+
                     self.player.interrupt_next()
                 else:
                     self.log.critical("playlist interruption disabled")
