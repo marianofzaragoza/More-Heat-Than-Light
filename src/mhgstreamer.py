@@ -69,8 +69,8 @@ class MhGstPlayer():
 
     def create_mixerpipeline(self):
         videomixer = Gst.parse_launch(
-           "intervideosrc name=video_src_1 channel=channel_video ! queue ! clocksync ! videoconvert ! queue ! videoconvert !  video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
-            "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! clocksync ! videoconvert ! queue ! videoconvert ! video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
+           "intervideosrc name=video_src_1 channel=channel_video ! queue  ! videoconvert ! queue ! videoconvert !  video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
+            "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! clocksync sync-to-first=true sync=false ! videoconvert ! queue ! videoconvert ! video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
             "glvideomixer " + 
             "sink_1::blend-constant-color-alpha=0 "+
             "sink_1::blend-function-src-alpha=14 "+
@@ -168,7 +168,7 @@ class MhGstPlayer():
         #intersink
         intersink = Gst.ElementFactory.make("intervideosink", "video_sink" + name)
         intersink.set_property('channel', 'channel' + name)
-        intersink.set_property('sync', False)
+        intersink.set_property('sync', True)
         ob.add(intersink)
         q2.link(intersink)
 
