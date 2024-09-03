@@ -20,6 +20,9 @@ from gi.repository import GLib, GObject, Gst, Gtk, GstNet, GdkX11, GstVideo
 
 class MhGstPlayer():
     def __init__(self, xid=None, playlist=None):
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir + '/../debug/')
+
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
 
@@ -29,7 +32,8 @@ class MhGstPlayer():
         
         self.playlist = playlist
         self.xid = xid
-        
+        self.overlay = True
+
         self.hdfile = "video/quality/HD PRORESS.mov"
         self.overlayfile = "video/animation/alice_hd.mov"
         self.tfile = "video/random/305_24p.mp4"
@@ -37,10 +41,15 @@ class MhGstPlayer():
         #GST
         Gst.init(None)
 
-        self.videoplayer = self.create_pb('_video', self.tfile)
-        self.overlayplayer = self.create_pb('_overlay', self.overlayfile)
         self.videomixer = self.create_mixerpipeline() 
+        self.videomixer.set_state(Gst.State.PLAYING)
 
+        self.videoplayer = self.create_pb('_video', self.tfile)
+        self.videoplayer.set_state(Gst.State.PLAYING)
+
+        if self.overlay:
+            self.overlayplayer = self.create_pb('_overlay', self.overlayfile)
+            self.overlayplayer.set_state(Gst.State.PLAYING)
         # This is needed to make the video output in gtk DrawingArea:
         self.bus = self.videomixer.get_bus()
 
@@ -48,22 +57,26 @@ class MhGstPlayer():
             self.bus.enable_sync_message_emission()
             self.bus.connect('sync-message::element', self.on_sync_message)
 
-        self.videomixer.set_state(Gst.State.PLAYING)
-        self.videoplayer.set_state(Gst.State.PLAYING)
-        self.overlayplayer.set_state(Gst.State.PLAYING)
 
         #self.interrupt_next(start=True)
 
     def log_stuff(self):
+        Gst.debug_bin_to_dot_file(self.videoplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_videoplayer_' )
+        Gst.debug_bin_to_dot_file(self.videomixer, Gst.DebugGraphDetails.ALL, 'gstdebug_videomixer_' + '3' )
+
 
         self.log.critical( 'video, dur: ' + str(self.videoplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.videoplayer.query_position(Gst.Format.TIME)) )
-        self.log.critical( 'overlay, dur: ' + str(self.overlayplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.overlayplayer.query_position(Gst.Format.TIME)) )
- 
+        if self.overlay:
+
+            Gst.debug_bin_to_dot_file(self.overlayplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_overlayplayer_' + '2' )
+            self.log.critical( 'overlay, dur: ' + str(self.overlayplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.overlayplayer.query_position(Gst.Format.TIME)) )
+     
 
     def quit(self):
         self.videomixer.set_state(Gst.State.NULL)
         self.videoplayer.set_state(Gst.State.NULL)
-        self.overlayplayer.set_state(Gst.State.NULL)
+        if self.overlay:
+            self.overlayplayer.set_state(Gst.State.NULL)
 
 
 
@@ -84,7 +97,7 @@ class MhGstPlayer():
             "sink_0::blend-function-src-rgb=6 "+ 
             "sink_0::blend-function-dst-rgb=7 "+
             "sink_1::alpha=1 sink_0::alpha=1 "+
-            "name=videomix ! videoconvert ! autovideosink sync=true"
+            "name=videomix ! glcolorconvert ! glimagesink sync=true "
             )
         return videomixer
 
