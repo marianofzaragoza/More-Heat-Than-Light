@@ -13,33 +13,33 @@ all:
     pi:
 
 video:
-    hosts:
-      alice-vid:
-        #ansible_host: 10.147.18.205  
-        ansible_host: 192.168.172.185
-      bob-vid:
-        ansible_host: 192.168.172.235	
-        #ansible_host: 10.147.18.4
-        ansible_user: root
-        host_var: hallo
+  hosts:
+    alice-vid:
+      #ansible_host: 10.147.18.205  
+      ansible_host: 192.168.172.185
+    bob-vid:
+      ansible_host: 192.168.172.235	
+      #ansible_host: 10.147.18.4
+      ansible_user: root
+      host_var: hallo
 
 pi:
   hosts:
-      alice:
-        #ansible_host: 10.147.18.197  
-        ansible_host: 192.168.172.101
+    alice:
+      #ansible_host: 10.147.18.197  
+      ansible_host: 192.168.172.101
 
-      bob:
-        #ansible_host: 10.147.18.60
-        ansible_host: 192.168.172.153
+    bob:
+      #ansible_host: 10.147.18.60
+      ansible_host: 192.168.172.153
 
-      carol:
-        ansible_host: 192.168.172.111
-        #ansible_host: 10.147.18.208
+    carol:
+      ansible_host: 192.168.172.111
+      #ansible_host: 10.147.18.208
 
-        test1:
-        test2:
-            host_var: value
+      test1:
+      test2:
+          host_var: value
     vars:
         group_all_var: value
         ansible_user: root

@@ -69,8 +69,8 @@ class MhGstPlayer():
 
     def create_mixerpipeline(self):
         videomixer = Gst.parse_launch(
-           "intervideosrc name=video_src_1 channel=channel_video ! queue ! videoconvert ! queue ! videoconvert !  video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
-            "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! videoconvert ! queue ! videoconvert ! video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
+           "intervideosrc name=video_src_1 channel=channel_video ! queue ! clocksync ! videoconvert ! queue ! videoconvert !  video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
+            "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! clocksync ! videoconvert ! queue ! videoconvert ! video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
             "glvideomixer " + 
             "sink_1::blend-constant-color-alpha=0 "+
             "sink_1::blend-function-src-alpha=14 "+
@@ -84,12 +84,17 @@ class MhGstPlayer():
             "sink_0::blend-function-src-rgb=6 "+ 
             "sink_0::blend-function-dst-rgb=7 "+
             "sink_1::alpha=1 sink_0::alpha=1 "+
-            "name=videomix ! videoconvert ! autovideosink sync=false"
+            "name=videomix ! videoconvert ! autovideosink sync=true"
             )
         return videomixer
 
-    # this should not be called normally, maybe could be used when the interrupt video is played in separate playbin (so it can be preloaded and mixed in)
     def on_eos(self, bus, msg):
+        # gstreamer stuff needs to be called from main thread, but this function can be called from any
+        GLib.idle_add(lambda: self.mt_on_eos(bus, msg))
+
+
+    # this should not be called normally, maybe could be used when the interrupt video is played in separate playbin (so it can be preloaded and mixed in)
+    def mt_on_eos(self, bus, msg):
         self.log.critical("EOS received from %s " /  str(msg.src))
         '''
         pb = msg.src
@@ -163,7 +168,7 @@ class MhGstPlayer():
         #intersink
         intersink = Gst.ElementFactory.make("intervideosink", "video_sink" + name)
         intersink.set_property('channel', 'channel' + name)
-        intersink.set_property('sync', True)
+        intersink.set_property('sync', False)
         ob.add(intersink)
         q2.link(intersink)
 
