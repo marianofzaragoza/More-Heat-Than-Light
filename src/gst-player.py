@@ -36,7 +36,10 @@ import socketserver
 
 from datetime import datetime
 import time
-from testplaylist import Playlist
+#from testplaylist import Playlist
+from playlist import Playlist
+
+
 from tempsender import Tempsender, TempSource
 
 from config import DynamicConfigIni

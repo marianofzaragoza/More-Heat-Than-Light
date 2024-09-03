@@ -42,9 +42,10 @@ class Playlist():
             self.b_temp = temp
 
     def get_overlay(self):
-        self.log.warning("file: " + realpath) 
         video_file = self.vc.get_broken_channel_file(self.channel, node)
         realpath = os.path.realpath(self.videodir + '/' + video_file)
+
+        self.log.warning("get_overlay: " + realpath) 
         return realpath
 
     def next(self, interrupt=False):

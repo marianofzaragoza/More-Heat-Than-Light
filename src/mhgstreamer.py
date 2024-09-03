@@ -39,9 +39,9 @@ class MhGstPlayer():
         #self.hdfile = "video/quality/HD PRORESS.mov"
         #self.overlayfile = "video/animation/alice_hd.mov"
         self.hdfile = "video/quality/HD PRORESS.mov"
-        self.tfile = "video/animation/alice_hd.mov"
+        self.overlayfile = "video/animation/alice_hd.mov"
         
-        self.overlayfile = "video/random/305_24p.mp4"
+        self.tfile = "video/random/305_24p.mp4"
 
         #GST
         Gst.init(None)
