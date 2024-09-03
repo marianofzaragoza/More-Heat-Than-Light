@@ -8,6 +8,7 @@ import sys
 import gi
 import cairo
 from aalink import Link
+from osc_test import OscSender
 
 gi.require_version('Gst', '1.0')
 gi.require_version('Gtk', '3.0')
@@ -138,12 +139,13 @@ class PlayerUi(Gtk.Window):
         self.init_gui() 
         self.show_all()
         self.xid = self.drawingarea.get_property('window').get_xid()
+        self.osc = OscSender()
 
         self.playlist = Playlist()
         
                 #gstreamer player
 
-        self.player = MhGstPlayer(playlist=self.playlist,xid=self.xid)
+        self.player = MhGstPlayer(playlist=self.playlist,xid=self.xid, osc=self.osc)
 
         #t = threading.Thread(target=self.th_test)
         #t.daemon = True
@@ -216,6 +218,7 @@ class PlayerUi(Gtk.Window):
             #print(str(beatno) + ' ' + str(int(link.phase)))
             #check
             if bm == 1 and bp == 1:
+                self.player.toggle_overlay()
                 self.cstate = "check"
                 #self.log.warning("check  ")
             
@@ -242,6 +245,9 @@ class PlayerUi(Gtk.Window):
                     self.log.critical("playlist interruption disabled")
             elif bm == 5 and bp == 5:
                 self.cstate = "sleep"
+
+            elif bm == 6 and bp == 6:
+                self.player.toggle_overlay()
 
             GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate))
 

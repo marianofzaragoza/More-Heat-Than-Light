@@ -20,6 +20,9 @@ class Playlist():
         self.log.setLevel(logging.WARN)
         self.a_temp = 24
         self.b_temp = 22
+        self.mhstate = 'INVALID'
+        self.mhcategory = 'invalid'
+        self.nowplaying = 'invalid'
         self.channel = 'C'
         if self.nodename == self.conf.playlist.vida_node:
             self.channel = 'A'
@@ -34,12 +37,29 @@ class Playlist():
         #p.save_data_file()
         self.vc.load_data_file()
 
+    def get_playlist_state(self):
+        s = dict()
+        s['channel'] = self.channel
+        if self.channel == 'A':
+            s['temp'] = self.a_temp
+        elif self.channel == 'B':
+            s['temp'] = self.b_temp
+        s['mhstate'] = self.mhstate
+        s['mhcategory'] = self.mhcategory
+        s['nowplaying'] = self.nowplaying
+        return s
+
     def update_temp(self, which, temp):
         #self.log.warning('temp_update ' + which + ' ' + str(temp))
         if which == 'A':
             self.a_temp = temp
         elif which == 'B':
             self.b_temp = temp
+        self.mhstate = self.vc.state_from_temp(self.a_temp, self.b_temp)
+        if self.channel == 'A':
+            self.mhcategory = self.vc.cat_from_temp(self.a_temp)
+        elif self.channel == 'B':
+            self.mhcategory = self.vc.cat_from_temp(self.b_temp)
 
     def get_overlay(self):
         video_file = self.vc.get_broken_channel_file(self.channel)
@@ -50,9 +70,9 @@ class Playlist():
 
     def next(self, interrupt=False):
         
-        self.log.warning(self.vc.state_from_temp(self.a_temp, self.b_temp))
-        video_file = self.vc.get_random_file(self.channel, self.a_temp, self.b_temp)
 
+        video_file = self.vc.get_random_file(self.channel, self.a_temp, self.b_temp)
+        self.nowplaying = video_file
         realpath = os.path.realpath(self.videodir + '/' + video_file)
         self.log.warning("file: " + realpath)
         #print(p.get_broken_channel_file('A'))

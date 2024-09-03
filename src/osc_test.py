@@ -1,13 +1,13 @@
-"""Small example OSC client
-
-This program sends 10 random values between 0.0 and 1.0 to the /filter address,
-waiting for 1 seconds between each value.
+"""
+osc sender
 """
 import argparse
 import random
 import time
 from config import DynamicConfigIni
-
+import logging
+import mhlog 
+import pathlib
 from pythonosc import udp_client
 
 import pythonosc
@@ -20,10 +20,29 @@ from pythonosc import osc_message_builder
 
 class OscSender():
     def __init__(self):
+        logging.setLoggerClass(mhlog.Logger)
+        self.log = mhlog.getLog("osc", self)
+        self.log.setLevel(logging.WARN)
+        srcdir = pathlib.Path(__file__).parent.resolve()
+ 
         self.config = DynamicConfigIni()
         print(self.config.DEFAULT.test)
         self.oscclient = pythonosc.udp_client.SimpleUDPClient(self.config.osc.addr, int(self.config.osc.port))
-    
+
+    def send_video_msg(self,ps):
+        self.log.critical("send video msg")
+        bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
+        channel = 'la' 
+        for k, v in ps.items():
+            m = osc_message_builder.OscMessageBuilder(address="/moreheat/video/" + ps['channel'] + "/" + k )
+            m.add_arg(v)
+            bundle.add_content(m.build())
+        bundle = bundle.build()
+        self.oscclient.send(bundle)
+
+
+
+
     def send(self):
         self.oscclient.send_message("/moreheat/test", random.random())
 
@@ -31,8 +50,7 @@ class OscSender():
         print('beat')
 
     def build_bundle(self):
-        bundle = osc_bundle_builder.OscBundleBuilder(
-        osc_bundle_builder.IMMEDIATELY)
+        bundle = osc_bundle_builder.OscBundleBuilder(osc_bundle_builder.IMMEDIATELY)
         
         msg1 = osc_message_builder.OscMessageBuilder(address="/moreheat/bundle/m1")
         msg1.add_arg(4.0)

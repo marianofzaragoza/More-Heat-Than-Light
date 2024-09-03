@@ -28,7 +28,10 @@ class Thermometer():
         self.testing = testing
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
-        self.tempstep = float(self.config.DEFAULT.tempstep)
+        try:
+            self.tempstep = float(self.config.DEFAULT.tempstep)
+        except AttributeError as e:
+            self.log.critical(e)
         self.last_temp_outside = 20
         self.last_temp_radiator = 20
         self.tick = 0

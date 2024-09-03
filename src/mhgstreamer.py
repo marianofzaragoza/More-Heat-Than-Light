@@ -19,7 +19,7 @@ gi.require_version("GstNet", "1.0")
 from gi.repository import GLib, GObject, Gst, Gtk, GstNet, GdkX11, GstVideo
 
 class MhGstPlayer():
-    def __init__(self, xid=None, playlist=None):
+    def __init__(self, xid=None, playlist=None, osc=None):
         current_dir = os.path.dirname(os.path.realpath(__file__))
         os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir + '/../debug/')
 
@@ -29,10 +29,13 @@ class MhGstPlayer():
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("GstPlayer", self)
         self.log.setLevel(logging.WARN)
-        
+       
         self.playlist = playlist
         self.xid = xid
+        self.osc = osc
+        
         self.overlay = True
+        self.overlayactive = False
         #self.tfile = "video/random/305_24p.mp4"
 
 
@@ -49,6 +52,7 @@ class MhGstPlayer():
         self.videomixer = self.create_mixerpipeline() 
         self.videomixer.set_state(Gst.State.PLAYING)
 
+
         self.videoplayer = self.create_pb('_video', self.tfile)
         self.videoplayer.set_state(Gst.State.PLAYING)
 
@@ -62,13 +66,17 @@ class MhGstPlayer():
             self.bus.enable_sync_message_emission()
             self.bus.connect('sync-message::element', self.on_sync_message)
 
-
+        self.log_stuff()
         self.interrupt_next(start=True)
 
     def log_stuff(self):
+
+        ps = self.playlist.get_playlist_state()
+        self.osc.send_video_msg(ps)
+
         Gst.debug_bin_to_dot_file(self.videoplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_videoplayer_' )
         Gst.debug_bin_to_dot_file(self.videomixer, Gst.DebugGraphDetails.ALL, 'gstdebug_videomixer_' + '3' )
-
+        #self.toggle_overlay()
         boole, cur = self.videoplayer.query_position(Gst.Format.TIME)
         if boole == False:
             self.log.critical("video stuck")
@@ -88,27 +96,44 @@ class MhGstPlayer():
         if self.overlay:
             self.overlayplayer.set_state(Gst.State.NULL)
 
+    def toggle_overlay(self):
+        if self.overlayactive == True:
+            ns = 0
+            self.overlayactive = False
+        else:
+            ns = 1
+            self.overlayactive = True
+
+        pads = self.videomixer.get_by_name('videomix').pads
+        for p in pads:
+            if p.get_peer().get_parent_element().name == "overlayplayer":
+                p.set_property("alpha", ns) 
+
 
 
     def create_mixerpipeline(self):
-        videomixer = Gst.parse_launch(
-           "intervideosrc name=video_src_1 channel=channel_video ! queue  !  clocksync sync-to-first=true sync=true !  videoconvert ! queue ! videoconvert !  video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
-            "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! clocksync sync-to-first=true sync=true ! videoconvert ! queue ! videoconvert ! video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
-            "glvideomixer " + 
-            "sink_1::blend-constant-color-alpha=0 "+
-            "sink_1::blend-function-src-alpha=14 "+
-            #"sink_1::blend-function-dst-alpha=0 "+
-            "sink_1::blend-function-src-rgb=6 "+
-            "sink_1::blend-function-dst-rgb=7 "+
+        #  intervideosrc gstintervideosrc.c:411:gst_inter_video_src_create:<video_src_1> Failed to negotiate caps video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, interlace-mode=(string)progressive, pixel-aspect-ratio=(fraction)1/1, chroma-site=(string)mpeg2, colorimetry=(string)bt709, framerate=(fraction)24/1
 
+        videomixer = Gst.parse_launch(
+           "intervideosrc name=video_src_1 channel=channel_video ! queue  !  clocksync sync-to-first=true sync=true !  videoconvert ! queue ! videoscale !  video/x-raw,width=1920,height=1080,framerate=24/1 ! queue name=videoplayer ! videomix. " +
+            "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! clocksync sync-to-first=true sync=true ! videoconvert ! queue ! videoscale ! video/x-raw,width=1920,height=1080,framerate=24/1 ! queue name=overlayplayer ! videomix. " +
+            "glvideomixer " + 
+            "sink_0::alpha=1 "+
             "sink_0::blend-constant-color-alpha=0 "+
             "sink_0::blend-function-src-alpha=14 "+
             #"sink_0::blend-function-dst-alpha=0"+
             "sink_0::blend-function-src-rgb=6 "+ 
             "sink_0::blend-function-dst-rgb=7 "+
-            "sink_1::alpha=1 sink_0::alpha=1 "+
-            "name=videomix ! glcolorconvert ! glimagesink sync=true "
+
+            "sink_1::alpha=0 " +
+            "sink_1::blend-constant-color-alpha=0 "+
+            "sink_1::blend-function-src-alpha=14 "+
+            #"sink_1::blend-function-dst-alpha=0 "+
+            "sink_1::blend-function-src-rgb=6 "+
+            "sink_1::blend-function-dst-rgb=7 "+
+                        "name=videomix ! glcolorconvert ! glimagesink sync=true "
             )
+
         return videomixer
 
     def on_eos(self, bus, msg):

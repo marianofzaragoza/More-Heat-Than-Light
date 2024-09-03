@@ -148,7 +148,8 @@ dependencies = [
   "janus",
   "ansible_runner",
   "gbulb",
-  "pylive"
+  "pylive",
+  "ipywidgets"
 
   
 ]

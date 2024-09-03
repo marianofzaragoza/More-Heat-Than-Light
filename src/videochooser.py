@@ -92,7 +92,21 @@ class Videochooser():
         s1=self.tempdf.temp_start.values
         s2=self.tempdf.temp_end.values
         s=tf.Value.values[:,None]
-        return np.dot((s>=s1)&(s<=s2),self.tempdf.CATEGORIA)[0]
+        '''
+        copy = self.tempdf 
+        lala = np.where(
+                (self.tempdf['temp_start'] <= temp) 
+                & (    self.tempdf['temp_end'] <= temp  )
+                , self.tempdf, np.nan)
+        
+        print(lala)
+        '''
+        res =  np.dot((s>s1)&(s<=s2),self.tempdf.CATEGORIA)
+        '''
+        print(type(res))
+        print(res)
+        '''
+        return res[0]
 
     def filenames_from_cat(self, node, cat):
         #la = self.videodf.query('`Usage` == `Y` and CHANNEL == `BOB` and `FEELING` == ' + cat )
@@ -136,7 +150,7 @@ class Videochooser():
                 try:
                     filename = random.choice(filenames)
                 except IndexError as e:
-                    self.log.critical("no video found for: " + node + str(temp_a) + ' ' + str(temp_b) + ' ' + state + cat)
+                    self.log.critical("no video found for: " + node + ' at: ' + str(temp_a) + ' bt:' + str(temp_b) + ' state: ' + state + 'cat: ' + cat)
                     filename = 'VIDEO_MISSING.mov'
             elif state == "ENTANGLEMENT":
                 filename = 'ENTANGLEMENT.mov'
@@ -160,8 +174,8 @@ if __name__ == "__main__":
     print(p.get_random_file('B', 0, 100))
     print(p.get_broken_channel_file('A'))
 
-    #cat = p.cat_from_temp(12)
-    #print(cat)
+    cat = p.cat_from_temp(22)
+    print(cat)
     #fn = p.filenames_from_cat("A", cat)
     #print(fn)
 
