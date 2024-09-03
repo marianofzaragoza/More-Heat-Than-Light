@@ -22,12 +22,10 @@ class MhGstPlayer():
     def __init__(self, xid=None, playlist=None):
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
-        
 
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("GstPlayer", self)
         self.log.setLevel(logging.WARN)
-       
         
         self.playlist = playlist
         self.xid = xid
@@ -38,7 +36,6 @@ class MhGstPlayer():
 
         #GST
         Gst.init(None)
- 
 
         self.videoplayer = self.create_pb('_video', self.tfile)
         self.overlayplayer = self.create_pb('_overlay', self.overlayfile)
@@ -51,11 +48,9 @@ class MhGstPlayer():
             self.bus.enable_sync_message_emission()
             self.bus.connect('sync-message::element', self.on_sync_message)
 
-
         self.videomixer.set_state(Gst.State.PLAYING)
         self.videoplayer.set_state(Gst.State.PLAYING)
         self.overlayplayer.set_state(Gst.State.PLAYING)
-
 
         #self.interrupt_next(start=True)
 
@@ -104,8 +99,13 @@ class MhGstPlayer():
         pb.set_state(Gst.State.PLAYING)
         '''
 
- 
     def on_about_to_finish(self, pb):
+        # gstreamer stuff needs to be called from main thread, but this function can be called from any
+        GLib.idle_add(lambda: self.mt_on_about_to_finish(pb))
+
+
+    def mt_on_about_to_finish(self, pb):
+        # FIXME: do this in main thread
         name = pb.get_property("name")
         uri = pb.get_property("uri")
         #state = pb.get_state() 

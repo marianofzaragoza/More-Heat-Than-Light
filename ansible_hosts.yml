@@ -7,25 +7,32 @@
 #alice	192.168.172.101	2C:CF:67:32:F3:CA	11h 41m 54s	Set Static
 #strooms-Mini	192.168.172.249	14:98:77:3A:28:DA	11h 41m 55s	Set Static
 
-all: 
-    hosts:
-      alice:
-        #ansible_host: 10.147.18.197  
-        ansible_host: 192.168.172.101
+all:
+  children:
+    video:
+    pi:
 
+video:
+    hosts:
       alice-vid:
         #ansible_host: 10.147.18.205  
         ansible_host: 192.168.172.185
-
-      bob:
-        #ansible_host: 10.147.18.60
-        ansible_host: 192.168.172.153
-
       bob-vid:
         ansible_host: 192.168.172.235	
         #ansible_host: 10.147.18.4
         ansible_user: root
         host_var: hallo
+
+pi:
+  hosts:
+      alice:
+        #ansible_host: 10.147.18.197  
+        ansible_host: 192.168.172.101
+
+      bob:
+        #ansible_host: 10.147.18.60
+        ansible_host: 192.168.172.153
+
       carol:
         ansible_host: 192.168.172.111
         #ansible_host: 10.147.18.208
