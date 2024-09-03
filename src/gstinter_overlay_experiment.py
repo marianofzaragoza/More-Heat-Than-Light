@@ -163,10 +163,10 @@ pipe3 = Gst.parse_launch(
     "sink_0::blend-function-dst-alpha=0"+
     "sink_0::blend-function-src-rgb=6 "+ 
     "sink_0::blend-function-dst-rgb=7 "+
-
-    "name=videomix sink_1::xpos=800 sink_1::alpha=1 sink_0::alpha=1 sink_1::ypos=800 ! videoconvert ! autovideosink sync=false"
+    "sink_1::alpha=1 sink_0::alpha=1 "+
+    "name=videomix ! videoconvert ! autovideosink sync=false"
     )
- 
+#sink_1::xpos=800 sink_1::alpha=1 sink_0::alpha=1 sink_1::ypos=800  
 pipe3asdfasdf = Gst.parse_launch(
    "intervideosrc name=video_src_1 channel=channel_video ! queue !  alpha method=custom black-sensitivity=128 target-b=255 target-r=255 target-g=255 ! queue ! videoconvert ! queue !videomix. " +
     "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! alpha method=custom black-sensitivity=128 target-b=255 target-r=255 target-g=255 ! videoconvert ! queue ! videomix. " +
