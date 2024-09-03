@@ -42,7 +42,7 @@ class Playlist():
             self.b_temp = temp
 
     def get_overlay(self):
-        video_file = self.vc.get_broken_channel_file(self.channel, self.channel)
+        video_file = self.vc.get_broken_channel_file(self.channel)
         realpath = os.path.realpath(self.videodir + '/' + video_file)
 
         self.log.warning("get_overlay: " + realpath) 
