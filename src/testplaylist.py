@@ -88,6 +88,10 @@ class Playlist():
         self.log.critical("next() " + realpath)
         return realpath
 
+    def get_overlay(self):
+        return "video/animation/alice_hd.mov"
+
+
        
     def choose_video(self, t):
         folder_index = 0
