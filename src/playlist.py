@@ -41,6 +41,12 @@ class Playlist():
         elif which == 'B':
             self.b_temp = temp
 
+    def get_overlay(self):
+        self.log.warning("file: " + realpath) 
+        video_file = self.vc.get_broken_channel_file(self.channel, node)
+        realpath = os.path.realpath(self.videodir + '/' + video_file)
+        return realpath
+
     def next(self, interrupt=False):
         
         self.log.warning(self.vc.state_from_temp(self.a_temp, self.b_temp))

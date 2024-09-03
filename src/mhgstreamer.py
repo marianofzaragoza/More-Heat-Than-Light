@@ -33,10 +33,15 @@ class MhGstPlayer():
         self.playlist = playlist
         self.xid = xid
         self.overlay = True
+        #self.tfile = "video/random/305_24p.mp4"
 
+
+        #self.hdfile = "video/quality/HD PRORESS.mov"
+        #self.overlayfile = "video/animation/alice_hd.mov"
         self.hdfile = "video/quality/HD PRORESS.mov"
-        self.overlayfile = "video/animation/alice_hd.mov"
-        self.tfile = "video/random/305_24p.mp4"
+        self.tfile = "video/animation/alice_hd.mov"
+        
+        self.overlayfile = "video/random/305_24p.mp4"
 
         #GST
         Gst.init(None)
@@ -132,10 +137,10 @@ class MhGstPlayer():
         self.log_stuff()
         if name == "playbin_overlay":
             self.log.warning("playbinoverlay about to finish")
-            uri = Gst.filename_to_uri(self.overlayfile)
+            uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
             self.log.warning("playbinvideo about to fi")
-            uri = Gst.filename_to_uri(self.tfile)
+            uri = Gst.filename_to_uri(self.playlist.next())
         else:
             uri = Gst.filename_to_uri(self.hdfile)
 
@@ -238,7 +243,7 @@ class MhGstPlayer():
 
     # for playing in a gtk window
     def on_sync_message(self, bus, msg):
-        self.log.critical("sync message")
+        #self.log.critical("sync message")
         if msg.get_structure().get_name() == 'prepare-window-handle':
             #print('prepare-window-handle')
             msg.src.set_window_handle(self.xid)
