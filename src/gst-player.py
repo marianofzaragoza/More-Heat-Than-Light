@@ -161,13 +161,14 @@ class PlayerUi(Gtk.Window):
         # beatloop
         task1 = asyncio.create_task(self.beat_test())
 
-        
+    '''        
     def pl_set_state(self,state):
         GLib.idle_add(lambda: self.player.pipeline.set_state(state))
 
     def state_change(self,state):
         self.player.pipeline.set_state(Gst.State.PLAYING)
 
+    '''
     def update_playlist_temp(self, which, temp):
         #self.log.warning('called: update_temp ' + which + str(temp))
 
@@ -288,7 +289,7 @@ class PlayerUi(Gtk.Window):
 
 
     def quit(self, window):
-        self.player.pipeline.set_state(Gst.State.NULL)
+        self.player.quit()
         Gtk.main_quit()
 
     def fullscreen_at_monitor(self, window, n):

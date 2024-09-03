@@ -10,18 +10,8 @@ from datetime import datetime
 import time
 from playlist import Playlist
 from tempsender import Tempsender, TempSource
-
-
-
-
-#from gi.repository import GLib, GObject, Gst, Gtk, GstNet
-# Needed for get_xid(), set_window_handle()
-#from gi.repository import GdkX11, GstVideo
-
-
 gi.require_version('Gst', '1.0')
 gi.require_version('Gtk', '3.0')
-#gi.require_version('Glib', '1.0')
 gi.require_version('GdkX11', '3.0')
 gi.require_version('GstVideo', '1.0')
 gi.require_version("GLib", "2.0")
@@ -32,81 +22,182 @@ class MhGstPlayer():
     def __init__(self, xid=None, playlist=None):
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
+        
 
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("GstPlayer", self)
         self.log.setLevel(logging.WARN)
+       
         
         self.playlist = playlist
         self.xid = xid
-
-        self.init_gst()
-
-        self.start()
- 
-    def init_gst(self):
-       
-        Gst.init(None)
-       ############
-        # Gst setup
-        ############
-        #video/x-raw,format=AYUV,framerate=\(fraction\)5/1,width=320,height=240
-
-    #glvideomixer name=videomix latency=1000 sink_1::alpha=0.5 message-forward=false start-time-selection=2  ! glimagesink sync=false\
-    #uridecodebin uri="file://${SRC}" name=demux1 ! queue leaky=0 ! videoconvert ! videorate ! queue ! glupload !glcolorconvert ! glcolorscale ! videomix. \
-    #uridecodebin uri="file://${SRC2}" name=demux2 ! \
-    #queue leaky=0 ! decodebin ! queue  ! videoconvert ! queue ! videorate ! glupload ! glcolorconvert  ! glcolorscale ! videomix.
-
-
-
-        ############## old
-        self.playbin = Gst.parse_launch('playbin3')
-        self.playbin.set_property('instant-uri', True)
- 
-        vsink = Gst.ElementFactory.make('xvimagesink', 'videosink')
-        overlaysink = Gst.parse_bin_from_description('videoconvert ! queue ! fpsdisplaysink name=fps video-sink="glimagesink name=glsink"', 'overlaysink')
-        fps = overlaysink.get_by_name('fps')
-        glsink = overlaysink.get_by_name('glsink')
-
-        #glist = Gst.ValueList([0,0,1920,1080])
-        #array = Gst.ValueArray (glist)
-        # https://github.com/GStreamer/gst-python/blob/master/testsuite/test_types.py
-        #a = Gst.ValueArray((1,2,3))
-        #rect = Gst.ValueArray((0,0,1920,1080))
-        #glsink.set_property('render-rectangle', rect)
-
-        videosink = overlaysink.get_by_name('glsink')
-        fps.set_property('text-overlay', True)
-        fps.set_property('signal-fps-measurements', True)
-        fps.set_property('fps-update-interval', 1000)
-        fps.connect('fps-measurements', self.on_fps_measurements, videosink)
-
-        asink = Gst.ElementFactory.make('fakesink', 'audiosink')
-        self.playbin.set_property('video-sink', overlaysink)
-        self.playbin.set_property('audio-sink', asink)
-        ############
-        # bus
-        ###############
-        bus = self.playbin.get_bus()
-        bus.add_signal_watch()
-        #bus.connect('message::error', self._error)
-        self.playbin.connect('about-to-finish', self.on_about_to_finish) 
-        bus.connect('message::eos', self.on_eos)
-        #bus.connect('message::application', self.on_msg)
-        #bus.connect('message::state_changed', self.on_msg)
-        #bus.connect('message::duration_changed', self.on_msg)
- 
-        #bus.connect('message::async-done', self._async_done)
-        self.pipeline = self.playbin 
         
+        self.hdfile = "video/quality/HD PRORESS.mov"
+        self.overlayfile = "video/animation/alice_hd.mov"
+        self.tfile = "video/random/305_24p.mp4"
+
+        #GST
+        Gst.init(None)
+ 
+
+        self.videoplayer = self.create_pb('_video', self.tfile)
+        self.overlayplayer = self.create_pb('_overlay', self.overlayfile)
+        self.videomixer = self.create_mixerpipeline() 
+
         # This is needed to make the video output in gtk DrawingArea:
+        self.bus = self.videomixer.get_bus()
+
         if self.xid:
-            bus.enable_sync_message_emission()
-            bus.connect('sync-message::element', self.on_sync_message)
+            self.bus.enable_sync_message_emission()
+            self.bus.connect('sync-message::element', self.on_sync_message)
 
+
+        self.videomixer.set_state(Gst.State.PLAYING)
+        self.videoplayer.set_state(Gst.State.PLAYING)
+        self.overlayplayer.set_state(Gst.State.PLAYING)
+
+
+        #self.interrupt_next(start=True)
+
+    def log_stuff(self):
+
+        self.log.critical( 'video, dur: ' + str(self.videoplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.videoplayer.query_position(Gst.Format.TIME)) )
+        self.log.critical( 'overlay, dur: ' + str(self.overlayplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.overlayplayer.query_position(Gst.Format.TIME)) )
+ 
+
+    def quit(self):
+        self.videomixer.set_state(Gst.State.NULL)
+        self.videoplayer.set_state(Gst.State.NULL)
+        self.overlayplayer.set_state(Gst.State.NULL)
+
+
+
+    def create_mixerpipeline(self):
+        videomixer = Gst.parse_launch(
+           "intervideosrc name=video_src_1 channel=channel_video ! queue ! videoconvert ! queue ! videoconvert !  video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
+            "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! videoconvert ! queue ! videoconvert ! video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
+            "glvideomixer " + 
+            "sink_1::blend-constant-color-alpha=0 "+
+            "sink_1::blend-function-src-alpha=14 "+
+            #"sink_1::blend-function-dst-alpha=0 "+
+            "sink_1::blend-function-src-rgb=6 "+
+            "sink_1::blend-function-dst-rgb=7 "+
+
+            "sink_0::blend-constant-color-alpha=0 "+
+            "sink_0::blend-function-src-alpha=14 "+
+            #"sink_0::blend-function-dst-alpha=0"+
+            "sink_0::blend-function-src-rgb=6 "+ 
+            "sink_0::blend-function-dst-rgb=7 "+
+            "sink_1::alpha=1 sink_0::alpha=1 "+
+            "name=videomix ! videoconvert ! autovideosink sync=false"
+            )
+        return videomixer
+
+    # this should not be called normally, maybe could be used when the interrupt video is played in separate playbin (so it can be preloaded and mixed in)
+    def on_eos(self, bus, msg):
+        self.log.critical("EOS received from %s " /  str(msg.src))
+        '''
+        pb = msg.src
+        pb.set_state(Gst.State.NULL)
+        uri = Gst.filename_to_uri(overlayfile)
+        pb.set_property("uri", uri) 
+        pb.set_state(Gst.State.PLAYING)
+        '''
+
+ 
+    def on_about_to_finish(self, pb):
+        name = pb.get_property("name")
+        uri = pb.get_property("uri")
+        #state = pb.get_state() 
+        self.log.critical(name + " about to finish " + uri)
+        #print(str(name)+ ' ' + str(state) + ' '  + str(uri))
+        self.log_stuff()
+        if name == "playbin_overlay":
+            self.log.warning("playbinoverlay about to finish")
+            uri = Gst.filename_to_uri(self.overlayfile)
+        elif name == "playbin_video":
+            self.log.warning("playbinvideo about to fi")
+            uri = Gst.filename_to_uri(self.tfile)
+        else:
+            uri = Gst.filename_to_uri(self.hdfile)
+
+        pb.set_property("uri", uri) 
+        pb.set_state(Gst.State.PLAYING)
+
+    def create_ob(self, name):
+
+        ob = Gst.Bin.new(name + "output")
+
+        #queue (input)
+        q1 = Gst.ElementFactory.make("queue", "q1")
+        ob.add(q1)
+        pad = q1.get_static_pad("sink")
+        ghostpad = Gst.GhostPad.new("sink", pad)
+        ob.add_pad(ghostpad)
+
+        #convert
+        convert = Gst.ElementFactory.make("videoconvert", "convert")
+        #ob.add(convert)
+        #q1.link(convert)
+
+        #rate
+        rate = Gst.ElementFactory.make("videorate", "videorate")
+        ob.add(rate)
+        q1.link(rate)
+
+
+        #capsfilter (seems needed for alpha)
+        capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
+        caps_str = "video/x-raw,format=BGRA,width=1920,height=1080,framerate=(fraction)24/1"
+        caps = Gst.Caps.from_string(caps_str)
+        capsfilter.set_property("caps", caps)
+        #ob.add(capsfilter)
+        #rate.link(capsfilter)
+         
+        #queue
+        q2 = Gst.ElementFactory.make("queue", "q2")
+        ob.add(q2)
+        #q2.link(capsfilter)
+        rate.link(q2)
+       
+        #intersink
+        intersink = Gst.ElementFactory.make("intervideosink", "video_sink" + name)
+        intersink.set_property('channel', 'channel' + name)
+        intersink.set_property('sync', True)
+        ob.add(intersink)
+        q2.link(intersink)
+
+        return ob
+
+
+    # We make the two pipelines
+    def create_pb(self, name, file):
+        uri = Gst.filename_to_uri(file)
+
+        #create playbin
+        pb = Gst.parse_launch('playbin3 name=playbin' + name)
+        pb.set_property('instant-uri', True)
+        pb.set_property("uri", uri) 
+
+        obsink = self.create_ob(name)
+        pb.set_property('video-sink', obsink)
+
+        asink = Gst.ElementFactory.make("fakesink", "audiosink")
+        pb.set_property('audio-sink', asink)
+
+        #signals
+        pb.connect('about-to-finish', self.on_about_to_finish) 
+
+        bus = pb.get_bus()
+        bus.connect('message::eos', self.on_eos)
+
+        #playsink = pb.get_by_name('playsink')
+        #pb.set_state(Gst.State.PAUSED)
+        return pb
+
+
+    # loads next file in main thread, almostfinished=True will not reset playback
     def interrupt_next(self, start=False, almostfinished=False):
-        #print('called: interrupt_next()')
-
         # gstreamer stuff needs to be called from main thread, but this function can be called from any
         GLib.idle_add(lambda: self.mt_interrupt_next(start=start))
 
@@ -114,114 +205,35 @@ class MhGstPlayer():
     # this function needs to be called from main thread, do not use directly, use interrupt_next
     def mt_interrupt_next(self, start=False):
         #print('called: MT_interrupt_next()')
-        self.pipeline.set_state(Gst.State.NULL)
+        self.videoplayer.set_state(Gst.State.NULL)
         
         if start:
             nextfile = self.playlist.next(interrupt=False)
         else: 
             nextfile = self.playlist.next(interrupt=True)
         
-        self.playbin.set_property("uri", "file://" + nextfile) 
-        self.pipeline.set_state(Gst.State.PLAYING)
+        self.videoplayer.set_property("uri", "file://" + nextfile) 
+        self.videoplayer.set_state(Gst.State.PLAYING)
 
         # returning False  removes it from the glib event loop
         return False
- 
-    def start(self):
-        #print('called: start()')
-        self.interrupt_next(start=True)
- 
+
     # for playing in a gtk window
     def on_sync_message(self, bus, msg):
+        self.log.critical("sync message")
         if msg.get_structure().get_name() == 'prepare-window-handle':
             #print('prepare-window-handle')
             msg.src.set_window_handle(self.xid)
 
-    def on_eos(self, bus, msg):
-        print("EOS")
-        #self.interrupt_next()
-
-    def next(self):
-
-        print('called: next()')
-        self.interrupt_next(almostfinished=True)
-        #nextfile = self.playlist.next()
-        #self.log.warning('next() nextfile: ' + nextfile)
-        #self.playbin.set_property("uri", "file://" + nextfile) 
-        #return True
-
-
-    def on_about_to_finish(self,*args):
-        self.next()
-
-    def on_error(self, bus, msg):
-        print('on_error():', msg.parse_error())
-    
-    def probe_block(self, pad, buf):
-        print("probe blocked")
-        return True
    
-    def on_fps_measurements(self, element, fps, droprate, avg, videosink):
-        self.log.info("fps: ", str(fps) + "droprate: " + str(droprate))
-        #caps = videosink.get_static_pad('sink').get_current_caps()
-        #print('fps: {:.2f} avg: {:.2f} droprate: {:.2f} caps: {}'.format(fps, avg, droprate, caps))
-        #self.print_caps(caps)
-
-    def print_field(self, field, value, pfx):
-        str = Gst.value_serialize(value)
-        print("{0:s}  {1:15s}: {2:s}".format(
-            pfx, GLib.quark_to_string(field), str))
-        return True
-
-    def print_caps(self, caps):
-        pfx = "     "
-        if not caps:
-            return
-
-        if caps.is_any():
-            print("{0:s}ANY".format(pfx))
-            return
-
-        if caps.is_empty():
-            print("{0:s}EMPTY".format(pfx))
-            return
-
-        for i in range(caps.get_size()):
-            structure = caps.get_structure(i)
-            print("{0:s}{1:s}".format(pfx, structure.get_name()))
-            structure.foreach(self.print_field, pfx) 
-
-    def on_msg(self, bus, msg):
-        self.log.debug('msg bus:' + str(bus)+ str(msg) + str(msg.type) )
-
-        if msg.type == Gst.MessageType.DURATION_CHANGED:
-            self.log.debug("DURATION CHANGED")
-        if msg.type == Gst.MessageType.STATE_CHANGED:
-            self.log.debug("STATE CHANGED")
-            if isinstance(message.src, Gst.Pipeline):
-                old_state, new_state, pending_state = message.parse_state_changed()
-                self.log.debug(("Pipeline state changed from %s to %s." % (old_state.value_nick, new_state.value_nick)))
-        if msg.type == Gst.MessageType.ERROR:
-            err, dbg = msg.parse_error()
-            self.log.critical("ERROR:", msg.src.get_name(), ":", err)
-            if dbg:
-                self.log.critical("Debug info:", dbg)
-        if msg.type == Gst.MessageType.APPLICATION:
-            #print("application msg")
-            #if msg.get_structure().get_name() == 'user_text':
-            structn = msg.get_structure().get_name()
-            structv = msg.get_structure().get_value('text') 
-            #print('appmsg: ' + str(structn) + ' v: ' + str(structv))
-                #overlay.set_property('text', struct['text'])
-            #overlay.set_property('text','asdfasdf')
-
 
 if __name__ == '__main__':
 
-    playlist = Playlist(True, 'A', 'videos')
+    playlist = Playlist()
     GObject.threads_init()
     mainloop = GObject.MainLoop()
 
     p = MhGstPlayer(playlist=playlist)
+
     mainloop.run()
 

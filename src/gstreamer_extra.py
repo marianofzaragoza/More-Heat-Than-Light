@@ -98,3 +98,75 @@ class MhGstPlayerExtra():
         context.set_line_width(1)
         context.stroke()
  
+    def probe_block(self, pad, buf):
+        print("probe blocked")
+        return True
+   
+    def on_fps_measurements(self, element, fps, droprate, avg, videosink):
+        self.log.info("fps: ", str(fps) + "droprate: " + str(droprate))
+        #caps = videosink.get_static_pad('sink').get_current_caps()
+        #print('fps: {:.2f} avg: {:.2f} droprate: {:.2f} caps: {}'.format(fps, avg, droprate, caps))
+        #self.print_caps(caps)
+
+    def print_field(self, field, value, pfx):
+        str = Gst.value_serialize(value)
+        print("{0:s}  {1:15s}: {2:s}".format(
+            pfx, GLib.quark_to_string(field), str))
+        return True
+
+    def print_caps(self, caps):
+        pfx = "     "
+        if not caps:
+            return
+
+        if caps.is_any():
+            print("{0:s}ANY".format(pfx))
+            return
+
+        if caps.is_empty():
+            print("{0:s}EMPTY".format(pfx))
+            return
+
+        for i in range(caps.get_size()):
+            structure = caps.get_structure(i)
+            print("{0:s}{1:s}".format(pfx, structure.get_name()))
+            structure.foreach(self.print_field, pfx) 
+
+    def on_msg(self, bus, msg):
+        self.log.debug('msg bus:' + str(bus)+ str(msg) + str(msg.type) )
+
+        if msg.type == Gst.MessageType.DURATION_CHANGED:
+            self.log.debug("DURATION CHANGED")
+        if msg.type == Gst.MessageType.STATE_CHANGED:
+            self.log.debug("STATE CHANGED")
+            if isinstance(message.src, Gst.Pipeline):
+                old_state, new_state, pending_state = message.parse_state_changed()
+                self.log.debug(("Pipeline state changed from %s to %s." % (old_state.value_nick, new_state.value_nick)))
+        if msg.type == Gst.MessageType.ERROR:
+            err, dbg = msg.parse_error()
+            self.log.critical("ERROR:", msg.src.get_name(), ":", err)
+            if dbg:
+                self.log.critical("Debug info:", dbg)
+        if msg.type == Gst.MessageType.APPLICATION:
+            #print("application msg")
+            #if msg.get_structure().get_name() == 'user_text':
+            structn = msg.get_structure().get_name()
+            structv = msg.get_structure().get_value('text') 
+            #print('appmsg: ' + str(structn) + ' v: ' + str(structv))
+                #overlay.set_property('text', struct['text'])
+            #overlay.set_property('text','asdfasdf')
+
+    def on_eos(self, bus, msg):
+        self.log.critical("EOS")
+        #self.interrupt_next()
+
+    def next(self):
+        print('called: next()')
+        self.interrupt_next(almostfinished=True)
+ 
+    def on_about_to_finish(self,*args):
+        self.next()
+
+    def on_error(self, bus, msg):
+        print('on_error():', msg.parse_error())
+ 
