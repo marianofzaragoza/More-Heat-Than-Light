@@ -12,7 +12,7 @@
 * DONE config file
 * lightbox (only send)
 * plymouth-reboot splash screen
-
+* fix alpha blend function (so its faster)
 * use live sync for timing video interruption
   * is the beat count the same on all machines???? check in aalink
   * interruption state machine

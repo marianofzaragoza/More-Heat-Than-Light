@@ -11,16 +11,20 @@ Gst.init(None)
 mainloop = GObject.MainLoop()
 
 hdfile = "video/quality/HD PRORESS.mov"
-#overlayfile = "video/animation/alice_hd.mov"
-overlayfile = "video/animation/animation_low.webm"
+overlayfile = "video/animation/alice_hd.mov"
 #overlayfile = "video/animation/alice_high.webm"
+#overlayfile = '/media/user/Ventoy/Timeline 1.mov'
 
 
 #overlayfile = "video/animation/animation.mxf"
 #overlayfile = "video/animation/LONLEY.mov"
 #overlayfile = "video/random/transparent-video.webm"
-tfile = "video/random/305_24p.mp4"
 #overlayfile = ""
+
+#tfile = "video/animation/animation_low.webm"
+#overlayfile= "video/animation/animation_low.webm"
+#overlayfile = "video/random/305_24p.mp4"
+tfile = "video/random/305_24p.mp4"
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 print(current_dir)
@@ -32,12 +36,25 @@ print('debug: ' + current_dir)
 
 #intervideosrc gstintervideosrc.c:411:gst_inter_video_src_create:<video_src_2> Failed to negotiate caps video/x-raw, format=(string)A444_10LE, width=(int)1920, height=(int)1080, interlace-mode=(string)progressive, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)bt709, framerate=(fraction)30/1
 
+def on_eos(bus, msg):
+    pb = msg.src
+    print("EOS from: " + str(msg.src))
+    pb.set_state(Gst.State.NULL)
+    uri = Gst.filename_to_uri(overlayfile)
+    pb.set_property("uri", uri) 
+    pb.set_state(Gst.State.PLAYING)
+
+
+    print("EOS")
+    #self.interrupt_next()
+
+
 def on_about_to_finish(pb):
     name = pb.get_property("name")
     uri = pb.get_property("uri")
-    state = pb.get_state() 
+    #state = pb.get_state() 
 
-    print(str(name)+ ' ' + str(state) + ' '  + str(uri))
+    #print(str(name)+ ' ' + str(state) + ' '  + str(uri))
 
     if name == "playbin_overlay":
         print("playbinoverlay")
@@ -64,27 +81,33 @@ def get_ob(name):
 
     #convert
     convert = Gst.ElementFactory.make("videoconvert", "convert")
-    ob.add(convert)
-    q1.link(convert)
+    #ob.add(convert)
+    #q1.link(convert)
+
+    #rate
+    rate = Gst.ElementFactory.make("videorate", "videorate")
+    ob.add(rate)
+    q1.link(rate)
+
 
     #capsfilter (seems needed for alpha)
     capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
-    caps_str = "video/x-raw,width=1920,height=1080,framerate=(fraction)24/1"
+    caps_str = "video/x-raw,format=BGRA,width=1920,height=1080,framerate=(fraction)24/1"
     caps = Gst.Caps.from_string(caps_str)
     capsfilter.set_property("caps", caps)
-    ob.add(capsfilter)
-    convert.link(capsfilter)
+    #ob.add(capsfilter)
+    #rate.link(capsfilter)
      
     #queue
     q2 = Gst.ElementFactory.make("queue", "q2")
     ob.add(q2)
     #q2.link(capsfilter)
-    capsfilter.link(q2)
+    rate.link(q2)
    
     #intersink
     intersink = Gst.ElementFactory.make("intervideosink", "video_sink" + name)
     intersink.set_property('channel', 'channel' + name)
-    intersink.set_property('sync', False)
+    intersink.set_property('sync', True)
     ob.add(intersink)
     q2.link(intersink)
 
@@ -103,7 +126,9 @@ def get_pb(name, file):
 
     #signals
     pb.connect('about-to-finish', on_about_to_finish) 
-    #bus.connect('message::eos', self.on_eos)
+
+    bus = pb.get_bus()
+   #bus.connect('message::eos', on_eos)
 
     #playsink = pb.get_by_name('playsink')
     pb.set_state(Gst.State.PLAYING)
@@ -112,11 +137,42 @@ def get_pb(name, file):
 videopl = get_pb('_video', tfile)
 overlaypl = get_pb('_overlay', overlayfile)
 
-pipe3 = Gst.parse_launch(
-    "intervideosrc name=video_src_1 channel=channel_video ! timeoverlay ! queue ! video/x-raw,width=1920,height=1080 !  videoconvert ! queue ! glupload ! glcolorconvert ! videomix. " +
-    "intervideosrc name=video_src_2 channel=channel_overlay ! timeoverlay ! queue !  video/x-raw,width=1920,height=1080 ! videoconvert ! queue ! glupload ! glcolorconvert! videomix. " +
-    "glvideomixer latency=10000 name=videomix ! glupload ! glcolorconvert ! glimagesink"
+'''
+pipe_opengl = Gst.parse_launch(
+    
+    "intervideosrc name=video_src_1 channel=channel_video ! queue ! video/x-raw,width=1920,height=1080 !  videoconvert ! queue ! videomix. " +
+    "intervideosrc name=video_src_2 channel=channel_overlay ! queue !  video/x-raw,width=1920,height=1080,format=A444_10L ! videoconvert ! queue ! videomix. " +
+    "glvideomixer name=videomix ! glupload ! glcolorconvert ! glimagesink"
     )
+    '''
+#    "videotestsrc is-live=true pattern=ball ! queue ! c. " +
+#    "alphacombine name=c ! queue ! videomix. " +
+#!  video/x-raw,width=1920,height=1080,framerate=24/1,format=BGRA ! videoconvert ! queue ! video/x-raw,format=A444_10LE  
+pipe3 = Gst.parse_launch(
+   "intervideosrc name=video_src_1 channel=channel_video ! queue ! videoconvert ! queue ! videoconvert !  video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
+    "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! videoconvert ! queue ! videoconvert ! video/x-raw,width=1920,height=1080,framerate=24/1 ! videomix. " +
+    "glvideomixer " + 
+    "sink_1::blend-constant-color-alpha=0 "+
+    "sink_1::blend-function-src-alpha=14 "+
+    "sink_1::blend-function-dst-alpha=0 "+
+    "sink_1::blend-function-src-rgb=6 "+
+    "sink_1::blend-function-dst-rgb=7 "+
+
+    "sink_0::blend-constant-color-alpha=0 "+
+    "sink_0::blend-function-src-alpha=14 "+
+    "sink_0::blend-function-dst-alpha=0"+
+    "sink_0::blend-function-src-rgb=6 "+ 
+    "sink_0::blend-function-dst-rgb=7 "+
+
+    "name=videomix sink_1::xpos=800 sink_1::alpha=1 sink_0::alpha=1 sink_1::ypos=800 ! videoconvert ! autovideosink sync=false"
+    )
+ 
+pipe3asdfasdf = Gst.parse_launch(
+   "intervideosrc name=video_src_1 channel=channel_video ! queue !  alpha method=custom black-sensitivity=128 target-b=255 target-r=255 target-g=255 ! queue ! videoconvert ! queue !videomix. " +
+    "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! alpha method=custom black-sensitivity=128 target-b=255 target-r=255 target-g=255 ! videoconvert ! queue ! videomix. " +
+    "compositor force-live=true name=videomix sink_1::xpos=800 sink_1::ypos=800  ! autovideosink "
+    )
+
 
 #
 #pipe3 = gst.parse_launch(

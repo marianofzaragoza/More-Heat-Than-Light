@@ -11,8 +11,8 @@ Gst.init(None)
 mainloop = GObject.MainLoop()
 
 hdfile = "video/quality/HD PRORESS.mov"
-#overlayfile = "video/animation/alice_hd.mov"
-overlayfile = "video/animation/animation_low.webm"
+overlayfile = "video/animation/alice_hd.mov"
+#overlayfile = "video/animation/animation_low.webm"
 #overlayfile = "video/animation/alice_high.webm"
 
 
@@ -35,9 +35,9 @@ print('debug: ' + current_dir)
 def on_about_to_finish(pb):
     name = pb.get_property("name")
     uri = pb.get_property("uri")
-    state = pb.get_state() 
+    #state = pb.get_state() 
 
-    print(str(name)+ ' ' + str(state) + ' '  + str(uri))
+    #print(str(name)+ ' ' + str(state) + ' '  + str(uri))
 
     if name == "playbin_overlay":
         print("playbinoverlay")
@@ -67,24 +67,34 @@ def get_ob(name):
     ob.add(convert)
     q1.link(convert)
 
+    #rate
+    rate = Gst.ElementFactory.make("videorate", "videorate")
+    ob.add(rate)
+    convert.link(rate)
+
+
     #capsfilter (seems needed for alpha)
+    '''
     capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
     caps_str = "video/x-raw,width=1920,height=1080,framerate=(fraction)24/1"
     caps = Gst.Caps.from_string(caps_str)
     capsfilter.set_property("caps", caps)
     ob.add(capsfilter)
-    convert.link(capsfilter)
-     
+    rate.link(capsfilter)
+    '''
     #queue
+
     q2 = Gst.ElementFactory.make("queue", "q2")
     ob.add(q2)
     #q2.link(capsfilter)
-    capsfilter.link(q2)
+    convert.link(q2)
    
     #intersink
-    intersink = Gst.ElementFactory.make("intervideosink", "video_sink" + name)
-    intersink.set_property('channel', 'channel' + name)
-    intersink.set_property('sync', False)
+    intersink = Gst.ElementFactory.make("interpipesink", "video_sink" + name)
+    intersink.set_property('name', 'channel' + name)
+    #intersink.set_property('channel', 'channel' + name)
+    #intersink.set_property('sync', False)
+    
     ob.add(intersink)
     q2.link(intersink)
 
@@ -110,11 +120,11 @@ def get_pb(name, file):
     return pb
 
 videopl = get_pb('_video', tfile)
-overlaypl = get_pb('_overlay', overlayfile)
+#overlaypl = get_pb('_overlay', overlayfile)
 
 pipe3 = Gst.parse_launch(
-    "intervideosrc name=video_src_1 channel=channel_video ! timeoverlay ! queue ! video/x-raw,width=1920,height=1080 !  videoconvert ! queue ! glupload ! glcolorconvert ! videomix. " +
-    "intervideosrc name=video_src_2 channel=channel_overlay ! timeoverlay ! queue !  video/x-raw,width=1920,height=1080 ! videoconvert ! queue ! glupload ! glcolorconvert! videomix. " +
+    "interpipesrc name=video_src_1 listen-to=channel_video ! timeoverlay ! queue ! video/x-raw,width=1920,height=1080 !  videoconvert ! queue ! glupload ! glcolorconvert ! videomix. " +
+    "interpipesrc name=video_src_2 listen-to=channel_overlay ! timeoverlay ! queue !  video/x-raw,width=1920,height=1080 ! videoconvert ! queue ! glupload ! glcolorconvert! videomix. " +
     "glvideomixer latency=10000 name=videomix ! glupload ! glcolorconvert ! glimagesink"
     )
 
@@ -140,13 +150,13 @@ pipe33 = Gst.parse_launch(
 #video_src_2 = pipe3.get_by_name('video_src_2')
 
 pipe3.set_state(Gst.State.PLAYING)
-#pipe1.set_state(Gst.State.PLAYING)
+videopl.set_state(Gst.State.PLAYING)
 #pipe2.set_state(Gst.State.PLAYING)
 
 def separate_thread():
     sleep(3)
     Gst.debug_bin_to_dot_file(videopl, Gst.DebugGraphDetails.ALL, 'gstdebug_' + '1' )
-    Gst.debug_bin_to_dot_file(overlaypl, Gst.DebugGraphDetails.ALL, 'gstdebug_' + '2' )
+    #Gst.debug_bin_to_dot_file(overlaypl, Gst.DebugGraphDetails.ALL, 'gstdebug_' + '2' )
     Gst.debug_bin_to_dot_file(pipe3, Gst.DebugGraphDetails.ALL, 'gstdebug_' + '3' )
 
     while True:
@@ -155,8 +165,8 @@ def separate_thread():
         print(videopl.query_duration(Gst.Format.TIME))
         print(videopl.query_position(Gst.Format.TIME))
  
-        print(overlaypl.query_duration(Gst.Format.TIME))
-        print(overlaypl.query_position(Gst.Format.TIME))
+        #print(overlaypl.query_duration(Gst.Format.TIME))
+        #print(overlaypl.query_position(Gst.Format.TIME))
  
 
 
