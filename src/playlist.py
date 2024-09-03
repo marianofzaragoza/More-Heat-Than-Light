@@ -13,13 +13,13 @@ class Playlist():
         self.conf = DynamicConfigIni()
         self.nodename = self.conf.DEFAULT.nodename
         self.playlist_category = eval('self.conf.' + self.nodename + '.playlist_category')
-        self.videodir = self.conf.playlist.videodir
+        self.videodir = self.conf.playlist.videodir_final
 
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("playlist", self)
         self.log.setLevel(logging.WARN)
-        self.a_temp = 242424
-        self.b_temp = 242424
+        self.a_temp = 24
+        self.b_temp = 22
         self.channel = 'C'
         if self.nodename == self.conf.playlist.vida_node:
             self.channel = 'A'

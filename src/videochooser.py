@@ -119,7 +119,7 @@ class Videochooser():
                 print(c + ': ' + str(self.filenames_from_cat(n, c)))
 
     def get_broken_channel_file(self, node):
-        return "BROKENCHANNEL_" + node
+        return "BROKENCHANNEL_" + node + '.mov'
 
     def get_random_file(self, node, temp_a, temp_b):
             state = self.state_from_temp(temp_a, temp_b)

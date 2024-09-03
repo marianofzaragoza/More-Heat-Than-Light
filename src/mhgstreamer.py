@@ -63,12 +63,17 @@ class MhGstPlayer():
             self.bus.connect('sync-message::element', self.on_sync_message)
 
 
-        #self.interrupt_next(start=True)
+        self.interrupt_next(start=True)
 
     def log_stuff(self):
         Gst.debug_bin_to_dot_file(self.videoplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_videoplayer_' )
         Gst.debug_bin_to_dot_file(self.videomixer, Gst.DebugGraphDetails.ALL, 'gstdebug_videomixer_' + '3' )
 
+        boole, cur = self.videoplayer.query_position(Gst.Format.TIME)
+        if boole == False:
+            self.log.critical("video stuck")
+        else:
+            self.log.critical("video not stuck yet")
 
         self.log.critical( 'video, dur: ' + str(self.videoplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.videoplayer.query_position(Gst.Format.TIME)) )
         if self.overlay:
@@ -139,8 +144,8 @@ class MhGstPlayer():
             self.log.warning("playbinoverlay about to finish")
             uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
-            self.log.warning("playbinvideo about to fi")
             uri = Gst.filename_to_uri(self.playlist.next())
+            self.log.warning("playbinvideo about to finish,  playlist: " + str(uri))
         else:
             uri = Gst.filename_to_uri(self.hdfile)
 

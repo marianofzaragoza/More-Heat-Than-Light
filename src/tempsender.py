@@ -84,7 +84,7 @@ class Tempsender():
             return round(self.stats[node][mtype][stype], 2)
         except KeyError as e:
             self.log.info("no STATS: node: " + node + ' mtype: ' + mtype + ' stype: ' + stype + ' err: '+ str(e))
-            return 232323
+            return 23
         #else:
         #    return 232323
 
