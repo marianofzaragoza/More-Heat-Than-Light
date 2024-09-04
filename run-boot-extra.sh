@@ -12,7 +12,12 @@ case `hostname` in
   alice-vid)
     # connect midi
     #./run.sh src/test_midi.py
-    sleep 5
+    #
+    while true
+    do
+      sleep 10
+      aconnect 'MIDI Mix':'MIDI Mix MIDI 1' 'mhtemp':'output'
+    done
     ;;
 
   *)
