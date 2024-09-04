@@ -13,9 +13,15 @@ case `hostname` in
     ./run.sh src/gst-player.py
     ;;
   alice-vid)
+    DISPLAY=:0 xrandr --output HDMI-0 --mode 1920x1200
     ./run.sh src/gst-player.py
     ;;
   bob-vid)
+    DISPLAY=:0 xrandr --output HDMI-0 --mode 1920x1200
+    ./run.sh src/gst-player.py
+    ;;
+  rivest)
+    DISPLAY=:0 xrandr --output HDMI-0 --mode 1920x1200
     ./run.sh src/gst-player.py
     ;;
   alice)
