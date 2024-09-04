@@ -67,6 +67,13 @@ class PlayerUi(Gtk.Window):
         srcdir = pathlib.Path(__file__).parent.resolve()
         provider.load_from_file(Gio.File.new_for_path(str(srcdir) + "/style.css"))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        
+        if self.nodename == "debian":
+            self.dw = True
+            bar_up = True
+        else:
+            self.dw = True
+            bar_up = False
 
 
         vbox = Gtk.VBox()
@@ -80,30 +87,27 @@ class PlayerUi(Gtk.Window):
         hbox.get_style_context().add_class('red-background')
         #hbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(1,0,1,1))
 
+        if self.dw:
+            self.text_tempa = Gtk.Button(label="temp A")
+            self.text_tempa.get_style_context().add_class('red-background')
 
-        self.text_tempa = Gtk.Button(label="temp A")
-        self.text_tempa.get_style_context().add_class('red-background')
+            hbox.pack_start(self.text_tempa, True, True, 0)
+            self.text_tempb = Gtk.Button(label="temp B")
+            hbox.pack_start(self.text_tempb, True, True, 0)
+            self.text_beatno = Gtk.Button(label="beatcount")
+            hbox.pack_start(self.text_beatno, True, True, 0)
 
-        hbox.pack_start(self.text_tempa, True, True, 0)
-        self.text_tempb = Gtk.Button(label="temp B")
-        hbox.pack_start(self.text_tempb, True, True, 0)
-        self.text_beatno = Gtk.Button(label="beatcount")
-        hbox.pack_start(self.text_beatno, True, True, 0)
+            self.text_clock = Gtk.Button(label="clock")
+            hbox.pack_start(self.text_clock, True, True, 0)
 
-        self.text_clock = Gtk.Button(label="clock")
-        hbox.pack_start(self.text_clock, True, True, 0)
+            self.text_clocknet = Gtk.Button(label="clocknet")
+            hbox.pack_start(self.text_clocknet, True, True, 0)
 
-        self.text_clocknet = Gtk.Button(label="clocknet")
-        hbox.pack_start(self.text_clocknet, True, True, 0)
+            self.text_state = Gtk.Button(label="state")
+            hbox.pack_start(self.text_state, True, True, 0)
 
-        self.text_state = Gtk.Button(label="state")
-        hbox.pack_start(self.text_state, True, True, 0)
-
-        self.text_cstate = Gtk.Button(label="cstate")
-        hbox.pack_start(self.text_cstate, True, True, 0)
-
-
-
+            self.text_cstate = Gtk.Button(label="cstate")
+            hbox.pack_start(self.text_cstate, True, True, 0)
 
 
 
@@ -111,16 +115,19 @@ class PlayerUi(Gtk.Window):
         # Create DrawingArea for video widget
         self.drawingarea = Gtk.DrawingArea()
         self.drawingarea.set_size_request(int(self.config.player.width), int(self.config.player.height)) 
-        vbox.pack_start(self.drawingarea, False, False, 0)
 
-        # add black bar to vbox
-        vbox.pack_start(hbox, True, True, 0)
+        if bar_up:
+            vbox.pack_start(hbox, True, True, 0)
+            vbox.pack_start(self.drawingarea, False, False, 0)
+        else:
+            vbox.pack_start(self.drawingarea, False, False, 0)
+            vbox.pack_start(hbox, True, True, 0)
 
                 #GLib.timeout_add(200, self.update)
        
-        header_bar = Gtk.HeaderBar()
-        header_bar.set_show_close_button(True)
-        self.set_titlebar(header_bar)  # Place 2
+        #header_bar = Gtk.HeaderBar()
+        #header_bar.set_show_close_button(True)
+        #self.set_titlebar(header_bar)  # Place 2
 
 
     def __init__(self):
@@ -212,9 +219,9 @@ class PlayerUi(Gtk.Window):
             #self.text_clock.set_label('clock: ' + str(beatno))
             nowt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-
-            GLib.idle_add(lambda: self.text_clock.set_label('beatcl: ' + nowt))
-            GLib.idle_add(lambda: self.text_beatno.set_label('P: ' + str(link.num_peers) + ' bpm: ' + str(int(link.tempo)) + ' bt: ' + str(int(beatno)) + ' ph: ' + str(int(link.phase)) + ' time: ' + str(link.time)))
+            if self.dw:
+                GLib.idle_add(lambda: self.text_clock.set_label('beatcl: ' + nowt))
+                GLib.idle_add(lambda: self.text_beatno.set_label('P: ' + str(link.num_peers) + ' bpm: ' + str(int(link.tempo)) + ' bt: ' + str(int(beatno)) + ' ph: ' + str(int(link.phase)) + ' time: ' + str(link.time)))
 
             self.update_playlist_temp('A', self.tempsender.get_stats(self.config.playlist.tempa_node, "temperature", "last"))
             self.update_playlist_temp('B', self.tempsender.get_stats(self.config.playlist.tempb_node, "temperature", "last"))
@@ -262,7 +269,8 @@ class PlayerUi(Gtk.Window):
             elif bm == 6 and bp == 6:
                 self.player.toggle_overlay()
 
-            GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate))
+            if self.dw:
+                GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate))
 
             #self.log.critical('bang! ' + str(beatno))
 
@@ -296,12 +304,10 @@ class PlayerUi(Gtk.Window):
         btime = self.tempsender.get_stats(self.config.playlist.tempb_node , "temperature", "last_seconds")
         bdt = datetime.utcfromtimestamp(btime).strftime('%Y-%m-%d %H:%M:%S')
         nowt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        GLib.idle_add(lambda: self.text_clocknet.set_label('nclock: ' + nowt))
- 
-
-
-        self.text_tempa.set_label(self.config.playlist.tempa_node + ' temp: ' + str(atemp) + ' : ' + str(adt))
-        self.text_tempb.set_label(self.config.playlist.tempb_node + ' temp: ' + str(btemp) + ' : ' + str(bdt))
+        if self.dw:
+            GLib.idle_add(lambda: self.text_clocknet.set_label('nclock: ' + nowt))
+            GLib.idle_add(lambda: self.text_tempa.set_label(self.config.playlist.tempa_node + ' temp: ' + str(atemp) + ' : ' + str(adt)))
+            GLib.idle_add(lambda: self.text_tempb.set_label(self.config.playlist.tempb_node + ' temp: ' + str(btemp) + ' : ' + str(bdt)))
         #self.text_clocknet.set_label(' net msg last:' + str(now))
 
 

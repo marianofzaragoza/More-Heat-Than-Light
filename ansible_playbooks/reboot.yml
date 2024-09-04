@@ -1,5 +1,6 @@
 ---
   - hosts: all
+    remote_user: root
     tasks:
       - command:
           chdir: "/home/user/src/More-Heat-Than-Light/"

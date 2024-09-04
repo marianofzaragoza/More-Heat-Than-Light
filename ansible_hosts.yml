@@ -22,7 +22,10 @@ video:
       #ansible_host: 10.147.18.4
       ansible_user: root
       host_var: hallo
-
+  vars:
+      group_all_var: value
+      ansible_user: root
+ 
 pi:
   hosts:
     alice:
@@ -40,7 +43,7 @@ pi:
       test1:
       test2:
           host_var: value
-    vars:
-        group_all_var: value
-        ansible_user: root
-    
+  vars:
+      group_all_var: value
+      ansible_user: root
+  
