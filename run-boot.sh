@@ -24,20 +24,8 @@ case `hostname` in
     #DISPLAY=:0 xrandr --output HDMI-0 --mode 1920x1200
     ./run.sh src/gst-player.py
     ;;
-  alice)
-    ./run.sh src/tempsender.py
-    ;;
-
-  bob)
-    ./run.sh src/tempsender.py
-    ;;
-  carol)
-    ./run.sh src/printerreceiver.py
-    ;;
-
   *)
     echo -n "unknown"
-    ./run.sh src/gst-player.py
-
+    sleep 360
     ;;
 esac
