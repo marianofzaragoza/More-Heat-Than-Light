@@ -19,7 +19,7 @@ gi.require_version("GLib", "2.0")
 gi.require_version("GstNet", "1.0")
 
 import asyncio, gbulb
-from gi.repository import GLib, GObject, Gst, Gtk, GstNet, GdkX11, GstVideo, Gdk
+from gi.repository import GLib, GObject, Gst, Gtk, GstNet, GdkX11, GstVideo, Gdk, Gio
 
 #
 # https://github.com/patrickkidd/pksampler/blob/master/pk/gst/gstsample.py
@@ -46,7 +46,7 @@ from tempsender import Tempsender, TempSource
 from config import DynamicConfigIni
 import logging
 import mhlog 
-
+import pathlib
 import asyncio
 from mhgstreamer import MhGstPlayer 
 
@@ -63,15 +63,27 @@ class PlayerUi(Gtk.Window):
         #Gtk.Window.fullscreen(self)
         #FIXME: possible fix for awesome fullscreen
         #gtk_window_set_geometry_hints(main_window, NULL, NULL, 0);
+        provider = Gtk.CssProvider()
+        srcdir = pathlib.Path(__file__).parent.resolve()
+        provider.load_from_file(Gio.File.new_for_path(str(srcdir) + "/style.css"))
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
 
         vbox = Gtk.VBox()
-        self.add(vbox)
+        vbox.get_style_context().add_class('red-background')
 
+        self.add(vbox)
+        #vbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(1,0,1,1))
+ 
         hbox = Gtk.HBox()
-        vbox.pack_start(hbox, True, True, 0)
+        hbox.set_size_request(int(self.config.player.barwidth), int(self.config.player.barheight)) 
+        hbox.get_style_context().add_class('red-background')
+        #hbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(1,0,1,1))
+
 
         self.text_tempa = Gtk.Button(label="temp A")
+        self.text_tempa.get_style_context().add_class('red-background')
+
         hbox.pack_start(self.text_tempa, True, True, 0)
         self.text_tempb = Gtk.Button(label="temp B")
         hbox.pack_start(self.text_tempb, True, True, 0)
@@ -101,7 +113,8 @@ class PlayerUi(Gtk.Window):
         self.drawingarea.set_size_request(int(self.config.player.width), int(self.config.player.height)) 
         vbox.pack_start(self.drawingarea, False, False, 0)
 
-
+        # add black bar to vbox
+        vbox.pack_start(hbox, True, True, 0)
 
                 #GLib.timeout_add(200, self.update)
        

@@ -50,6 +50,14 @@ class MhGstPlayer():
         Gst.init(None)
 
         self.videomixer = self.create_mixerpipeline() 
+        # This is needed to make the video output in gtk DrawingArea:
+        self.bus = self.videomixer.get_bus()
+
+        if self.xid:
+            self.bus.enable_sync_message_emission()
+            self.bus.connect('sync-message::element', self.on_sync_message)
+
+
         self.videomixer.set_state(Gst.State.PLAYING)
 
 
@@ -59,13 +67,6 @@ class MhGstPlayer():
         if self.overlay:
             self.overlayplayer = self.create_pb('_overlay', self.overlayfile)
             self.overlayplayer.set_state(Gst.State.PLAYING)
-        # This is needed to make the video output in gtk DrawingArea:
-        self.bus = self.videomixer.get_bus()
-
-        if self.xid:
-            self.bus.enable_sync_message_emission()
-            self.bus.connect('sync-message::element', self.on_sync_message)
-
         self.log_stuff()
         self.interrupt_next(start=True)
 
