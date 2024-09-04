@@ -142,7 +142,8 @@ class Videochooser():
             elif node == 'B':
                 temp = temp_b
             else:
-                channel = 'unknown'
+                self.log.critical(f'node {node} has no known channel configured, using A')
+                temp = temp_a
      
             if state == "TRANSMISSION" or state == "BROKENCHANNEL":
                 cat = self.cat_from_temp(temp)
