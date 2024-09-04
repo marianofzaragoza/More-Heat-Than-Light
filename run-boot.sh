@@ -32,7 +32,7 @@ case `hostname` in
     ./run.sh src/tempsender.py
     ;;
   carol)
-    ./run.sh src/printer.py
+    ./run.sh src/printerreceiver.py
     ;;
 
   *)
