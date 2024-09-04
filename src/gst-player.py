@@ -174,7 +174,8 @@ class PlayerUi(Gtk.Window):
       
         #TODO start the player
         #self.start()
-
+        #drawingarea.connect('configure-event', on_widget_configure, glsink)
+        #window.connect('delete-event', Gtk.main_quit)
         asyncio.run(self.beat_test())
 
         asyncio.get_event_loop().run_forever()

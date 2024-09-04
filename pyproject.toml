@@ -149,7 +149,8 @@ dependencies = [
   "ansible_runner",
   "gbulb",
   "pylive",
-  "ipywidgets"
+  "ipywidgets",
+  "alsa-midi",
 
   
 ]

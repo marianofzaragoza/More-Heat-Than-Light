@@ -38,19 +38,25 @@ import mhlog
 * keeps track of last termperature received
 '''
 class Tempsender():
-    def __init__(self, enable_appqueue=False):
+    def __init__(self, enable_appqueue=False, thermometer=False, source=False):
         self.enable_appqueue=enable_appqueue
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("tempsender", self)
         self.log.setLevel(logging.WARN)
  
         self.config = DynamicConfigIni()
-        self.nodename = self.config.DEFAULT.nodename  # Access the nodename
- 
-        if self.nodename == 'alice' or self.nodename == 'bob':
-            self.thermometer = Thermometer()
+        if source:
+            self.nodename = source
         else:
-            self.thermometer = Thermometer(testing=True)
+            self.nodename = self.config.DEFAULT.nodename  # Access the nodename
+
+        if thermometer:
+            self.thermometer = thermometer
+        else:
+            if self.nodename == 'alice' or self.nodename == 'bob':
+                self.thermometer = Thermometer()
+            else:
+                self.thermometer = Thermometer(testing=True)
 
         # stats (last / avg)
         # [node].type.value
@@ -144,9 +150,10 @@ class Tempsender():
         msglen = len(msg.SerializeToString())
         self.log.debug("length bits: " + str(msglen * 8))
         
+        self.log.critical(msg)
         self.log.debug(msg.SerializeToString())
 
-        ts.socket.send(msg.SerializeToString())
+        self.socket.send(msg.SerializeToString())
  
     def random_walk(y):
         # put some stuff here to make it stay within normal range
