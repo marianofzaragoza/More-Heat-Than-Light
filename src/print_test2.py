@@ -11,7 +11,9 @@ class Printer():
         self.margin_text = self.config.printer.margin_text
         self.last_print_time_stamp = time.time()
         self.counter = 0
-        
+        self.devfile = '/dev/usb/lp0'
+        #self.devfile = 'debug/printer.log'
+       
     font_height_5 = {
         'A': [
         [0, 1, 1, 0],
@@ -303,17 +305,17 @@ class Printer():
                     #else:
                     #    img.putpixel((t, 0), (255, 255, 255))
         raster = StarTSPImage.imageToRaster(img, cut=False)
-        printer = open('/dev/usb/lp0', "wb")
-        printer.write(raster) 
-        printer.close()
+        self.printer = open(self.devfile, "wb")
+        self.printer.write(raster) 
+        self.printer.close()
 
     def check_time_and_print(self, last_print_time_stamp, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
         check_time = time.time()
         if check_time - last_print_time_stamp > 0:
-            printer.print_pixel_line(a_temp, b_temp, entanglement, broken_channel, text_matrix, counter)
-            printer.last_print_time_stamp = check_time
+            self.print_pixel_line(a_temp, b_temp, entanglement, broken_channel, text_matrix, counter)
+            self.last_print_time_stamp = check_time
             self.counter = self.counter + 1
-
+    
     def test(self):
         a_temp = 20
         b_temp = 40
