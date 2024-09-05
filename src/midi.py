@@ -25,8 +25,11 @@ class MidiSender():
         self.log.setLevel(logging.WARN)
        
         self.client = SequencerClient("mhplayer")
-        self.input_port = self.client.create_port("input", WRITE_PORT)
         self.output_port = self.client.create_port("output", READ_PORT)
+        
+        self.cport = self.get_out_port()
+        self.output_port.connect_to(self.cport)
+
         self.log.critical('hello from midi')
         
     async def send_note_async(self,note):
@@ -45,11 +48,11 @@ class MidiSender():
 
     def get_out_port(self): 
         out_ports = self.client.list_ports(output=True)
-        print('op: ' + str(out_ports))
+        #print('op: ' + str(out_ports))
         for p in out_ports:
-            print(type(p))
-            print(p.name)
-            if p.name == "MIDI Mix MIDI 1":
+            #print(type(p))
+            #print(p.name)
+            if p.name == "stroom":
                 out_port = p
         return out_port
 
