@@ -138,9 +138,11 @@ class Videochooser():
                 n = an
             elif node == 'B':
                 n = bn
+            else:
+                n = an
         except IndexError as e:
             n = 23
-            self.log.critical(e)
+            self.log.critical('node: ' + node + ' cat: ' + str(cat) + '   ' + str(e))
         #print('A: ' + str(an), 'B: ' + str(bn))
         return n
  
@@ -191,7 +193,7 @@ class Videochooser():
      
             if state == "TRANSMISSION":
                 cat = self.cat_from_temp(temp)
-                note = self.note_from_cat(node, temp)
+                note = self.note_from_cat(node, cat)
             elif state == "ENTANGLEMENT":
                 note = 19
             elif state == "BROKENCHANNEL":
