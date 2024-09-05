@@ -27,3 +27,17 @@
         become_user: "user"
         environment:
           XDG_RUNTIME_DIR: "/run/user/1000" 
+      - command:
+          chdir: "/home/user/src/More-Heat-Than-Light/"
+          cmd: "systemctl --user restart mhtemp.service"
+        become: true
+        become_user: "user"
+        environment:
+          XDG_RUNTIME_DIR: "/run/user/1000" 
+      - command:
+          chdir: "/home/user/src/More-Heat-Than-Light/"
+          cmd: "systemctl --user restart mhextra.service"
+        become: true
+        become_user: "user"
+        environment:
+          XDG_RUNTIME_DIR: "/run/user/1000" 
