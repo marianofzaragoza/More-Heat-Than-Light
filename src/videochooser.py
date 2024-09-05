@@ -110,10 +110,11 @@ class Videochooser():
 
     def filenames_from_cat(self, node, cat):
         #la = self.videodf.query('`Usage` == `Y` and CHANNEL == `BOB` and `FEELING` == ' + cat )
+        
         if node == 'A':
-            channel = 'BOB'
-        elif node == 'B':
             channel = 'ALICE'
+        elif node == 'B':
+            channel = 'BOB'
         else:
             channel = 'unknown'
         #la = self.videodf.query('USE == "Y" and CHANNEL == @channel or CHANNEL == "BOTH" and FEELING == @cat')
