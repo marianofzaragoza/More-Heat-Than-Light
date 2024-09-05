@@ -2,7 +2,8 @@
 * DONE multicast protocol
 * reliability / boot
 * DONE network
-* printer charly
+* printer carol
+  
 * logging (temperatures)
 * DONE remote control 
 * DONE 2 thermometers on 1-wire bus 
@@ -35,6 +36,7 @@
 * sequence numbers in messages (for debugging packet drops)
 * quit program properly (quit doesn't work with the async / glib integration)
 * smooth transition on interrupting
-
+* log 
+* check and act on states / transitions
 #BLOCK
 * videos (and corresponding filenames in google sheet)
