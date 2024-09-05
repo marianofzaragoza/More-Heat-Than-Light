@@ -18,6 +18,7 @@ gi.require_version("GLib", "2.0")
 gi.require_version("GstNet", "1.0")
 from gi.repository import GLib, GObject, Gst, Gtk, GstNet, GdkX11, GstVideo
 
+
 class MhGstPlayer():
     def __init__(self, xid=None, playlist=None, osc=None):
         current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -70,6 +71,29 @@ class MhGstPlayer():
         self.log_stuff()
         self.interrupt_next(start=True)
 
+    def format_ns(self, ns):
+        s, ns = divmod(ns, 1000000000)
+        m, s = divmod(s, 60)
+        h, m = divmod(m, 60)
+
+        #return "%u:%02u:%02u.%09u" % (h, m, s, ns)
+        return "%u:%02u:%02u" % (h, m, s)
+
+    def get_pos(self):
+        booledur, duration = self.videoplayer.query_duration(Gst.Format.TIME)
+        boole, current = self.videoplayer.query_position(Gst.Format.TIME)
+        if boole == False:
+            #self.log.critical("video stuck")
+            vidpos = "P (STUCK): {0} / {1}".format(self.format_ns(current), self.format_ns(duration))
+        else:
+            #self.log.critical("video not stuck yet")
+            vidpos = "P: {0} / {1}".format(self.format_ns(current), self.format_ns(duration))
+
+        #self.log.critical( 'video, dur: ' + str(self.videoplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.videoplayer.query_position(Gst.Format.TIME)) )
+        
+        #print(vidpos)
+        return vidpos
+
     def log_stuff(self):
 
         ps = self.playlist.get_playlist_state()
@@ -78,13 +102,7 @@ class MhGstPlayer():
         Gst.debug_bin_to_dot_file(self.videoplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_videoplayer_' )
         Gst.debug_bin_to_dot_file(self.videomixer, Gst.DebugGraphDetails.ALL, 'gstdebug_videomixer_' + '3' )
         #self.toggle_overlay()
-        boole, cur = self.videoplayer.query_position(Gst.Format.TIME)
-        if boole == False:
-            self.log.critical("video stuck")
-        else:
-            self.log.critical("video not stuck yet")
-
-        self.log.critical( 'video, dur: ' + str(self.videoplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.videoplayer.query_position(Gst.Format.TIME)) )
+        print(self.get_pos())
         if self.overlay:
 
             Gst.debug_bin_to_dot_file(self.overlayplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_overlayplayer_' + '2' )

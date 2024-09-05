@@ -21,7 +21,9 @@ class Videochooser():
 
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
-        self.load_data_gsheet()
+        if gsheet:
+            self.log.critical("loading data from gsheet, takes some seconds....")
+            self.load_data_gsheet()
  
     def load_data_gsheet(self):
         try:

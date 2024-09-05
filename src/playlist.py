@@ -26,13 +26,16 @@ class Playlist():
         self.channel = 'C'
         if self.nodename == self.conf.playlist.vida_node:
             self.channel = 'A'
+            self.gsheet = True
         elif self.nodename == self.conf.playlist.vidb_node:
             self.channel = 'B'
+            self.gsheet = True
         else:
+            self.gsheet = False
             self.log.critical("this player has no channel assigned")
 
       
-        self.vc = Videochooser(gsheet=True)
+        self.vc = Videochooser(gsheet=self.gsheet)
         #self.vc.load_data_gsheet()
         #p.save_data_file()
         self.vc.load_data_file()
