@@ -26,7 +26,7 @@ class OscSender():
         srcdir = pathlib.Path(__file__).parent.resolve()
  
         self.config = DynamicConfigIni()
-        print(self.config.DEFAULT.test)
+        self.log.critical('hello from osc')
         self.oscclient = pythonosc.udp_client.SimpleUDPClient(self.config.osc.addr, int(self.config.osc.port))
 
     def send_video_msg(self,ps):

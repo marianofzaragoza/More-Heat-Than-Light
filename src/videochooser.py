@@ -117,7 +117,7 @@ class Videochooser():
         else:
             channel = 'unknown'
         #la = self.videodf.query('USE == "Y" and CHANNEL == @channel or CHANNEL == "BOTH" and FEELING == @cat')
-        la = self.videodf.query('(CHANNEL == @channel or CHANNEL == "BOTH") and USE == "Y" and (AVAILABLE == "USB") and FEELING == @cat')
+        la = self.videodf.query('(CHANNEL == @channel or CHANNEL == "BOTH") and USE == "Y" and (AVAILABLE == "UPLOADED") and FEELING == @cat')
 
         fnames = la['FILE NAME'].tolist()
         #fnames = la['NOTES'].tolist()
@@ -163,8 +163,8 @@ class Videochooser():
 
 if __name__ == "__main__":
     p = Videochooser()
-    #p.load_data_gsheet()
-    #p.save_data_file()
+    p.load_data_gsheet()
+    p.save_data_file()
     p.load_data_file()
     p.test_cat()
     print(p.state_from_temp(10, 10))
