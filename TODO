@@ -1,10 +1,9 @@
-* video play related to temperature
-* video sync
+* DONE video play related to temperature
 * DONE multicast protocol
-* sound player
 * reliability / boot
-* network
-* printer charly
+* DONE network
+* printer carol
+  
 * logging (temperatures)
 * DONE remote control 
 * DONE 2 thermometers on 1-wire bus 
@@ -12,7 +11,8 @@
 * DONE config file
 * lightbox (only send)
 * plymouth-reboot splash screen
-* fix alpha blend function (so its faster)
+* NOTNEEDED? fix alpha blend function (so its faster)
+* video interruption sync
 * use live sync for timing video interruption
   * is the beat count the same on all machines???? check in aalink
   * interruption state machine
@@ -22,18 +22,22 @@
     - video starts playing on 2nd next full beat (based on message timestamp??) ( so there is always enough time)
 
 * DONE time sync protocol (ntp or ptp)
-* sync communnication on ableton live sync
+* DONE sync communnication on ableton live sync
 * logfile to recreate the printout (avideo#, bvideo#, atemp, btemp, state )
 * triggering scenes in ableton
 * logging / graphing temperatures and videos
-* weird resolution / aspect ratio
-* updaterate temperature in video player
-* black bar projector under video ( in gtk?)
+* DONE weird resolution / aspect ratio
+* NOTNEEDED? updaterate temperature in video player
+* DONE black bar projector under video ( in gtk?)
 * DONE google sheet import
-* disable notifications (for example about updates)
+* DONE disable notifications (for example about updates)
 * disable unnattended upgrades
+* cleanup extra daemons on computers
+* sequence numbers in messages (for debugging packet drops)
 * quit program properly (quit doesn't work with the async / glib integration)
 * interrupting by using 3th player
-
+* smooth transition on interrupting
+* log 
+* check and act on states / transitions
 #BLOCK
 * videos (and corresponding filenames in google sheet)
