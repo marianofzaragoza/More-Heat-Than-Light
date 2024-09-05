@@ -32,7 +32,7 @@ class Playlist():
             self.log.critical("this player has no channel assigned")
 
       
-        self.vc = Videochooser()
+        self.vc = Videochooser(gsheet=True)
         #self.vc.load_data_gsheet()
         #p.save_data_file()
         self.vc.load_data_file()

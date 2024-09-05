@@ -8,7 +8,7 @@ import gspread
 import pandas as pd
 import random
 class Videochooser():
-    def __init__(self, enable_appqueue=False):
+    def __init__(self, gsheet=False):
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("newplaylist", self)
         self.log.setLevel(logging.WARN)
@@ -21,7 +21,8 @@ class Videochooser():
 
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
-
+        self.load_data_gsheet()
+ 
     def load_data_gsheet(self):
         try:
             gc = gspread.service_account()

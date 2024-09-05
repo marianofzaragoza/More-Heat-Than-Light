@@ -220,9 +220,15 @@ class PlayerUi(Gtk.Window):
             #self.text_clock.set_label('clock: ' + str(beatno))
             nowt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+            state = self.playlist.mhstate
+            playing = self.playlist.nowplaying
+            cat = self.playlist.mhcategory
+
             if self.dw:
                 GLib.idle_add(lambda: self.text_clock.set_label('beatcl: ' + nowt))
                 GLib.idle_add(lambda: self.text_beatno.set_label('P: ' + str(link.num_peers) + ' bpm: ' + str(int(link.tempo)) + ' bt: ' + str(int(beatno)) + ' ph: ' + str(int(link.phase)) + ' time: ' + str(link.time)))
+
+            GLib.idle_add(lambda: self.text_state.set_label('s: ' + state + ' f: ' + playing + ' c: ' + cat))
 
             self.update_playlist_temp('A', self.tempsender.get_stats(self.config.playlist.tempa_node, "temperature", "last"))
             self.update_playlist_temp('B', self.tempsender.get_stats(self.config.playlist.tempb_node, "temperature", "last"))
