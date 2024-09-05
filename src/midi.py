@@ -52,7 +52,7 @@ class MidiSender():
         for p in out_ports:
             #print(type(p))
             #print(p.name)
-            if p.name == "stroom":
+            if p.name == "stroom2":
                 out_port = p
         return out_port
 
