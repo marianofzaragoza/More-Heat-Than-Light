@@ -18,12 +18,14 @@ class Playlist():
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("playlist", self)
         self.log.setLevel(logging.WARN)
+
         self.a_temp = 24
         self.b_temp = 22
         self.mhstate = 'INVALID'
         self.mhcategory = 'invalid'
         self.nowplaying = 'invalid'
         self.channel = 'C'
+
         if self.nodename == self.conf.playlist.vida_node:
             self.channel = 'A'
             self.gsheet = True
@@ -38,7 +40,7 @@ class Playlist():
         self.vc = Videochooser(gsheet=self.gsheet)
         #self.vc.load_data_gsheet()
         #p.save_data_file()
-        self.vc.load_data_file()
+        #self.vc.load_data_file()
 
     def get_playlist_state(self):
         s = dict()

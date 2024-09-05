@@ -1,10 +1,10 @@
-CATEGORIA,Amount:,Aprox Total Time,temp difference,runtime per degree,temp_start,temp_end,Sound:,Description:
-caring,13,9:38:00,4,2:24:30,41,100,,Diamond Growth and Piranha Clean Room
-lonely,36,10:14:00,4,2:33:30,37,41,,Route and Abandoned KPN
-stability,20,8:19:00,3,2:46:20,34,37,,Clocks and Diamond Model
-waiting,15,8:13:00,3,2:44:20,31,34,,Clocks - Machines - Estanterías - Samples
-pressure,10,3:50:00,2,1:55:00,29,31,,Nitrogen and some clocks
-suspense,16,9:09:00,4,2:17:15,25,29,,Optical Table and Golden Tower
-flirting,24,7:28:00,3,2:29:20,22,25,,Diamante microscopio
-excitement,31,13:07:00,4,3:16:45,18,22,,Laser
-commitment,10,4:54:00,2,2:27:00,-100,18,,Cube and Optical Table
+CATEGORIA,Amount:,Aprox Total Time,temp difference,runtime per degree,temp_start,temp_end,Sound:,Description:,MIDIA,MIDIB
+caring,13,9:38:00,4,2:24:30,41,100,,Diamond Growth and Piranha Clean Room,17,18
+lonely,36,10:14:00,4,2:33:30,37,41,,Route and Abandoned KPN,1,2
+stability,20,8:19:00,3,2:46:20,34,37,,Clocks and Diamond Model,5,6
+waiting,15,8:13:00,3,2:44:20,31,34,,Clocks - Machines - Estanterías - Samples,11,12
+pressure,10,3:50:00,2,1:55:00,29,31,,Nitrogen and some clocks,7,8
+suspense,16,9:09:00,4,2:17:15,25,29,,Optical Table and Golden Tower,8,10
+flirting,24,7:28:00,3,2:29:20,22,25,,Diamante microscopio,3,4
+excitement,31,13:07:00,4,3:16:45,18,22,,Laser,13,14
+commitment,10,4:54:00,2,2:27:00,-100,18,,Cube and Optical Table,15,16

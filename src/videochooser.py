@@ -24,6 +24,8 @@ class Videochooser():
         if gsheet:
             self.log.critical("loading data from gsheet, takes some seconds....")
             self.load_data_gsheet()
+        else:
+            self.load_data_file()
  
     def load_data_gsheet(self):
         try:
