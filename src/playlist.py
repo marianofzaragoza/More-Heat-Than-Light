@@ -4,8 +4,8 @@ from config import DynamicConfigIni
 from videochooser import Videochooser
 import logging
 import mhlog 
-
-
+import asyncio
+from midi import MidiSender
 
 class Playlist():
     def __init__(self):
@@ -18,7 +18,8 @@ class Playlist():
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("playlist", self)
         self.log.setLevel(logging.WARN)
-
+        
+        self.midi = MidiSender()
         self.a_temp = 24
         self.b_temp = 22
         self.mhstate = 'INVALID'
@@ -83,8 +84,21 @@ class Playlist():
         #print(p.get_broken_channel_file('A'))
         
         return realpath
-       
+      
+    def send_midi(self, interrupt=False):
+        if interrupt == True:
+            note = 19
+        else:
+            note = self.vc.get_midi_note(self.channel, self.a_temp, self.b_temp)
+        #asyncio.run(self.midi.send_note_async(note))
+        self.midi.send_note(note)
 
+
+        self.log.warning("midinote: " + str(note))
+        #print(p.get_broken_channel_file('A'))
+        
+        return True
+ 
        
 if __name__ == "__main__":
     print("Testing of the playlist happens here...")

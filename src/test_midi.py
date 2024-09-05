@@ -1,4 +1,5 @@
 import time
+import sys
 #from alsa_midi import SequencerClient, READ_PORT, NoteOnEvent, NoteOffEvent
 
 from tempsender import Tempsender, TempSource
@@ -24,23 +25,54 @@ class Thermometer():
         print('setting: ' + str(temp))
         self.temp = temp
  
-class Midi():
+class MidiSender():
     async def bang(self, link, name, interval):
         while True:
             beat = await link.sync(interval)
             self.ts_a.send_temp()
             self.ts_b.send_temp()
+    
+    async def notesender(self, link, name, interval):
+        note = 1
+        while True:
+            beat = await link.sync(interval) 
+            print(note)
+            await self.send_note(note)
+            note = note + 1
+            if note > 100:
+                note = 1
+
 
             #print('bang', name, beat) 
 
-    def __init__(self):
+    def __init__(self, mtype="temp"):
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
 
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("playerui", self)
         self.log.setLevel(logging.WARN)
+       
+    def run_ableton(self):
+        self.client = AsyncSequencerClient("abctrl")
 
+        self.input_port = self.client.create_port("input", WRITE_PORT)
+        #sleep(0.1)
+        #self.input_port.connect_to(self.client.list_ports(input=True)[0])
+        #sleep(0.1)
+
+        #self.input_port.connect_to(self.get_in_port())
+
+        self.output_port = self.client.create_port("output", READ_PORT)
+        #self.output_port.connect_to(self.get_out_port())
+
+        print('out: ' + str(self.output_port) + ' in: ' + str(self.input_port))
+        loop = asyncio.get_event_loop()
+        link = Link(120, loop)
+        link.enabled = True
+        loop.run_until_complete(asyncio.gather( self.notesender(link, 'test', 1)))
+ 
+    def run_temp(self):
         self.tm_a = Thermometer()
         self.ts_a = Tempsender(thermometer=self.tm_a, source='alice')
         self.tm_a.set_temp(23)
@@ -50,8 +82,6 @@ class Midi():
         self.ts_b = Tempsender(thermometer=self.tm_b, source='bob')
         self.tm_b.set_temp(23)
         self.ts_b.send_temp()
-
-
 
         self.client = AsyncSequencerClient("mhtemp")
 
@@ -70,6 +100,12 @@ class Midi():
         link = Link(120, loop)
         link.enabled = True
         loop.run_until_complete(asyncio.gather(self.show_input(), self.bang(link, 'test', 1)))
+    
+    async def send_note(self,note):
+        event = NoteOnEvent(note=note)
+        await self.client.event_output(event, port=self.output_port)
+        await self.client.drain_output()
+
 
     async def play_chord(self):
         
@@ -127,5 +163,15 @@ class Midi():
         return in_ports[0]
  
 if __name__ == '__main__':
-    p = Midi()
+    
+
+    if len(sys.argv) > 1 and sys.argv[1] == "sendnote":
+        p = MidiSender()
+        p.run_ableton()
+        while True:
+            p.send_note(12)
+            time.sleep(1)
+    else:
+        p = MidiSender()
+        p.run_temp()
 

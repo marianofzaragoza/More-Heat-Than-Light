@@ -10,6 +10,7 @@ import cairo
 from aalink import Link
 from osc_test import OscSender
 
+
 gi.require_version('Gst', '1.0')
 gi.require_version('Gtk', '3.0')
 #gi.require_version('Glib', '1.0')

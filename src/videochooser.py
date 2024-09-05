@@ -40,7 +40,7 @@ class Videochooser():
             states_worksheet = sheet.worksheet("STATES")
             #values_list = video_worksheet.row_values(1)
             self.videodf = pd.DataFrame(video_worksheet.get_all_records())
-            self.tempdf = temp_dataframe.head(9).astype({"temp_start":"int","temp_end":"int"})
+            self.tempdf = temp_dataframe.head(9).astype({"temp_start":"int","temp_end":"int","MIDIA":"int","MIDIB":"int"})
             self.statesdf = pd.DataFrame(video_worksheet.get_all_records()).head(6)
 
             return True
@@ -129,14 +129,30 @@ class Videochooser():
         #fnames = la['NOTES'].tolist()
 
         return fnames
-    
+    def note_from_cat(self, node, cat):
+        try:
+            la = self.tempdf.query('(CATEGORIA == @cat)')
+            an = la['MIDIA'].iloc[0]
+            bn = la['MIDIB'].iloc[0]
+        except IndexError as e:
+            n = 23
+            self.log.critical(e)
+        #print('A: ' + str(an), 'B: ' + str(bn))
+        if node == 'A':
+            n = an
+        elif node == 'B':
+            n = bn
+        return n
+ 
+
     def test_cat(self):
         for n in ("A", "B"):
             print()
             print("node: " + n)
             print()
             for c in self.tempdf.CATEGORIA:
-                print(c + ': ' + str(self.filenames_from_cat(n, c)))
+                midi = self.note_from_cat(n, c)
+                print(c + ' : ' + str(midi) + ' '  + str(self.filenames_from_cat(n, c)))
 
     def get_broken_channel_file(self, node):
         return "BROKENCHANNEL_" + node + '.mov'
@@ -163,7 +179,24 @@ class Videochooser():
                 filename = 'ENTANGLEMENT.mov'
             return filename
 
-
+    def get_midi_note(self, node, temp_a, temp_b):
+            state = self.state_from_temp(temp_a, temp_b)
+            if node == 'A':
+                temp = temp_a
+            elif node == 'B':
+                temp = temp_b
+            else:
+                self.log.critical(f'node {node} has no known channel configured, using A')
+                temp = temp_a
+     
+            if state == "TRANSMISSION":
+                cat = self.cat_from_temp(temp)
+                note = self.note_from_cat(node, temp)
+            elif state == "ENTANGLEMENT":
+                note = 19
+            elif state == "BROKENCHANNEL":
+                note = 20
+            return note
 
 
 
@@ -183,6 +216,8 @@ if __name__ == "__main__":
 
     cat = p.cat_from_temp(22)
     print(cat)
+    print('notes')
+    note = p.note_from_cat('A',cat)
     #fn = p.filenames_from_cat("A", cat)
     #print(fn)
 

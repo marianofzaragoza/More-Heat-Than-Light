@@ -99,6 +99,7 @@ class MhGstPlayer():
         ps = self.playlist.get_playlist_state()
         self.osc.send_video_msg(ps)
 
+
         Gst.debug_bin_to_dot_file(self.videoplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_videoplayer_' )
         Gst.debug_bin_to_dot_file(self.videomixer, Gst.DebugGraphDetails.ALL, 'gstdebug_videomixer_' + '3' )
         #self.toggle_overlay()
@@ -188,6 +189,7 @@ class MhGstPlayer():
             self.log.warning("playbinoverlay about to finish")
             uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
+            self.playlist.send_midi()
             uri = Gst.filename_to_uri(self.playlist.next())
             self.log.warning("playbinvideo about to finish,  playlist: " + str(uri))
         else:

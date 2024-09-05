@@ -151,6 +151,8 @@ dependencies = [
   "pylive",
   "ipywidgets",
   "alsa-midi",
+  "dbus-python",
+  "pydbus"
 
   
 ]
