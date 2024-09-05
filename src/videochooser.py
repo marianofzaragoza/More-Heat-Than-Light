@@ -134,14 +134,14 @@ class Videochooser():
             la = self.tempdf.query('(CATEGORIA == @cat)')
             an = la['MIDIA'].iloc[0]
             bn = la['MIDIB'].iloc[0]
+            if node == 'A':
+                n = an
+            elif node == 'B':
+                n = bn
         except IndexError as e:
             n = 23
             self.log.critical(e)
         #print('A: ' + str(an), 'B: ' + str(bn))
-        if node == 'A':
-            n = an
-        elif node == 'B':
-            n = bn
         return n
  
 
