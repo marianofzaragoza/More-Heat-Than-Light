@@ -104,8 +104,6 @@ if __name__ == "__main__":
     print("Testing of the playlist happens here...")
  #   dir = "/home/agustina/More-Heat-Than-Light/testfile"
     dir = "testfile"
- 
-
     playlist = Playlist()
     playlist.update_temp('A', 20)
     playlist.update_temp('A', 20)

@@ -39,5 +39,7 @@
 * smooth transition on interrupting
 * log 
 * check and act on states / transitions
+* restart player on stuck video
+
 #BLOCK
 * videos (and corresponding filenames in google sheet)

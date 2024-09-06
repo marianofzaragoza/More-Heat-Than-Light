@@ -152,7 +152,11 @@ dependencies = [
   "ipywidgets",
   "alsa-midi",
   "dbus-python",
-  "pydbus"
+  "pydbus",
+  "python-statemachine",
+  "pydot",
+  "Graphviz",
+  "states3"
 
   
 ]

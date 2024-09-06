@@ -145,7 +145,12 @@ class Videochooser():
             self.log.critical('node: ' + node + ' cat: ' + str(cat) + '   ' + str(e))
         #print('A: ' + str(an), 'B: ' + str(bn))
         return n
- 
+    
+    def get_all_cat(self):
+        ac = list()
+        for c in self.tempdf.CATEGORIA:
+            ac.append(str(c))
+        return c
 
     def test_cat(self):
         for n in ("A", "B"):

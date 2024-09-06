@@ -19,7 +19,7 @@ class MidiSender():
     def __init__(self, mtype="temp"):
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
-
+        self.lastnote = 1
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("playerui", self)
         self.log.setLevel(logging.WARN)
@@ -41,10 +41,14 @@ class MidiSender():
 
     def send_note(self,note):
         note = note + 23
-        self.log.info('send_note'+ str(note))
-        event = NoteOnEvent(note=note)
-        self.client.event_output(event, port=self.output_port)
-        self.client.drain_output()
+        if note == self.lastnote:
+            self.log.info('not sending note (same as last): ' + str(note)) 
+        else:
+            self.log.info('send_note'+ str(note))
+            event = NoteOnEvent(note=note)
+            self.client.event_output(event, port=self.output_port)
+            self.client.drain_output()
+            self.lastnote = note
 
 
 
@@ -73,6 +77,8 @@ class MidiSender():
 if __name__ == '__main__':
     
         p = MidiSender()
+        p.log.setLevel(logging.INFO)
+ 
         while True:
             print('hello')
             p.send_note(19)
