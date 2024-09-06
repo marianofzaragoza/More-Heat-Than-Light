@@ -71,7 +71,7 @@ class Playlist():
         video_file = self.vc.get_broken_channel_file(self.channel)
         realpath = os.path.realpath(self.videodir + '/' + video_file)
 
-        self.log.warning("get_overlay: " + realpath) 
+        self.log.info("get_overlay: " + realpath) 
         return realpath
 
     def next(self, interrupt=False):
@@ -80,7 +80,7 @@ class Playlist():
         video_file = self.vc.get_random_file(self.channel, self.a_temp, self.b_temp)
         self.nowplaying = video_file
         realpath = os.path.realpath(self.videodir + '/' + video_file)
-        self.log.warning("file: " + realpath)
+        self.log.info("file: " + realpath)
         #print(p.get_broken_channel_file('A'))
         
         return realpath
@@ -94,7 +94,7 @@ class Playlist():
         self.midi.send_note(note)
 
 
-        self.log.warning("midinote: " + str(note))
+        self.log.info("midinote: " + str(note))
         #print(p.get_broken_channel_file('A'))
         
         return True

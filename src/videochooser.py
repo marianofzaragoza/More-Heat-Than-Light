@@ -166,7 +166,7 @@ class Videochooser():
             elif node == 'B':
                 temp = temp_b
             else:
-                self.log.critical(f'node {node} has no known channel configured, using A')
+                self.log.critical(f'midi: node {node} has no known channel configured, using A')
                 temp = temp_a
      
             if state == "TRANSMISSION" or state == "BROKENCHANNEL":
@@ -188,7 +188,7 @@ class Videochooser():
             elif node == 'B':
                 temp = temp_b
             else:
-                self.log.critical(f'node {node} has no known channel configured, using A')
+                self.log.critical(f'midi: node {node} has no known channel configured, using A')
                 temp = temp_a
      
             if state == "TRANSMISSION":

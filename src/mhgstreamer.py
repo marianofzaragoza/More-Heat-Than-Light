@@ -22,6 +22,7 @@ from gi.repository import GLib, GObject, Gst, Gtk, GstNet, GdkX11, GstVideo
 class MhGstPlayer():
     def __init__(self, xid=None, playlist=None, osc=None):
         current_dir = os.path.dirname(os.path.realpath(__file__))
+        #FIXME 
         os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir + '/../debug/')
 
         self.config = DynamicConfigIni()
@@ -37,6 +38,7 @@ class MhGstPlayer():
         
         self.overlay = True
         self.overlayactive = False
+        self.overlaytest = False
         #self.tfile = "video/random/305_24p.mp4"
 
 
@@ -89,7 +91,7 @@ class MhGstPlayer():
             #self.log.critical("video not stuck yet")
             vidpos = "P: {0} / {1}".format(self.format_ns(current), self.format_ns(duration))
 
-        #self.log.critical( 'video, dur: ' + str(self.videoplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.videoplayer.query_position(Gst.Format.TIME)) )
+        self.log.info( 'video, dur: ' + str(self.videoplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.videoplayer.query_position(Gst.Format.TIME)) )
         
         #print(vidpos)
         return vidpos
@@ -107,7 +109,7 @@ class MhGstPlayer():
         if self.overlay:
 
             Gst.debug_bin_to_dot_file(self.overlayplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_overlayplayer_' + '2' )
-            self.log.critical( 'overlay, dur: ' + str(self.overlayplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.overlayplayer.query_position(Gst.Format.TIME)) )
+            self.log.info( 'overlay, dur: ' + str(self.overlayplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.overlayplayer.query_position(Gst.Format.TIME)) )
      
 
     def quit(self):
@@ -182,16 +184,16 @@ class MhGstPlayer():
         name = pb.get_property("name")
         uri = pb.get_property("uri")
         #state = pb.get_state() 
-        self.log.critical(name + " about to finish " + uri)
+        self.log.info(name + " about to finish " + uri)
         #print(str(name)+ ' ' + str(state) + ' '  + str(uri))
         self.log_stuff()
         if name == "playbin_overlay":
-            self.log.warning("playbinoverlay about to finish")
+            self.log.info("playbinoverlay about to finish")
             uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
             self.playlist.send_midi()
             uri = Gst.filename_to_uri(self.playlist.next())
-            self.log.warning("playbinvideo about to finish,  playlist: " + str(uri))
+            self.log.info("playbinvideo about to finish,  playlist: " + str(uri))
         else:
             uri = Gst.filename_to_uri(self.hdfile)
 

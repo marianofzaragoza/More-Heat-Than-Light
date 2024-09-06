@@ -70,7 +70,7 @@ class PlayerUi(Gtk.Window):
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         
         if self.nodename == "debian":
-            self.dw = True
+            self.dw = False
             bar_up = True
         else:
             self.dw = True
@@ -129,7 +129,7 @@ class PlayerUi(Gtk.Window):
             vbox.pack_start(self.drawingarea, False, False, 0)
         else:
             vbox.pack_start(self.drawingarea, False, False, 0)
-            vbox.pack_start(hbox, true, true, 0)
+            vbox.pack_start(hbox, True, True, 0)
             vbox.pack_start(hbox2, True, True, 0)
 
                 #GLib.timeout_add(200, self.update)
@@ -238,7 +238,7 @@ class PlayerUi(Gtk.Window):
                 GLib.idle_add(lambda: self.text_clock.set_label('beatcl: ' + nowt))
                 GLib.idle_add(lambda: self.text_beatno.set_label('P: ' + str(link.num_peers) + ' bpm: ' + str(int(link.tempo)) + ' bt: ' + str(int(beatno)) + ' ph: ' + str(int(link.phase)) + ' time: ' + str(link.time)))
 
-            GLib.idle_add(lambda: self.text_state.set_label('s: ' + state + ' f: ' + playing + ' c: ' + cat + ' ' + str(pos)))
+                GLib.idle_add(lambda: self.text_state.set_label('s: ' + state + ' f: ' + playing + ' c: ' + cat + ' ' + str(pos)))
 
             self.update_playlist_temp('A', self.tempsender.get_stats(self.config.playlist.tempa_node, "temperature", "last"))
             self.update_playlist_temp('B', self.tempsender.get_stats(self.config.playlist.tempb_node, "temperature", "last"))
@@ -255,7 +255,7 @@ class PlayerUi(Gtk.Window):
             #print(str(beatno) + ' ' + str(int(link.phase)))
             #check
             if bm == 1 and bp == 1:
-                self.player.toggle_overlay()
+                #self.player.toggle_overlay()
                 self.cstate = "check"
                 #self.log.warning("check  ")
             
@@ -283,8 +283,8 @@ class PlayerUi(Gtk.Window):
             elif bm == 5 and bp == 5:
                 self.cstate = "sleep"
 
-            elif bm == 6 and bp == 6:
-                self.player.toggle_overlay()
+            #elif bm == 6 and bp == 6:
+                #self.player.toggle_overlay()
 
             if self.dw:
                 GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate))

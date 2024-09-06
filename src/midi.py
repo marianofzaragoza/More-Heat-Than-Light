@@ -31,17 +31,17 @@ class MidiSender():
         if self.cport:
             self.output_port.connect_to(self.cport)
 
-        self.log.critical('hello from midi')
+        self.log.info('hello from midi')
         
     async def send_note_async(self,note):
-        self.log.critical('send_note_async'+ str(note))
+        self.log.info('send_note_async'+ str(note))
         event = NoteOnEvent(note=note)
         await self.client.event_output(event, port=self.output_port)
         await self.client.drain_output()
 
     def send_note(self,note):
         note = note + 23
-        self.log.critical('send_note'+ str(note))
+        self.log.info('send_note'+ str(note))
         event = NoteOnEvent(note=note)
         self.client.event_output(event, port=self.output_port)
         self.client.drain_output()
