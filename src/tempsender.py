@@ -89,7 +89,7 @@ class Tempsender():
         try:
             return round(self.stats[node][mtype][stype], 2)
         except KeyError as e:
-            self.log.info("no STATS: node: " + node + ' mtype: ' + mtype + ' stype: ' + stype + ' err: '+ str(e))
+            self.log.warning("no STATS: node: " + node + ' mtype: ' + mtype + ' stype: ' + stype + ' err: '+ str(e))
             return 23
         #else:
         #    return 232323
@@ -127,7 +127,7 @@ class Tempsender():
             #msglen = len(msg)
             self.update_stats(decoded.source, decoded.type, decoded.value, decoded.seconds, decoded.nanos)
 
-            self.log.debug(str(decoded.source) + ' ' + str(decoded.type) + ' ' + str(decoded.value))
+            #self.log.debug(str(decoded.source) + ' ' + str(decoded.type) + ' ' + str(decoded.value))
             if self.enable_appqueue: 
                 self.appqueue.append(decoded.value)
             #except IndexError:
@@ -148,10 +148,10 @@ class Tempsender():
         msg.value = self.thermometer.read_total_temperature()
 
         msglen = len(msg.SerializeToString())
-        self.log.debug("length bits: " + str(msglen * 8))
+        #self.log.debug("length bits: " + str(msglen * 8))
         
-        self.log.critical(msg)
-        self.log.debug(msg.SerializeToString())
+        #self.log.critical(msg)
+        #self.log.debug(msg.SerializeToString())
 
         self.socket.send(msg.SerializeToString())
  
