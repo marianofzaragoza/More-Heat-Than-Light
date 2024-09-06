@@ -28,7 +28,8 @@ class MidiSender():
         self.output_port = self.client.create_port("output", READ_PORT)
         
         self.cport = self.get_out_port()
-        self.output_port.connect_to(self.cport)
+        if self.cport:
+            self.output_port.connect_to(self.cport)
 
         self.log.critical('hello from midi')
         
@@ -48,6 +49,7 @@ class MidiSender():
 
 
     def get_out_port(self): 
+        out_port = False
         out_ports = self.client.list_ports(output=True)
         #print('op: ' + str(out_ports))
         for p in out_ports:

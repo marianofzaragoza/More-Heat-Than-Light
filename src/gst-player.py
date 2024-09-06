@@ -84,8 +84,14 @@ class PlayerUi(Gtk.Window):
         #vbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(1,0,1,1))
  
         hbox = Gtk.HBox()
-        hbox.set_size_request(int(self.config.player.barwidth), int(self.config.player.barheight)) 
+        hbox.set_size_request(int(self.config.player.barwidth), int(self.config.player.barheight) / 2.0) 
         hbox.get_style_context().add_class('red-background')
+
+        hbox2 = Gtk.HBox()
+        hbox2.set_size_request(int(self.config.player.barwidth), int(self.config.player.barheight) / 2.0) 
+        hbox2.get_style_context().add_class('red-background')
+
+
         #hbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(1,0,1,1))
 
         if self.dw:
@@ -99,16 +105,16 @@ class PlayerUi(Gtk.Window):
             hbox.pack_start(self.text_beatno, True, True, 0)
 
             self.text_clock = Gtk.Button(label="clock")
-            hbox.pack_start(self.text_clock, True, True, 0)
+            hbox2.pack_start(self.text_clock, True, True, 0)
 
             self.text_clocknet = Gtk.Button(label="clocknet")
-            hbox.pack_start(self.text_clocknet, True, True, 0)
+            hbox2.pack_start(self.text_clocknet, True, True, 0)
 
             self.text_state = Gtk.Button(label="state")
-            hbox.pack_start(self.text_state, True, True, 0)
+            hbox2.pack_start(self.text_state, True, True, 0)
 
             self.text_cstate = Gtk.Button(label="cstate")
-            hbox.pack_start(self.text_cstate, True, True, 0)
+            hbox2.pack_start(self.text_cstate, True, True, 0)
 
 
 
@@ -119,10 +125,12 @@ class PlayerUi(Gtk.Window):
 
         if bar_up:
             vbox.pack_start(hbox, True, True, 0)
+            vbox.pack_start(hbox2, True, True, 0)
             vbox.pack_start(self.drawingarea, False, False, 0)
         else:
             vbox.pack_start(self.drawingarea, False, False, 0)
-            vbox.pack_start(hbox, True, True, 0)
+            vbox.pack_start(hbox, true, true, 0)
+            vbox.pack_start(hbox2, True, True, 0)
 
                 #GLib.timeout_add(200, self.update)
        
