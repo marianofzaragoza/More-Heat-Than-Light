@@ -86,6 +86,7 @@ class MhGstPlayer():
         # get state from videochooser
         nst = self.playlist.vc.state_from_temp(self.playlist.a_temp, self.playlist.b_temp)
         # check 
+        cst = self.cst
         if nst == self.cst:
             return True
 
