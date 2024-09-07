@@ -38,6 +38,7 @@ class MhGstPlayer():
         
         self.overlay_enabled = True
         self.overlaytest = True
+        self.overlay_active = False
         #self.tfile = "video/random/305_24p.mp4"
 
         self.cst = "TRANSMISSION"
@@ -76,7 +77,7 @@ class MhGstPlayer():
             self.overlayplayer = self.create_pb('_overlay', self.overlayfile)
             self.overlayplayer.set_state(Gst.State.PLAYING)
         self.log_stuff()
-        self.interrupt_next(start=True)
+        #self.interrupt_next(start=True)
    
     
     def statemachine(self, onvideochange=False):
@@ -203,19 +204,26 @@ class MhGstPlayer():
 
         if active == 1:
             ns = 0
+            self.overlay_active = False
         else:
             ns = 1
+            self.overlay_active = True
 
         pads = self.videomixer.get_by_name('videomix').pads
         for p in pads:
             if p.get_peer().get_parent_element().name == "overlayplayer":
                 p.set_property("alpha", ns) 
 
-    def overlay(self, enabled):
-            p = self.get_overlay_pad()
+    def overlay(self, onoff):
+        p = self.get_overlay_pad()
+        if onoff == True and self.overlay_active == False:
+            # should be enabled, but is not enabled
+            self.overlayplayer.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
             p.set_property("alpha", 1) 
+        elif onoff == False:
+            p.set_property("alpha", 0)
+            self.overlay_active == False
 
-            msg.src.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
 
 
 
