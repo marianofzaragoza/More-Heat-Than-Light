@@ -23,7 +23,7 @@ class MhGstPlayer():
     def __init__(self, xid=None, playlist=None, osc=None):
         current_dir = os.path.dirname(os.path.realpath(__file__))
         #FIXME 
-        os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir + '/../debug/')
+        #os.putenv('GST_DEBUG_DUMP_DIR_DIR', current_dir + '/../debug/')
 
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
@@ -36,18 +36,23 @@ class MhGstPlayer():
         self.xid = xid
         self.osc = osc
         
-        self.overlay = True
-        self.overlayactive = False
-        self.overlaytest = False
+        self.overlay_enabled = True
+        self.overlaytest = True
         #self.tfile = "video/random/305_24p.mp4"
 
-
+        self.cst = "TRANSMISSION"
+        self.lst = "ENTANGLEMENT" 
+        self.in_entanglement = False
+        self.pre_entanglement = False
         #self.hdfile = "video/quality/HD PRORESS.mov"
         #self.overlayfile = "video/animation/alice_hd.mov"
-        self.hdfile = "video/quality/HD PRORESS.mov"
-        self.overlayfile = "video/animation/alice_hd.mov"
+        #self.hdfile = "/home/user/media/moreheat/VIDEO_MISSING.mov"
+        self.overlayfile = "/home/user/media/moreheat/BROKENCHANNEL_A.mov"
         
-        self.tfile = "video/random/305_24p.mp4"
+        self.tfile = "/home/user/media/moreheat/VIDEO_MISSING.mov"
+
+        Gst.debug_set_active(True)
+        Gst.debug_set_default_threshold(3)
 
         #GST
         Gst.init(None)
@@ -67,12 +72,56 @@ class MhGstPlayer():
         self.videoplayer = self.create_pb('_video', self.tfile)
         self.videoplayer.set_state(Gst.State.PLAYING)
 
-        if self.overlay:
+        if self.overlay_enabled:
             self.overlayplayer = self.create_pb('_overlay', self.overlayfile)
             self.overlayplayer.set_state(Gst.State.PLAYING)
         self.log_stuff()
         self.interrupt_next(start=True)
+   
+    
+    def statemachine(self, onvideochange=False):
 
+        # get temp from  playlist
+        self.playlist.a_temp 
+        # get state from videochooser
+        nst = self.playlist.vc.state_from_temp(self.playlist.a_temp, self.playlist.b_temp)
+        # check 
+        if nst == self.cst:
+            return True
+
+        elif cst == "TRANSMISSION" and nst == "ENTANGLEMENT":
+            self.pre_entanglement = True
+            self.cst = "ENTANGLEMENT"
+
+        elif cst == "TRANSMISSION" and nst == "BROKENCHANNEL":
+            self.overlay(False)
+            # enable overlay  (go to start of overlay video)
+            self.cst = "BROKENCHANNEL"
+
+        elif cst == "ENTANGLEMENT" and nst == "TRANSMISSION":
+            self.pre_entanglement = False
+            self.entanglement = False
+            self.cst = "TRANSMISSION"
+
+        elif cst == "ENTANGLEMENT" and nst == "BROKENCHANNEL":
+            self.pre_entanglement = False
+            self.entanglement = False
+            self.overlay(True)
+            self.cst = "BROKENCHANNEL"
+
+        elif cst == "BROKENCHANNEL" and nst == "TRANSMISSION":
+            self.overlay(False)
+            self.cst = "TRANSMISSION"
+            
+        elif cst == "BROKENCHANNEL" and nst == "ENTANGLEMENT":
+            self.pre_entanglement = True
+            #self.entanglement = False
+            self.overlay(False)
+            self.cst = "ENTANGLEMENT"
+        self.log.critical("went from: " + cst + " to " + nst) 
+        return (cst, nst)
+
+    
     def format_ns(self, ns):
         s, ns = divmod(ns, 1000000000)
         m, s = divmod(s, 60)
@@ -97,6 +146,23 @@ class MhGstPlayer():
         #print(vidpos)
         return vidpos
 
+    def get_olpos(self):
+        booledur, duration = self.overlayplayer.query_duration(Gst.Format.TIME)
+        boole, current = self.overlayplayer.query_position(Gst.Format.TIME)
+        if boole == False:
+            #self.log.critical("video stuck")
+            vidpos = "P (STUCK): {0} / {1}".format(self.format_ns(current), self.format_ns(duration))
+            #self.interrupt_next(start=True)
+        else:
+            #self.log.critical("video not stuck yet")
+            vidpos = "P: {0} / {1}".format(self.format_ns(current), self.format_ns(duration))
+
+        #self.log.info( 'video, dur: ' + str(self.videoplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.videoplayer.query_position(Gst.Format.TIME)) )
+        
+        #print(vidpos)
+        return vidpos
+
+
     def log_stuff(self):
 
         ps = self.playlist.get_playlist_state()
@@ -105,9 +171,9 @@ class MhGstPlayer():
 
         Gst.debug_bin_to_dot_file(self.videoplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_videoplayer_' )
         Gst.debug_bin_to_dot_file(self.videomixer, Gst.DebugGraphDetails.ALL, 'gstdebug_videomixer_' + '3' )
-        #self.toggle_overlay()
-        print(self.get_pos())
-        if self.overlay:
+        self.toggle_overlay()
+        #print(self.get_pos())
+        if self.overlay_enabled:
 
             Gst.debug_bin_to_dot_file(self.overlayplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_overlayplayer_' + '2' )
             self.log.info( 'overlay, dur: ' + str(self.overlayplayer.query_duration(Gst.Format.TIME)) + ' pos: '+ str(self.overlayplayer.query_position(Gst.Format.TIME)) )
@@ -116,21 +182,39 @@ class MhGstPlayer():
     def quit(self):
         self.videomixer.set_state(Gst.State.NULL)
         self.videoplayer.set_state(Gst.State.NULL)
-        if self.overlay:
+        if self.overlay_enabled:
             self.overlayplayer.set_state(Gst.State.NULL)
 
+    def get_overlay_pad(self):
+        pads = self.videomixer.get_by_name('videomix').pads
+        for p in pads:
+            if p.get_peer().get_parent_element().name == "overlayplayer":
+                return p
+
+
     def toggle_overlay(self):
-        if self.overlayactive == True:
+        pads = self.videomixer.get_by_name('videomix').pads
+        for p in pads:
+            if p.get_peer().get_parent_element().name == "overlayplayer":
+                active = p.get_property("alpha") 
+
+        print("toggle " + str(active))
+
+        if active == 1:
             ns = 0
-            self.overlayactive = False
         else:
             ns = 1
-            self.overlayactive = True
 
         pads = self.videomixer.get_by_name('videomix').pads
         for p in pads:
             if p.get_peer().get_parent_element().name == "overlayplayer":
                 p.set_property("alpha", ns) 
+
+    def overlay(self, enabled):
+            p = self.get_overlay_pad()
+            p.set_property("alpha", 1) 
+
+            msg.src.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
 
 
 
@@ -154,7 +238,7 @@ class MhGstPlayer():
             #"sink_1::blend-function-dst-alpha=0 "+
             "sink_1::blend-function-src-rgb=6 "+
             "sink_1::blend-function-dst-rgb=7 "+
-                        "name=videomix ! glcolorconvert ! glimagesink sync=true "
+                        "name=videomix ! glcolorconvert ! glimagesink sync=true"
             )
 
         return videomixer
@@ -167,6 +251,22 @@ class MhGstPlayer():
     # this should not be called normally, maybe could be used when the interrupt video is played in separate playbin (so it can be preloaded and mixed in)
     def mt_on_eos(self, bus, msg):
         self.log.critical("EOS received from %s " /  str(msg.src))
+        pb = msg.src
+        name = pb.get_property("name")
+        name = pb.get_property("uri")
+
+        if name == "playbin_overlay":
+            self.log.info("playbinoverlay eos")
+            msg.src.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
+            #uri = Gst.filename_to_uri(self.playlist.get_overlay())
+        elif name == "playbin_video":
+            self.log.info("playbinvideo ,  playlist: " + str(uri))
+        else:
+            self.log.critical("unknown eos")
+            #uri = Gst.filename_to_uri(self.hdfile)
+
+
+
         '''
         pb = msg.src
         pb.set_state(Gst.State.NULL)
@@ -185,12 +285,12 @@ class MhGstPlayer():
         name = pb.get_property("name")
         uri = pb.get_property("uri")
         #state = pb.get_state() 
-        self.log.info(name + " about to finish " + uri)
+        self.log.info(str(name) + " about to finish " + str(uri))
         #print(str(name)+ ' ' + str(state) + ' '  + str(uri))
         self.log_stuff()
         if name == "playbin_overlay":
-            self.log.info("playbinoverlay about to finish")
-            uri = Gst.filename_to_uri(self.playlist.get_overlay())
+            self.log.info("playbinoverlay about to finish, not doing anytyhing")
+            #uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
             self.playlist.send_midi()
             uri = Gst.filename_to_uri(self.playlist.next())

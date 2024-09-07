@@ -68,10 +68,15 @@ class PlayerUi(Gtk.Window):
         srcdir = pathlib.Path(__file__).parent.resolve()
         provider.load_from_file(Gio.File.new_for_path(str(srcdir) + "/style.css"))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-        
+       
+
         if self.nodename == "debian":
             self.dw = False
             bar_up = True
+        elif self.nodename == "test_vid":
+            self.dw = True
+            bar_up = True
+ 
         else:
             self.dw = True
             bar_up = False
@@ -97,10 +102,11 @@ class PlayerUi(Gtk.Window):
         if self.dw:
             self.text_tempa = Gtk.Button(label="temp A")
             self.text_tempa.get_style_context().add_class('red-background')
-
             hbox.pack_start(self.text_tempa, True, True, 0)
+
             self.text_tempb = Gtk.Button(label="temp B")
             hbox.pack_start(self.text_tempb, True, True, 0)
+
             self.text_beatno = Gtk.Button(label="beatcount")
             hbox.pack_start(self.text_beatno, True, True, 0)
 
@@ -112,6 +118,10 @@ class PlayerUi(Gtk.Window):
 
             self.text_state = Gtk.Button(label="state")
             hbox2.pack_start(self.text_state, True, True, 0)
+
+            self.text_olstate = Gtk.Button(label="olstate")
+            hbox2.pack_start(self.text_olstate, True, True, 0)
+
 
             self.text_cstate = Gtk.Button(label="cstate")
             hbox2.pack_start(self.text_cstate, True, True, 0)
@@ -233,15 +243,21 @@ class PlayerUi(Gtk.Window):
             playing = self.playlist.nowplaying
             cat = self.playlist.mhcategory
             pos = self.player.get_pos()
+            olpos = self.player.get_olpos()
+
 
             if self.dw:
                 GLib.idle_add(lambda: self.text_clock.set_label('beatcl: ' + nowt))
                 GLib.idle_add(lambda: self.text_beatno.set_label('P: ' + str(link.num_peers) + ' bpm: ' + str(int(link.tempo)) + ' bt: ' + str(int(beatno)) + ' ph: ' + str(int(link.phase)) + ' time: ' + str(link.time)))
 
                 GLib.idle_add(lambda: self.text_state.set_label('s: ' + state + ' f: ' + playing + ' c: ' + cat + ' ' + str(pos)))
+                GLib.idle_add(lambda: self.text_olstate.set_label('s:' + str(pos)))
+
 
             self.update_playlist_temp('A', self.tempsender.get_stats(self.config.playlist.tempa_node, "temperature", "last"))
             self.update_playlist_temp('B', self.tempsender.get_stats(self.config.playlist.tempb_node, "temperature", "last"))
+
+            self.player.statemachine() 
 
             #print('last from debian: ' + str(self.tempsender.get_stats("debian", "temperature", "last")))
             #print('last from alice: ' + str(self.tempsender.get_stats("alice", "temperature", "last")))
@@ -255,7 +271,7 @@ class PlayerUi(Gtk.Window):
             #print(str(beatno) + ' ' + str(int(link.phase)))
             #check
             if bm == 1 and bp == 1:
-                #self.player.toggle_overlay()
+                self.player.toggle_overlay()
                 self.cstate = "check"
                 #self.log.warning("check  ")
             
@@ -284,7 +300,7 @@ class PlayerUi(Gtk.Window):
                 self.cstate = "sleep"
 
             #elif bm == 6 and bp == 6:
-                #self.player.toggle_overlay()
+                self.player.toggle_overlay()
 
             if self.dw:
                 GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate))

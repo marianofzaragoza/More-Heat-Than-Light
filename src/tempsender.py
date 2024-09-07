@@ -42,7 +42,7 @@ class Tempsender():
         self.enable_appqueue=enable_appqueue
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("tempsender", self)
-        self.log.setLevel(logging.WARN)
+        self.log.setLevel(logging.CRITICAL)
  
         self.config = DynamicConfigIni()
         if source:

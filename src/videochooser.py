@@ -7,6 +7,7 @@ import config
 import gspread
 import pandas as pd
 import random
+import os
 class Videochooser():
     def __init__(self, gsheet=False):
         logging.setLoggerClass(mhlog.Logger)
@@ -17,7 +18,7 @@ class Videochooser():
         self.tempsfile = str(srcdir) + '/temperaturas.dataframe'
         self.videofile = str(srcdir) + '/finaledits.dataframe'
         self.statesfile = str(srcdir) + '/states.dataframe'
-
+        
 
         self.config = DynamicConfigIni()
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
@@ -26,7 +27,10 @@ class Videochooser():
             self.load_data_gsheet()
         else:
             self.load_data_file()
- 
+
+
+
+
     def load_data_gsheet(self):
         try:
             gc = gspread.service_account()
@@ -46,6 +50,7 @@ class Videochooser():
             return True
         except Exception as e:
             self.log.critical("gsheet not working" + str(e))
+            self.load_data_file()
             return False
 
     def dataframe_to_code(self, df):
@@ -171,7 +176,7 @@ class Videochooser():
             elif node == 'B':
                 temp = temp_b
             else:
-                self.log.critical(f'midi: node {node} has no known channel configured, using A')
+                #self.log.critical(f'midi: node {node} has no known channel configured, using A')
                 temp = temp_a
      
             if state == "TRANSMISSION" or state == "BROKENCHANNEL":
@@ -180,7 +185,7 @@ class Videochooser():
                 try:
                     filename = random.choice(filenames)
                 except IndexError as e:
-                    self.log.critical("no video found for: " + node + ' at: ' + str(temp_a) + ' bt:' + str(temp_b) + ' state: ' + state + 'cat: ' + cat)
+                    self.log.info("no video found for: " + node + ' at: ' + str(temp_a) + ' bt:' + str(temp_b) + ' state: ' + state + ' cat: ' + cat)
                     filename = 'VIDEO_MISSING.mov'
             elif state == "ENTANGLEMENT":
                 filename = 'ENTANGLEMENT.mov'
@@ -193,7 +198,7 @@ class Videochooser():
             elif node == 'B':
                 temp = temp_b
             else:
-                self.log.critical(f'midi: node {node} has no known channel configured, using A')
+                #self.log.critical(f'midi: node {node} has no known channel configured, using A')
                 temp = temp_a
      
             if state == "TRANSMISSION":

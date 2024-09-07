@@ -42,6 +42,16 @@ class Playlist():
         #self.vc.load_data_gsheet()
         #p.save_data_file()
         #self.vc.load_data_file()
+        self.check_files()
+
+    def check_files(self):
+        # TODO check everything in gsheet
+
+        files = [ 'VIDEO_MISSING.mov', 'ENTANGLEMENT.mov', "BROKENCHANNEL_A.mov", "BROKENCHANNEL_B.mov" ]
+        for file in files:
+            if not os.path.isfile(self.videodir + '/' + file):
+                self.log.critical('file missing: ' + file)
+
 
     def get_playlist_state(self):
         s = dict()
