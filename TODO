@@ -1,3 +1,6 @@
+* check if files exist before playing
+* convert framerate in conversion pipeline
+
 * DONE video play related to temperature
 * DONE multicast protocol
 * reliability / boot
