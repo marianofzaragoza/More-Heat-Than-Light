@@ -218,7 +218,7 @@ if __name__ == "__main__":
     
             print('last from debian: ' + str(ts.get_stats("debian", "temperature", "last")))
             print('last from alice: ' + str(ts.get_stats("alice", "temperature", "last")))
-            print('last from bob: ' + str(ts.get_stats("alice", "temperature", "last")))
+            print('last from bob: ' + str(ts.get_stats("bob", "temperature", "last")))
 
 
 
