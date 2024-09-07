@@ -87,7 +87,7 @@ class MhGstPlayer():
         if boole == False:
             #self.log.critical("video stuck")
             vidpos = "P (STUCK): {0} / {1}".format(self.format_ns(current), self.format_ns(duration))
-            self.interrupt_next(start=True)
+            #self.interrupt_next(start=True)
         else:
             #self.log.critical("video not stuck yet")
             vidpos = "P: {0} / {1}".format(self.format_ns(current), self.format_ns(duration))
