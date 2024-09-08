@@ -310,6 +310,9 @@ class PlayerUi(Gtk.Window):
                 if self.player.pre_entanglement and not self.player.in_entanglement:
                     # send message 
                     self.tempsender.send_temp(entanglement=True)
+                else:
+                    self.tempsender.send_temp(cancel_entanglement=True)
+
 
                 #self.log.warning("send  ")
                 boole, pos2 = self.player.videoplayer.query_position(Gst.Format.TIME)

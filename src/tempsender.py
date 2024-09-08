@@ -138,7 +138,7 @@ class Tempsender():
             #    self.log.critical("indexerror in process_messages")
             #    return True
         
-    def send_temp(self, entanglement=False):
+    def send_temp(self, entanglement=False, cancel_entanglement=False):
         msg = moreheat_pb2.MhMessage()
         t = datetime.datetime.now().timestamp()
         seconds = int(t)
@@ -148,13 +148,15 @@ class Tempsender():
         msg.seconds = seconds
         msg.nanos = nanos
         msg.source = self.nodename
-        if entanglement:
+        if entanglement or cancel_entanglement:
             msg.type = "entanglement"
         else:
             msg.type = "temperature"
 
         if entanglement:
             msg.value = 127
+        elif cancel_entanglement:
+            msg.value = 64
         else:
             msg.value = self.thermometer.read_total_temperature()
 
