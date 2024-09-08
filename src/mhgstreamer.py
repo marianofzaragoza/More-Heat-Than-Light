@@ -358,7 +358,11 @@ class MhGstPlayer():
             #GLib.idle_add(lambda: self.playlist.send_midi())
 
             #self.videoplayer.set_state(Gst.State.NULL) 
-            uri = Gst.filename_to_uri(self.playlist.next())
+            if self.in_entanglement == True:
+                uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
+            else:
+                uri = Gst.filename_to_uri(self.playlist.next(entanglement=False))
+
             #self.videoplayer.set_state(Gst.State.PLAYING) 
  
             self.log.critical("playbinvideo about to finish,  playlist: " + str(uri))

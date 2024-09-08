@@ -320,10 +320,16 @@ class PlayerUi(Gtk.Window):
 
                 self.cstate = "receive"
                 value = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last")
-                rxtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
-                print('check: ' + str(entseconds) + 'last ent msg: ' + str(rxtime) + ' v: ' + str(value))
-                
-                if (value == 127 and rxtime - entseconds < 2) and not self.player.in_entanglement and self.player.pre_entanglement:
+                txtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
+                print('checktime: ' + str(entseconds) + 'txtime other: ' + str(rxtime) + ' value: ' + str(value))
+
+                if (value == 127 and rxtime == entseconds)  and not self.player.in_entanglement and self.player.pre_entanglement:
+                    print('ENTANG, exact time match')
+
+                if ( value == 127 and rxtime > entseconds + 1 and rxtime < entseconds -1 )  and not self.player.in_entanglement and self.player.pre_entanglement:
+                    print('ENTANG, plusminus time match')
+ 
+                if (value == 127 and rxtime == entseconds) or ( value == 127 and rxtime > entseconds + 1 and rxtime < entseconds -1 ) and not self.player.in_entanglement and self.player.pre_entanglement:
                     print("ENTANGLEMENT")
                     self.player.playlist.send_specific_midi(20) 
 
