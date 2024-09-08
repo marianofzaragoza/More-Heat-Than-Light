@@ -322,7 +322,7 @@ class PlayerUi(Gtk.Window):
                 self.cstate = "receive"
                 value = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last")
                 rxtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
-                print('checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value))
+                print('checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value) + 'phase: ' + str(bp))
 
                 if (value == 127 and rxtime == entseconds)  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print('ENTANG, exact time match')
