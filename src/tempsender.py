@@ -101,7 +101,7 @@ class Tempsender():
     def poll(self):
         gotdata = False
         while (data := self.socket.recv()) is not None:
-            print('receiving' + str(self.stats))
+            #print('receiving' + str(self.stats))
             self.rxqueue.append(data) 
             gotdata = True
         return gotdata
