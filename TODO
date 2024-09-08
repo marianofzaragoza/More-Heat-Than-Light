@@ -1,3 +1,5 @@
+* disable mouse cursor
+* fullscreen desktop background
 * fix message receive check of entanglement
 * figure out what to do after 1 time entanglement finishes playing
 * DONE check if files exist before playing

@@ -171,6 +171,8 @@ class PlayerUi(Gtk.Window):
         #debug
         if not self.notemp:
             self.tempsender = Tempsender()
+            self.tempsender.send_temp(cancel_entanglement=True)
+
             self.log.info("creating msgsource")
             msgsource = TempSource(self.tempsender, self.onnetmessage)
             #simple.ircobj.fn_to_add_socket = source.add_socket
