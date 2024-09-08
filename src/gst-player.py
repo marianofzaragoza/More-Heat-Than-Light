@@ -330,7 +330,7 @@ class PlayerUi(Gtk.Window):
                 if ( value == 127 and rxtime > entseconds + 1 and rxtime < entseconds -1 )  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print('ENTANG, plusminus time match')
  
-                if ((value == 127 and rxtime == entseconds) or ( value == 127 and rxtime > entseconds + 1 and rxtime < entseconds -1 )) and not self.player.in_entanglement and self.player.pre_entanglement:
+                if ((value == 127 and rxtime == entseconds) or ( value == 127 and rxtime < entseconds + 1 and rxtime > entseconds -1 )) and not self.player.in_entanglement and self.player.pre_entanglement:
                     print("ENTANGLEMENT")
                     self.player.playlist.send_specific_midi(20) 
 
