@@ -203,6 +203,7 @@ class Videochooser():
             return filename
 
     def get_midi_note(self, node, temp_a, temp_b):
+            print("get midi note")
             state = self.state_from_temp(temp_a, temp_b)
             if node == 'A':
                 temp = temp_a
@@ -215,6 +216,7 @@ class Videochooser():
             if state == "TRANSMISSION":
                 cat = self.cat_from_temp(temp)
                 note = self.note_from_cat(node, cat)
+                print("got note " + str(note))
             elif state == "ENTANGLEMENT":
                 note = False
             elif state == "BROKENCHANNEL":
