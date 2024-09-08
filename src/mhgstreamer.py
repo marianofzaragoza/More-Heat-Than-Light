@@ -123,12 +123,12 @@ class MhGstPlayer():
 
         elif cst == "ENTANGLEMENT" and nst == "TRANSMISSION":
             self.pre_entanglement = False
-            self.entanglement = False
+            self.in_entanglement = False
             self.cst = "TRANSMISSION"
 
         elif cst == "ENTANGLEMENT" and nst == "BROKENCHANNEL":
             self.pre_entanglement = False
-            self.entanglement = False
+            self.in_entanglement = False
             self.overlay(True)
             self.cst = "BROKENCHANNEL"
 
@@ -480,12 +480,14 @@ class MhGstPlayer():
 
 
     # this function needs to be called from main thread, do not use directly, use interrupt_next
-    def mt_interrupt_next(self, start=False):
+    def mt_interrupt_next(self, start=False, entanglement=False):
         #print('called: MT_interrupt_next()')
         self.videoplayer.set_state(Gst.State.NULL)
         
         if start:
             nextfile = self.playlist.next(interrupt=False)
+        elif entanglement:
+            nextfile = self.playlist.next(interrupt=True, entanglement=True)
         else: 
             nextfile = self.playlist.next(interrupt=True)
         

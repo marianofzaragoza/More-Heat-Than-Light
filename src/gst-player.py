@@ -240,6 +240,8 @@ class PlayerUi(Gtk.Window):
         pos1 = 1
         pos2 = 2
         pos3 = 3
+        entseconds = 0
+        rxtime = 999999
         while True:
             beatno = await link.sync(float(eval(self.config.sync.syncbeat)), float(self.config.sync.offset))
 
@@ -292,6 +294,11 @@ class PlayerUi(Gtk.Window):
             if bm == 1 and bp == 1:
                 #self.player.toggle_overlay()
                 self.cstate = "check"
+                entseconds = 0
+                if self.player.pre_entanglement and not self.player.in_entanglement:
+                    t = datetime.now().timestamp()
+                    entseconds = int(t)
+             
                 #self.log.warning("check  ")
                 boole, pos1 = self.player.videoplayer.query_position(Gst.Format.TIME)
  
@@ -299,6 +306,10 @@ class PlayerUi(Gtk.Window):
             #send
             elif bm == 2 and bp == 2:
                 self.cstate = "send"
+                if self.player.pre_entanglement and not self.player.in_entanglement:
+                    # send message 
+                    self.tempsender.send_temp(entanglement=True)
+
                 #self.log.warning("send  ")
                 boole, pos2 = self.player.videoplayer.query_position(Gst.Format.TIME)
  
@@ -306,7 +317,19 @@ class PlayerUi(Gtk.Window):
 
             #receive
             elif bm == 3 and bp == 3:
+
                 self.cstate = "receive"
+                value = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last")
+                rxtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
+                print('check: ' + str(entseconds) + 'last ent msg: ' + str(rxtime) + ' v: ' + str(value))
+                
+                if value == 127 and rxtime - entseconds < 2:
+                    print("ENTANGLEMENT")
+                    self.player.mt_interrupt_next(entanglement=True)
+                    self.playlist.entanglement = True
+                    self.playlist.pre_entanglement = False
+                    
+                ###
                 #self.log.warning("receive ")
                 await asyncio.sleep(0)
                 boole, pos3 = self.player.videoplayer.query_position(Gst.Format.TIME)
@@ -340,7 +363,7 @@ class PlayerUi(Gtk.Window):
 
 
             if self.dw:
-                GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate))
+                GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate + str(self.player.pre_entanglement) + str(self.player.in_entanglement)))
 
             #self.log.critical('bang! ' + str(beatno))
 
