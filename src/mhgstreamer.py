@@ -504,6 +504,7 @@ class MhGstPlayer():
     # this function needs to be called from main thread, do not use directly, use interrupt_next
     def mt_interrupt_next(self, start=False, entanglement=False):
         #print('called: MT_interrupt_next()')
+        self.log.critical('interrupt_next ' + str(entanglement))
         self.videoplayer.set_state(Gst.State.NULL)
         
         if start:
