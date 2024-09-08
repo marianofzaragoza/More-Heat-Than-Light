@@ -125,12 +125,16 @@ class MhGstPlayer():
             self.pre_entanglement = False
             self.in_entanglement = False
             self.cst = "TRANSMISSION"
+            #interrupt and start playing transmission
+            self.interrupt_next(self, start=False, almostfinished=False, entanglement=False):
 
         elif cst == "ENTANGLEMENT" and nst == "BROKENCHANNEL":
             self.pre_entanglement = False
             self.in_entanglement = False
             self.overlay(True)
             self.cst = "BROKENCHANNEL"
+            #interrupt and start playing transmission
+            self.interrupt_next(self, start=False, almostfinished=False, entanglement=False):
 
         elif cst == "BROKENCHANNEL" and nst == "TRANSMISSION":
             self.overlay(False)
@@ -140,7 +144,7 @@ class MhGstPlayer():
             self.log.critical('note exiting brokenchannel ' + str(note))
             self.playlist.send_specific_midi(note) 
             self.cst = "TRANSMISSION"
-            
+ 
         elif cst == "BROKENCHANNEL" and nst == "ENTANGLEMENT":
             self.pre_entanglement = True
             self.overlay(False)
@@ -488,9 +492,9 @@ class MhGstPlayer():
 
 
     # loads next file in main thread, almostfinished=True will not reset playback
-    def interrupt_next(self, start=False, almostfinished=False):
+    def interrupt_next(self, start=False, almostfinished=False, entanglement=False):
         # gstreamer stuff needs to be called from main thread, but this function can be called from any
-        GLib.idle_add(lambda: self.mt_interrupt_next(start=start))
+        GLib.idle_add(lambda: self.mt_interrupt_next(start=start,entanglement=entanglement))
 
 
     # this function needs to be called from main thread, do not use directly, use interrupt_next
