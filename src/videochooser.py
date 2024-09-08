@@ -215,9 +215,9 @@ class Videochooser():
                 cat = self.cat_from_temp(temp)
                 note = self.note_from_cat(node, cat)
             elif state == "ENTANGLEMENT":
-                note = 19
+                note = False
             elif state == "BROKENCHANNEL":
-                note = 20
+                note = False
             return note
 
 

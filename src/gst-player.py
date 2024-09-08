@@ -325,6 +325,8 @@ class PlayerUi(Gtk.Window):
                 
                 if (value == 127 and rxtime - entseconds < 2) and not self.player.in_entanglement and self.player.pre_entanglement:
                     print("ENTANGLEMENT")
+                    self.player.playlist.send_specific_midi(20) 
+
                     self.player.mt_interrupt_next(entanglement=True)
                     self.player.in_entanglement = True
                     self.player.pre_entanglement = False

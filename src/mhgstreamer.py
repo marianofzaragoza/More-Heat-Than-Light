@@ -134,6 +134,11 @@ class MhGstPlayer():
 
         elif cst == "BROKENCHANNEL" and nst == "TRANSMISSION":
             self.overlay(False)
+            #note = self.playlist.vc.get_midi_note()
+            note = self.playlist.vc.get_midi_note(self.playlist.channel, self.playlist.a_temp, self.playlist.b_temp)
+
+            self.log.critical('note exiting brokenchannel ' + str(note))
+            self.playlist.send_specific_midi(note) 
             self.cst = "TRANSMISSION"
             
         elif cst == "BROKENCHANNEL" and nst == "ENTANGLEMENT":
@@ -248,6 +253,7 @@ class MhGstPlayer():
         p = self.get_overlay_pad()
         active = p.get_property("alpha") 
         if onoff == True and active == 0:
+            self.playlist.send_specific_midi(20) 
         #and self.overlay_active == False:
             # should be enabled, but is not enabled
             self.overlayplayer.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
