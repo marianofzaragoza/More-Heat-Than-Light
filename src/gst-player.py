@@ -298,7 +298,7 @@ class PlayerUi(Gtk.Window):
                 if self.player.pre_entanglement and not self.player.in_entanglement:
                     t = datetime.now().timestamp()
                     entseconds = int(t)
-                    self.tempsender.send_temp(entanglement=True)
+                    #self.tempsender.send_temp(entanglement=True)
              
                 #self.log.warning("check  ")
                 boole, pos1 = self.player.videoplayer.query_position(Gst.Format.TIME)
