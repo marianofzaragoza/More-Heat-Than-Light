@@ -294,7 +294,7 @@ class PlayerUi(Gtk.Window):
             if bm == 1 and bp == 1:
                 #self.player.toggle_overlay()
                 self.cstate = "check"
-                entseconds = 0
+                
                 if self.player.pre_entanglement and not self.player.in_entanglement:
                     t = datetime.now().timestamp()
                     entseconds = int(t)
@@ -323,11 +323,11 @@ class PlayerUi(Gtk.Window):
                 rxtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
                 print('check: ' + str(entseconds) + 'last ent msg: ' + str(rxtime) + ' v: ' + str(value))
                 
-                if value == 127 and rxtime - entseconds < 2:
+                if (value == 127 and rxtime - entseconds < 2) and not self.player.in_entanglement and self.player.pre_entanglement:
                     print("ENTANGLEMENT")
                     self.player.mt_interrupt_next(entanglement=True)
-                    self.playlist.entanglement = True
-                    self.playlist.pre_entanglement = False
+                    self.player.in_entanglement = True
+                    self.player.pre_entanglement = False
                     
                 ###
                 #self.log.warning("receive ")
