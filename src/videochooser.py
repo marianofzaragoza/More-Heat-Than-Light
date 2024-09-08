@@ -21,6 +21,9 @@ class Videochooser():
         
 
         self.config = DynamicConfigIni()
+        self.videodir = self.config.playlist.videodir_final
+
+
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
         if gsheet:
             self.log.critical("loading data from gsheet, takes some seconds....")
@@ -189,6 +192,11 @@ class Videochooser():
                     filename = 'VIDEO_MISSING.mov'
             elif state == "ENTANGLEMENT":
                 filename = 'ENTANGLEMENT.mov'
+
+            if not os.path.isfile(self.videodir + '/' + filename):
+                self.log.critical('file missing: ' + filename)
+                filename = 'VIDEO_MISSING.mov'
+
             return filename
 
     def get_midi_note(self, node, temp_a, temp_b):

@@ -107,6 +107,10 @@ class PlayerUi(Gtk.Window):
             self.text_tempb = Gtk.Button(label="temp B")
             hbox.pack_start(self.text_tempb, True, True, 0)
 
+            self.text_sm = Gtk.Button(label="beatcount")
+            hbox.pack_start(self.text_sm, True, True, 0)
+
+
             self.text_beatno = Gtk.Button(label="beatcount")
             hbox.pack_start(self.text_beatno, True, True, 0)
 
@@ -233,17 +237,30 @@ class PlayerUi(Gtk.Window):
         #    for i in range(4):
         #        await link.sync(1)
         #        self.log.critical('bang! ' + name)
+        pos1 = 1
+        pos2 = 2
+        pos3 = 3
         while True:
             beatno = await link.sync(float(eval(self.config.sync.syncbeat)), float(self.config.sync.offset))
-            #self.text_beatno.set_label('beat: ' + str(beatno))
+
+            sstr = str(self.player.statemachine())
+            GLib.idle_add(lambda: self.text_sm.set_label('sm: ' + sstr))
+
+            await asyncio.sleep(0)
+
+               #self.text_beatno.set_label('beat: ' + str(beatno))
             #self.text_clock.set_label('clock: ' + str(beatno))
             nowt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
             state = self.playlist.mhstate
             playing = self.playlist.nowplaying
             cat = self.playlist.mhcategory
+            await asyncio.sleep(0)
             pos = self.player.get_pos()
+            await asyncio.sleep(0)
             olpos = self.player.get_olpos()
+            await asyncio.sleep(0)
+
 
 
             if self.dw:
@@ -253,11 +270,11 @@ class PlayerUi(Gtk.Window):
                 GLib.idle_add(lambda: self.text_state.set_label('s: ' + state + ' f: ' + playing + ' c: ' + cat + ' ' + str(pos)))
                 GLib.idle_add(lambda: self.text_olstate.set_label('s:' + str(pos)))
 
-
+            await asyncio.sleep(0)
             self.update_playlist_temp('A', self.tempsender.get_stats(self.config.playlist.tempa_node, "temperature", "last"))
+            await asyncio.sleep(0)
             self.update_playlist_temp('B', self.tempsender.get_stats(self.config.playlist.tempb_node, "temperature", "last"))
 
-            self.player.statemachine() 
 
             #print('last from debian: ' + str(self.tempsender.get_stats("debian", "temperature", "last")))
             #print('last from alice: ' + str(self.tempsender.get_stats("alice", "temperature", "last")))
@@ -266,24 +283,42 @@ class PlayerUi(Gtk.Window):
             # we need to be on the whole beat, but also in the right phase (beat numbers are not the same on each node.....)
             bm = beatno % int(self.config.sync.modulo)
             bp = int(link.phase)
-            
+            await asyncio.sleep(0)
+
+
 
             #print(str(beatno) + ' ' + str(int(link.phase)))
             #check
             if bm == 1 and bp == 1:
-                self.player.toggle_overlay()
+                #self.player.toggle_overlay()
                 self.cstate = "check"
                 #self.log.warning("check  ")
-            
+                boole, pos1 = self.player.videoplayer.query_position(Gst.Format.TIME)
+ 
+        
             #send
             elif bm == 2 and bp == 2:
                 self.cstate = "send"
                 #self.log.warning("send  ")
+                boole, pos2 = self.player.videoplayer.query_position(Gst.Format.TIME)
+ 
+
 
             #receive
             elif bm == 3 and bp == 3:
                 self.cstate = "receive"
                 #self.log.warning("receive ")
+                await asyncio.sleep(0)
+                boole, pos3 = self.player.videoplayer.query_position(Gst.Format.TIME)
+                await asyncio.sleep(0)
+                print( str(pos1) + ' ' + str(pos2) + ' ' + str(pos3))
+                if pos1 == pos2 and pos2 == pos3:
+                    print("the player is stuck")
+                    self.player.videoplayer.set_state(Gst.State.NULL)
+                    await asyncio.sleep(0)
+                    self.player.videoplayer.set_state(Gst.State.PLAYING)
+ 
+
 
             #play
             elif bm == 4 and bp == 4:
@@ -300,7 +335,9 @@ class PlayerUi(Gtk.Window):
                 self.cstate = "sleep"
 
             #elif bm == 6 and bp == 6:
-                self.player.toggle_overlay()
+                #self.player.toggle_overlay()
+            await asyncio.sleep(0)
+
 
             if self.dw:
                 GLib.idle_add(lambda: self.text_cstate.set_label('cstate: ' + self.cstate))

@@ -197,7 +197,16 @@ class TempSource(GLib.Source):
 if __name__ == "__main__":
      
     aq = False
-    ts = Tempsender(enable_appqueue=aq)
+    if os.environ.get('TESTTEMP') is not None: 
+        print("RANDOM temperatures (not real)")
+        tm = Thermometer(testing=True)
+    else:
+        tm = Thermometer()
+
+
+
+    ts = Tempsender(enable_appqueue=aq, thermometer=tm)
+
 
     ts.log.info("testing tempsender" + str(sys.argv))
     time.sleep(1)
