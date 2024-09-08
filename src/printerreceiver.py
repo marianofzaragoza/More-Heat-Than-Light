@@ -22,9 +22,9 @@ class PrinterReceiver():
             beat = await link.sync(self.receive_interval)
             self.tempsender.poll()
             self.tempsender.process_messages()
-            self.a_temp = self.tempsender.get_stats('alice', 'temp', 'last')
-            self.b_temp = self.tempsender.get_stats('bob', 'temp', 'last')
-            #print('receive a: ' + str(self.a_temp) + ' b: ' + str(self.b_temp) , beat) 
+            self.a_temp = self.tempsender.get_stats('alice', 'temperature', 'last')
+            self.b_temp = self.tempsender.get_stats('bob', 'temperature', 'last')
+            #print('receive a: ' + str(self.a_temp) + ' b: ' + str(self.b_temp) + ' beat: ' + str(beat)) 
 
 
     def print_on_clock(self):
@@ -44,7 +44,7 @@ class PrinterReceiver():
             brokenchannel = False 
  
         text_matrix = self.printer.text_to_matrix(self.printer.margin_text, self.printer.font_height_5, self.printer.text_scale)
-        #print(text_matrix)
+        #print('A: ' + str(self.a_temp) + ' B:' + str(self.b_temp))
         self.printer.check_time_and_print(self.printer.last_print_time_stamp, self.a_temp, self.b_temp, entanglement, brokenchannel, text_matrix, self.printer.counter)
 
 
