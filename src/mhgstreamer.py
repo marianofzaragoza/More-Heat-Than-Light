@@ -298,7 +298,7 @@ class MhGstPlayer():
         name = pb.get_property("uri")
 
         if name == "playbin_overlay":
-            self.log.info("playbinoverlay eos")
+            self.log.critical("playbinoverlay eos")
             msg.src.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
             #uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
@@ -331,7 +331,7 @@ class MhGstPlayer():
         #print(str(name)+ ' ' + str(state) + ' '  + str(uri))
         #self.log_stuff()
         if name == "playbin_overlay":
-            self.log.info("playbinoverlay about to finish, not doing anytyhing")
+            self.log.critical("playbinoverlay about to finish, not doing anytyhing")
             #uri = Gst.filename_to_uri(self.playlist.get_overlay())
             #self.videoplayer.set_state(Gst.State.NULL) 
             #self.videoplayer.set_state(Gst.State.PLAYING) 
