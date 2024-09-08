@@ -315,8 +315,8 @@ class PlayerUi(Gtk.Window):
                 if self.player.pre_entanglement and not self.player.in_entanglement:
                     # send message 
                     self.tempsender.send_temp(entanglement=True)
-                #else:
-                #    self.tempsender.send_temp(cancel_entanglement=True)
+                else:
+                    self.tempsender.send_temp(cancel_entanglement=True)
 
 
                 #self.log.warning("send  ")
@@ -338,10 +338,10 @@ class PlayerUi(Gtk.Window):
                 if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 3 )  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print('ENTANG, plusminus time match')
  
-                if ( value == 127 and rxtime < entseconds + 1 and rxtime > entseconds - 1 )  and not self.player.in_entanglement and self.player.pre_entanglement:
+                if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 2 )  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print("ENTANGLEMENT")
-                    self.player.playlist.send_specific_midi(20) 
-                    self.tempsender.send_temp(cancel_entanglement=True)
+                    self.player.playlist.send_specific_midi(19) 
+                    #self.tempsender.send_temp(cancel_entanglement=True)
 
                     self.player.mt_interrupt_next(entanglement=True)
                     self.player.in_entanglement = True
