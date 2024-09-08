@@ -26,8 +26,14 @@ class DynamicConfigIni:
         conf = configparser.ConfigParser()
 
         conf.read('moreheat.ini')
-        hostname = socket.gethostname()
-        conf['DEFAULT']['nodename'] = hostname.replace('-', '_')
+
+        if os.environ.get('NODENAME') is not None:
+            nn = os.environ.get('NODENAME')
+            print('nodename override: ' + nn)
+            conf['DEFAULT']['nodename'] = nn
+        else:
+            hostname = socket.gethostname()
+            conf['DEFAULT']['nodename'] = hostname.replace('-', '_')
         #print(config.sections())
         #print(config['DEFAULT']['alice_outdoorweight'])
         #print(config['DEFAULT']['bob_outdoorweight'])

@@ -1,7 +1,7 @@
-USE,FILE NAME,NEW NAMES,MOVE,,AVAILABLE,DURATION,CHANNEL,NOTES,SCALE,FEELING,ROOM / DEVICE,STAGE,MOTION,LIGHT,COLOR,O,P,Q,R,S,T,U,V,w
-Y,A003_04290249_C005.mov,,,TRUE,,2:00:03,ALICE,Clean room cleaning bottle,human,caring,Diamond Acid,Prep,Still,Light,,,,,,Cine,MILD,,,
-Y,A003_04290249_C005_A.mov,,,TRUE,,1:08:00,ALICE,boiling dimaond,human,caring,Diamond Acid,Prep,Still,Light,,,,,,Cine,MILD,,,
-Y,A003_04290254_C006.mov,,,TRUE,,0:30:16,ALICE,Clean room puring acid shaky hand,human,caring,Diamond Acid,Prep,Still,,,,,,,Cine,MILD,,,
-Y,A003_04290254_C006_B.mov,,,TRUE,,0:30:12,ALICE,Clean room close up puring acid shaky hand,human,caring,Diamond Acid,Prep,Still,,,,,,,Cine,MILD,,,
-Y,A003_04290254_C006_C.mov,,,TRUE,,1:23:00,ALICE,clenn room placing diamond in acid,human,caring,Diamond Acid,Prep,Still,,,,,,,Cine,MILD,,,
-Y,A003_04290304_C007_B.mov,,,TRUE,,0:15:00,BOB,Clean room two small jars hands move them,human,caring,Diamond Acid,Prep,Still,,,,,,,Cine,MILD,,,
+USE,FILE NAME,NEW NAMES,MOVE,Unnamed: 4,AVAILABLE,DURATION,CHANNEL,NOTES,SCALE,FEELING,ROOM / DEVICE,STAGE,MOTION,LIGHT,COLOR,O,P,Q,R,S,T,U,V,w
+Y,A003_04290249_C005.mov,,,True,,2:00:03,ALICE,Clean room cleaning bottle,human,caring,Diamond Acid,Prep,Still,Light,,,,,,Cine,MILD,,,
+Y,A003_04290249_C005_A.mov,,,True,,1:08:00,ALICE,boiling dimaond,human,caring,Diamond Acid,Prep,Still,Light,,,,,,Cine,MILD,,,
+Y,A003_04290254_C006.mov,,,True,,0:30:16,ALICE,Clean room puring acid shaky hand,human,caring,Diamond Acid,Prep,Still,,,,,,,Cine,MILD,,,
+Y,A003_04290254_C006_B.mov,,,True,,0:30:12,ALICE,Clean room close up puring acid shaky hand,human,caring,Diamond Acid,Prep,Still,,,,,,,Cine,MILD,,,
+Y,A003_04290254_C006_C.mov,,,True,,1:23:00,ALICE,clenn room placing diamond in acid,human,caring,Diamond Acid,Prep,Still,,,,,,,Cine,MILD,,,
+Y,A003_04290304_C007_B.mov,,,True,,0:15:00,BOB,Clean room two small jars hands move them,human,caring,Diamond Acid,Prep,Still,,,,,,,Cine,MILD,,,

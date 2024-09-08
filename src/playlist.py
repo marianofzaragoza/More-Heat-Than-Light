@@ -28,9 +28,11 @@ class Playlist():
         self.channel = 'C'
 
         if self.nodename == self.conf.playlist.vida_node:
+            self.othernode = self.conf.playlist.vidb_node
             self.channel = 'A'
             self.gsheet = True
         elif self.nodename == self.conf.playlist.vidb_node:
+            self.othernode = self.conf.playlist.vida_node
             self.channel = 'B'
             self.gsheet = True
         else:
@@ -42,6 +44,19 @@ class Playlist():
         #self.vc.load_data_gsheet()
         #p.save_data_file()
         #self.vc.load_data_file()
+        self.check_files()
+
+    def get_other_node(self):
+        return self.othernode
+
+    def check_files(self):
+        # TODO check everything in gsheet
+
+        files = [ 'VIDEO_MISSING.mov', 'ENTANGLEMENT.mov', "BROKENCHANNEL_A.mov", "BROKENCHANNEL_B.mov" ]
+        for file in files:
+            if not os.path.isfile(self.videodir + '/' + file):
+                self.log.critical('file missing: ' + file)
+
 
     def get_playlist_state(self):
         s = dict()
@@ -74,10 +89,10 @@ class Playlist():
         self.log.info("get_overlay: " + realpath) 
         return realpath
 
-    def next(self, interrupt=False):
+    def next(self, interrupt=False, entanglement=False):
         
 
-        video_file = self.vc.get_random_file(self.channel, self.a_temp, self.b_temp)
+        video_file = self.vc.get_random_file(self.channel, self.a_temp, self.b_temp, entanglement=entanglement)
         self.nowplaying = video_file
         realpath = os.path.realpath(self.videodir + '/' + video_file)
         self.log.info("file: " + realpath)

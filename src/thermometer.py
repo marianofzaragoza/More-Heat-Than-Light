@@ -15,15 +15,6 @@ class Thermometer():
 
         assert isinstance(self.log, mhlog.Logger)
         self.log.setLevel(logging.INFO)
-        
-        self.log.debug('hello debug')
-        self.log.info('hello info')
-        self.log.warning('hello warning')
-        self.log.error('hello error')
-        self.log.critical('hello critical')
-        
-
-
 
         self.testing = testing
         self.config = DynamicConfigIni()
@@ -122,7 +113,7 @@ class Thermometer():
 
 
 if __name__ == "__main__":
-    thermometer = Thermometer(testing=True)
+    thermometer = Thermometer(testing=False)
     thermometer.test()
 
     

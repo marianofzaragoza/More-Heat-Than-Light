@@ -38,17 +38,20 @@ import mhlog
 * keeps track of last termperature received
 '''
 class Tempsender():
-    def __init__(self, enable_appqueue=False, thermometer=False, source=False):
+    def __init__(self, enable_appqueue=False, thermometer=False, source=False, node=False):
         self.enable_appqueue=enable_appqueue
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("tempsender", self)
-        self.log.setLevel(logging.WARN)
+        self.log.setLevel(logging.CRITICAL)
  
         self.config = DynamicConfigIni()
-        if source:
-            self.nodename = source
+        if not node == False:
+            self.nodename = node
         else:
-            self.nodename = self.config.DEFAULT.nodename  # Access the nodename
+            if source:
+                self.nodename = source
+            else:
+                self.nodename = self.config.DEFAULT.nodename  # Access the nodename
 
         if thermometer:
             self.thermometer = thermometer
@@ -134,7 +137,7 @@ class Tempsender():
             #    self.log.critical("indexerror in process_messages")
             #    return True
         
-    def send_temp(self):
+    def send_temp(self, entanglement=False):
         msg = moreheat_pb2.MhMessage()
         t = datetime.datetime.now().timestamp()
         seconds = int(t)
@@ -144,8 +147,15 @@ class Tempsender():
         msg.seconds = seconds
         msg.nanos = nanos
         msg.source = self.nodename
-        msg.type = "temperature"
-        msg.value = self.thermometer.read_total_temperature()
+        if entanglement:
+            msg.type = "entanglement"
+        else:
+            msg.type = "temperature"
+
+        if entanglement:
+            msg.value = 127
+        else:
+            msg.value = self.thermometer.read_total_temperature()
 
         msglen = len(msg.SerializeToString())
         #self.log.debug("length bits: " + str(msglen * 8))
@@ -192,12 +202,30 @@ class TempSource(GLib.Source):
                 self.remove_poll(pollfd)
                 self.pollfds.remove(pollfd)
 '''
+class StaticThermometer():
+    def __init__(self, temp=1):
+        self.temp = temp
+    def read_total_temperature(self):
+        return self.temp
 
+    def set_temp(self, temp):
+        print('setting: ' + str(temp))
+        self.temp = temp
+ 
 
 if __name__ == "__main__":
      
     aq = False
-    ts = Tempsender(enable_appqueue=aq)
+    if os.environ.get('TESTTEMP') is not None: 
+        print("RANDOM temperatures (not real)")
+        tm = Thermometer(testing=True)
+    else:
+        tm = Thermometer()
+
+
+
+    ts = Tempsender(enable_appqueue=aq, thermometer=tm)
+
 
     ts.log.info("testing tempsender" + str(sys.argv))
     time.sleep(1)
@@ -218,10 +246,25 @@ if __name__ == "__main__":
     
             print('last from debian: ' + str(ts.get_stats("debian", "temperature", "last")))
             print('last from alice: ' + str(ts.get_stats("alice", "temperature", "last")))
+            print('last from bob: ' + str(ts.get_stats("bob", "temperature", "last")))
+
 
 
             #ts.log.debug('socket empty')
             time.sleep(1)
+
+    elif len(sys.argv) > 1 and sys.argv[1] == "static":
+
+        ta = StaticThermometer(temp=int(sys.argv[2]))
+        tb = StaticThermometer(temp=int(sys.argv[3]))
+        tsa = Tempsender(enable_appqueue=aq, thermometer=ta, node='alice')
+        tsb = Tempsender(enable_appqueue=aq, thermometer=tb, node='bob')
+
+        while True:
+            tsa.send_temp()
+            tsb.send_temp() 
+
+            time.sleep(0.5)
 
     else:
         count = 0
