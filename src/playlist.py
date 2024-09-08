@@ -37,6 +37,8 @@ class Playlist():
             self.gsheet = True
         else:
             self.gsheet = False
+            self.channel = 'A'
+            self.othernode = 'B'
             self.log.critical("this player has no channel assigned")
 
       

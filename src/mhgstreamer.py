@@ -48,7 +48,7 @@ class MhGstPlayer():
         #self.hdfile = "video/quality/HD PRORESS.mov"
         #self.overlayfile = "video/animation/alice_hd.mov"
         #self.hdfile = "/home/user/media/moreheat/VIDEO_MISSING.mov"
-        self.overlayfile = "/home/user/media/moreheat/BROKENCHANNEL_A.mov"
+        self.overlayfile = self.playlist.videodir + self.playlist.vc.get_broken_channel_file(self.playlist.nodename)
         
         self.tfile = "/home/user/media/moreheat/VIDEO_MISSING.mov"
 
