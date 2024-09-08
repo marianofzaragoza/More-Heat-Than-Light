@@ -217,21 +217,13 @@ class StaticThermometer():
 if __name__ == "__main__":
      
     aq = False
-    if os.environ.get('TESTTEMP') is not None: 
-        print("RANDOM temperatures (not real)")
-        tm = Thermometer(testing=True)
-    else:
-        tm = Thermometer()
 
 
 
-    ts = Tempsender(enable_appqueue=aq, thermometer=tm)
-
-
-    ts.log.info("testing tempsender" + str(sys.argv))
+    #ts.log.info("testing tempsender" + str(sys.argv))
     time.sleep(1)
     if len(sys.argv) > 1 and sys.argv[1] == "recv":
-
+        ts = Tempsender()
         while True:
             #ts.log.debug('receiving')
             ts.poll()
@@ -255,7 +247,14 @@ if __name__ == "__main__":
             time.sleep(1)
 
     elif len(sys.argv) > 1 and sys.argv[1] == "static":
+        if os.environ.get('TESTTEMP') is not None: 
+            print("RANDOM temperatures (not real)")
+            tm = Thermometer(testing=True)
+        else:
+            tm = Thermometer()
 
+
+        ts = Tempsender(enable_appqueue=aq, thermometer=tm)
         ta = StaticThermometer(temp=int(sys.argv[2]))
         tb = StaticThermometer(temp=int(sys.argv[3]))
         tsa = Tempsender(enable_appqueue=aq, thermometer=ta, node='alice')
@@ -269,6 +268,14 @@ if __name__ == "__main__":
 
     else:
         count = 0
+        if os.environ.get('TESTTEMP') is not None: 
+            print("RANDOM temperatures (not real)")
+            tm = Thermometer(testing=True)
+        else:
+            tm = Thermometer()
+
+
+        ts = Tempsender(enable_appqueue=aq, thermometer=tm)
         while True:
             #print('testing')         
             #msg =  "temp: " + str(ts.thermometer.read_total_temperature())
