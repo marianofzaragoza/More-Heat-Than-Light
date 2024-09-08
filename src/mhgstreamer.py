@@ -126,7 +126,7 @@ class MhGstPlayer():
             self.in_entanglement = False
             self.cst = "TRANSMISSION"
             #interrupt and start playing transmission
-            self.interrupt_next(self, start=False, almostfinished=False, entanglement=False)
+            self.interrupt_next(start=False, almostfinished=False, entanglement=False)
 
         elif cst == "ENTANGLEMENT" and nst == "BROKENCHANNEL":
             self.pre_entanglement = False
@@ -134,7 +134,7 @@ class MhGstPlayer():
             self.overlay(True)
             self.cst = "BROKENCHANNEL"
             #interrupt and start playing transmission
-            self.interrupt_next(self, start=False, almostfinished=False, entanglement=False)
+            self.interrupt_next(start=False, almostfinished=False, entanglement=False)
 
         elif cst == "BROKENCHANNEL" and nst == "TRANSMISSION":
             self.overlay(False)
