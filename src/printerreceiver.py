@@ -24,7 +24,7 @@ class PrinterReceiver():
             self.tempsender.process_messages()
             self.a_temp = self.tempsender.get_stats('alice', 'temp', 'last')
             self.b_temp = self.tempsender.get_stats('bob', 'temp', 'last')
-            #print('receive a: ' + str(self.a_temp) + ' b: ' + str(self.b_temp) , beat) 
+            print('receive a: ' + str(self.a_temp) + ' b: ' + str(self.b_temp) , beat) 
 
 
     def print_on_clock(self):
