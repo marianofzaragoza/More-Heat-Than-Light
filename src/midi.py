@@ -44,16 +44,17 @@ class MidiSender():
             await self.client.drain_output()
 
     def send_note(self,note):
-        note = note + 23
-        if note == self.lastnote:
-            self.log.info('not sending note (same as last): ' + str(note)) 
-        else:
-            self.log.info('send_note'+ str(note))
-            if self.alsa:
-                event = NoteOnEvent(note=note)
-                self.client.event_output(event, port=self.output_port)
-                self.client.drain_output()
+        if not note == False:
+            note = note + 23
+            if note == self.lastnote:
+                self.log.critical('not sending note (same as last): ' + str(note) + 'last: ' + str(self.lastnote)) 
+            else:
+                self.log.critical('send_note'+ str(note))
                 self.lastnote = note
+                if self.alsa:
+                    event = NoteOnEvent(note=note)
+                    self.client.event_output(event, port=self.output_port)
+                    self.client.drain_output()
 
 
 

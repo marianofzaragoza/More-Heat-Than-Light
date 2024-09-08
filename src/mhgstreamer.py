@@ -48,7 +48,7 @@ class MhGstPlayer():
         #self.hdfile = "video/quality/HD PRORESS.mov"
         #self.overlayfile = "video/animation/alice_hd.mov"
         #self.hdfile = "/home/user/media/moreheat/VIDEO_MISSING.mov"
-        self.overlayfile = "/home/user/media/moreheat/BROKENCHANNEL_A.mov"
+        self.overlayfile = self.playlist.videodir + self.playlist.vc.get_broken_channel_file(self.playlist.channel)
         
         self.tfile = "/home/user/media/moreheat/VIDEO_MISSING.mov"
 
@@ -118,6 +118,7 @@ class MhGstPlayer():
 
         elif cst == "TRANSMISSION" and nst == "BROKENCHANNEL":
             self.overlay(True)
+            self.playlist.send_specific_midi(20) 
             # enable overlay  (go to start of overlay video)
             self.cst = "BROKENCHANNEL"
 
@@ -125,17 +126,27 @@ class MhGstPlayer():
             self.pre_entanglement = False
             self.in_entanglement = False
             self.cst = "TRANSMISSION"
+            #interrupt and start playing transmission
+            self.interrupt_next(start=False, almostfinished=False, entanglement=False)
 
         elif cst == "ENTANGLEMENT" and nst == "BROKENCHANNEL":
             self.pre_entanglement = False
             self.in_entanglement = False
             self.overlay(True)
+            self.playlist.send_specific_midi(20) 
             self.cst = "BROKENCHANNEL"
+            #interrupt and start playing transmission
+            self.interrupt_next(start=False, almostfinished=False, entanglement=False)
 
         elif cst == "BROKENCHANNEL" and nst == "TRANSMISSION":
             self.overlay(False)
+            #note = self.playlist.vc.get_midi_note()
+            note = self.playlist.vc.get_midi_note(self.playlist.channel, self.playlist.a_temp, self.playlist.b_temp)
+
+            self.log.critical('note exiting brokenchannel ' + str(note))
+            self.playlist.send_specific_midi(note) 
             self.cst = "TRANSMISSION"
-            
+ 
         elif cst == "BROKENCHANNEL" and nst == "ENTANGLEMENT":
             self.pre_entanglement = True
             self.overlay(False)
@@ -190,6 +201,14 @@ class MhGstPlayer():
         ps = self.playlist.get_playlist_state()
         self.osc.send_video_msg(ps)
 
+        '''
+        video_state = self.videoplayer.get_state(Gst.CLOCK_TIME_NONE)
+
+        if self.overlay_enabled:
+            overlay_state = self.overlayplayer.get_state(Gst.CLOCK_TIME_NONE)
+
+            print('video state: ' + str(video_state.state) + 'overlay state ' + str(overlay_state.state))
+        '''
 
         Gst.debug_bin_to_dot_file(self.videoplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_videoplayer_' )
         Gst.debug_bin_to_dot_file(self.videomixer, Gst.DebugGraphDetails.ALL, 'gstdebug_videomixer_' + '3' )
@@ -337,10 +356,14 @@ class MhGstPlayer():
             #self.videoplayer.set_state(Gst.State.PLAYING) 
  
         elif name == "playbin_video":
-            #GLib.idle_add(lambda: self.playlist.send_midi())
 
             #self.videoplayer.set_state(Gst.State.NULL) 
-            uri = Gst.filename_to_uri(self.playlist.next())
+            if self.in_entanglement == True:
+                uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
+            else:
+                self.playlist.send_midi()
+                uri = Gst.filename_to_uri(self.playlist.next(entanglement=False))
+
             #self.videoplayer.set_state(Gst.State.PLAYING) 
  
             self.log.critical("playbinvideo about to finish,  playlist: " + str(uri))
@@ -474,14 +497,15 @@ class MhGstPlayer():
 
 
     # loads next file in main thread, almostfinished=True will not reset playback
-    def interrupt_next(self, start=False, almostfinished=False):
+    def interrupt_next(self, start=False, almostfinished=False, entanglement=False):
         # gstreamer stuff needs to be called from main thread, but this function can be called from any
-        GLib.idle_add(lambda: self.mt_interrupt_next(start=start))
+        GLib.idle_add(lambda: self.mt_interrupt_next(start=start,entanglement=entanglement))
 
 
     # this function needs to be called from main thread, do not use directly, use interrupt_next
     def mt_interrupt_next(self, start=False, entanglement=False):
         #print('called: MT_interrupt_next()')
+        self.log.critical('interrupt_next ' + str(entanglement))
         self.videoplayer.set_state(Gst.State.NULL)
         
         if start:

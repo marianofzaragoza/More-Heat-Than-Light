@@ -37,6 +37,8 @@ class Playlist():
             self.gsheet = True
         else:
             self.gsheet = False
+            self.channel = 'A'
+            self.othernode = 'B'
             self.log.critical("this player has no channel assigned")
 
       
@@ -99,17 +101,20 @@ class Playlist():
         #print(p.get_broken_channel_file('A'))
         
         return realpath
-      
+     
+    def send_specific_midi(self, note):
+        self.midi.send_note(note)
+
     def send_midi(self, interrupt=False):
-        if interrupt == True:
-            note = 19
-        else:
-            note = self.vc.get_midi_note(self.channel, self.a_temp, self.b_temp)
+        #if interrupt == True:
+        #    note = 19
+        #else:
+        note = self.vc.get_midi_note(self.channel, self.a_temp, self.b_temp)
         #asyncio.run(self.midi.send_note_async(note))
         self.midi.send_note(note)
 
 
-        self.log.info("midinote: " + str(note))
+        #self.log.info("midinote: " + str(note))
         #print(p.get_broken_channel_file('A'))
         
         return True

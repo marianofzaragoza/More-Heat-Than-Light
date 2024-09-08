@@ -1,22 +1,25 @@
+* disable mouse cursor
+* fullscreen desktop background
+* fix message receive check of entanglement
 * figure out what to do after 1 time entanglement finishes playing
-* check if files exist before playing
-* convert framerate in conversion pipeline
+* DONE check if files exist before playing
+* DONE convert framerate in conversion pipeline
 
 * DONE video play related to temperature
 * DONE multicast protocol
-* reliability / boot
+* reliability / boot (proper logo)
 * DONE network
-* printer carol
+* DONE printer carol
   
 * logging (temperatures)
 * DONE remote control 
 * DONE 2 thermometers on 1-wire bus 
 * testing with actual videos
 * DONE config file
-* lightbox (only send)
-* plymouth-reboot splash screen
+* NOTNEEDED lightbox (only send)
+* NOTNEEDED plymouth-reboot splash screen
 * NOTNEEDED? fix alpha blend function (so its faster)
-* video interruption sync
+* NEEDSTESTING video interruption sync
 * use live sync for timing video interruption
   * is the beat count the same on all machines???? check in aalink
   * interruption state machine
@@ -28,7 +31,7 @@
 * DONE time sync protocol (ntp or ptp)
 * DONE sync communnication on ableton live sync
 * logfile to recreate the printout (avideo#, bvideo#, atemp, btemp, state )
-* triggering scenes in ableton
+* DONE triggering scenes in ableton
 * logging / graphing temperatures and videos
 * DONE weird resolution / aspect ratio
 * NOTNEEDED? updaterate temperature in video player
@@ -39,11 +42,8 @@
 * cleanup extra daemons on computers
 * sequence numbers in messages (for debugging packet drops)
 * quit program properly (quit doesn't work with the async / glib integration)
-* interrupting by using 3th player
-* smooth transition on interrupting
+* FUTURE interrupting by using 3th player / smooth transition on interrupting
 * log 
-* check and act on states / transitions
-* restart player on stuck video
+* DONE check and act on states / transitions
+* DONE restart player on stuck video
 
-#BLOCK
-* videos (and corresponding filenames in google sheet)

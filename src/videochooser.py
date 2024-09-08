@@ -170,8 +170,9 @@ class Videochooser():
                 midi = self.note_from_cat(n, c)
                 print(c + ' : ' + str(midi) + ' '  + str(self.filenames_from_cat(n, c)))
 
-    def get_broken_channel_file(self, node):
-        return "BROKENCHANNEL_" + node + '.mov'
+    def get_broken_channel_file(self, channel):
+        self.log.critical('bc0 ' + channel)
+        return "BROKENCHANNEL_" + channel + '.mov'
 
     def get_random_file(self, node, temp_a, temp_b, entanglement=False):
             state = self.state_from_temp(temp_a, temp_b)
@@ -202,6 +203,7 @@ class Videochooser():
             return filename
 
     def get_midi_note(self, node, temp_a, temp_b):
+            print("get midi note")
             state = self.state_from_temp(temp_a, temp_b)
             if node == 'A':
                 temp = temp_a
@@ -214,10 +216,11 @@ class Videochooser():
             if state == "TRANSMISSION":
                 cat = self.cat_from_temp(temp)
                 note = self.note_from_cat(node, cat)
+                print("got note " + str(note))
             elif state == "ENTANGLEMENT":
-                note = 19
+                note = False
             elif state == "BROKENCHANNEL":
-                note = 20
+                note = False
             return note
 
 

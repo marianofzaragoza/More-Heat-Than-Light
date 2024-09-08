@@ -138,7 +138,7 @@ class Tempsender():
             #    self.log.critical("indexerror in process_messages")
             #    return True
         
-    def send_temp(self, entanglement=False):
+    def send_temp(self, entanglement=False, cancel_entanglement=False):
         msg = moreheat_pb2.MhMessage()
         t = datetime.datetime.now().timestamp()
         seconds = int(t)
@@ -148,13 +148,15 @@ class Tempsender():
         msg.seconds = seconds
         msg.nanos = nanos
         msg.source = self.nodename
-        if entanglement:
+        if entanglement or cancel_entanglement:
             msg.type = "entanglement"
         else:
             msg.type = "temperature"
 
         if entanglement:
             msg.value = 127
+        elif cancel_entanglement:
+            msg.value = 64
         else:
             msg.value = self.thermometer.read_total_temperature()
 
@@ -217,21 +219,13 @@ class StaticThermometer():
 if __name__ == "__main__":
      
     aq = False
-    if os.environ.get('TESTTEMP') is not None: 
-        print("RANDOM temperatures (not real)")
-        tm = Thermometer(testing=True)
-    else:
-        tm = Thermometer()
 
 
 
-    ts = Tempsender(enable_appqueue=aq, thermometer=tm)
-
-
-    ts.log.info("testing tempsender" + str(sys.argv))
+    #ts.log.info("testing tempsender" + str(sys.argv))
     time.sleep(1)
     if len(sys.argv) > 1 and sys.argv[1] == "recv":
-
+        ts = Tempsender()
         while True:
             #ts.log.debug('receiving')
             ts.poll()
@@ -255,7 +249,14 @@ if __name__ == "__main__":
             time.sleep(1)
 
     elif len(sys.argv) > 1 and sys.argv[1] == "static":
+        if os.environ.get('TESTTEMP') is not None: 
+            print("RANDOM temperatures (not real)")
+            tm = Thermometer(testing=True)
+        else:
+            tm = Thermometer()
 
+
+        ts = Tempsender(enable_appqueue=aq, thermometer=tm)
         ta = StaticThermometer(temp=int(sys.argv[2]))
         tb = StaticThermometer(temp=int(sys.argv[3]))
         tsa = Tempsender(enable_appqueue=aq, thermometer=ta, node='alice')
@@ -269,6 +270,14 @@ if __name__ == "__main__":
 
     else:
         count = 0
+        if os.environ.get('TESTTEMP') is not None: 
+            print("RANDOM temperatures (not real)")
+            tm = Thermometer(testing=True)
+        else:
+            tm = Thermometer()
+
+
+        ts = Tempsender(enable_appqueue=aq, thermometer=tm)
         while True:
             #print('testing')         
             #msg =  "temp: " + str(ts.thermometer.read_total_temperature())

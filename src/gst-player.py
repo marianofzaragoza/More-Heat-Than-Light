@@ -76,7 +76,9 @@ class PlayerUi(Gtk.Window):
         elif self.nodename == "test_vid":
             self.dw = True
             bar_up = True
- 
+        elif self.nodename == "rivest":
+            self.dw = True
+            bar_up = True
         else:
             self.dw = True
             bar_up = False
@@ -101,7 +103,7 @@ class PlayerUi(Gtk.Window):
 
         if self.dw:
             self.text_tempa = Gtk.Button(label="temp A")
-            self.text_tempa.get_style_context().add_class('red-background')
+            self.text_tempa.get_style_context()
             hbox.pack_start(self.text_tempa, True, True, 0)
 
             self.text_tempb = Gtk.Button(label="temp B")
@@ -169,6 +171,8 @@ class PlayerUi(Gtk.Window):
         #debug
         if not self.notemp:
             self.tempsender = Tempsender()
+            self.tempsender.send_temp(cancel_entanglement=True)
+
             self.log.info("creating msgsource")
             msgsource = TempSource(self.tempsender, self.onnetmessage)
             #simple.ircobj.fn_to_add_socket = source.add_socket
@@ -246,7 +250,8 @@ class PlayerUi(Gtk.Window):
             beatno = await link.sync(float(eval(self.config.sync.syncbeat)), float(self.config.sync.offset))
 
             sstr = str(self.player.statemachine())
-            GLib.idle_add(lambda: self.text_sm.set_label('sm: ' + sstr))
+            if self.dw:
+                GLib.idle_add(lambda: self.text_sm.set_label('sm: ' + sstr))
 
             await asyncio.sleep(0)
 
@@ -298,6 +303,7 @@ class PlayerUi(Gtk.Window):
                 if self.player.pre_entanglement and not self.player.in_entanglement:
                     t = datetime.now().timestamp()
                     entseconds = int(t)
+                    #self.tempsender.send_temp(entanglement=True)
              
                 #self.log.warning("check  ")
                 boole, pos1 = self.player.videoplayer.query_position(Gst.Format.TIME)
@@ -309,6 +315,9 @@ class PlayerUi(Gtk.Window):
                 if self.player.pre_entanglement and not self.player.in_entanglement:
                     # send message 
                     self.tempsender.send_temp(entanglement=True)
+                else:
+                    self.tempsender.send_temp(cancel_entanglement=True)
+
 
                 #self.log.warning("send  ")
                 boole, pos2 = self.player.videoplayer.query_position(Gst.Format.TIME)
@@ -321,10 +330,19 @@ class PlayerUi(Gtk.Window):
                 self.cstate = "receive"
                 value = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last")
                 rxtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
-                print('check: ' + str(entseconds) + 'last ent msg: ' + str(rxtime) + ' v: ' + str(value))
-                
-                if (value == 127 and rxtime - entseconds < 2) and not self.player.in_entanglement and self.player.pre_entanglement:
+                print('checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value) + 'phase: ' + str(bp), 'pre: ' + str(self.player.pre_entanglement) +  'ent: ' + str(self.player.in_entanglement))
+
+                if (value == 127 and rxtime == entseconds)  and not self.player.in_entanglement and self.player.pre_entanglement:
+                    print('ENTANG, exact time match')
+
+                if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 3 )  and not self.player.in_entanglement and self.player.pre_entanglement:
+                    print('ENTANG, plusminus time match')
+ 
+                if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 2 )  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print("ENTANGLEMENT")
+                    self.player.playlist.send_specific_midi(19) 
+                    #self.tempsender.send_temp(cancel_entanglement=True)
+
                     self.player.mt_interrupt_next(entanglement=True)
                     self.player.in_entanglement = True
                     self.player.pre_entanglement = False
