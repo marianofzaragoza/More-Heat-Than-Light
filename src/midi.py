@@ -86,7 +86,7 @@ if __name__ == '__main__':
  
         while True:
             print('hello')
-            p.send_note(19)
+            p.send_note(20)
  
             #asyncio.run(p.send_note_async(12))
             time.sleep(1)

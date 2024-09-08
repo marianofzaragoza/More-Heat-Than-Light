@@ -29,22 +29,26 @@ class PrinterReceiver():
 
     def print_on_clock(self):
         state = self.vc.state_from_temp(self.a_temp, self.b_temp)
+        ebob = int(self.tempsender.get_stats('bob_vid', 'entanglement', 'last'))
+        ealice = int(self.tempsender.get_stats('alice_vid', 'entanglement', 'last'))
 
-        if state == "ENTANGLEMENT":
+        #and ebob == 127 and ealice == 127
+        if state == "ENTANGLEMENT" :
             entanglement = True
             brokenchannel = False
         elif state == "BROKENCHANNEL":
-            entanglement = True
-            brokenchannel = False
+            entanglement = False
+            brokenchannel = True
         elif state == "TRANSMISSION":
             entanglement = False
             brokenchannel = False
         else:
+            print("unknown state: " + state)
             entanglement = False
             brokenchannel = False 
  
         text_matrix = self.printer.text_to_matrix(self.printer.margin_text, self.printer.font_height_5, self.printer.text_scale)
-        #print('A: ' + str(self.a_temp) + ' B:' + str(self.b_temp))
+        print('A: ' + str(self.a_temp) + ' B:' + str(self.b_temp) + ' entanglement: ' + str(entanglement) + ' broken: ' + str(brokenchannel) + ' ebob: ' + str(ebob) + ' eali: ' + str(ealice))
         self.printer.check_time_and_print(self.printer.last_print_time_stamp, self.a_temp, self.b_temp, entanglement, brokenchannel, text_matrix, self.printer.counter)
 
 
@@ -69,6 +73,7 @@ class PrinterReceiver():
 
         loop = asyncio.get_event_loop()
         link = Link(120, loop)
+        link.quantum = 12
         link.enabled = True
         loop.run_until_complete(asyncio.gather(self.receive_msg(link), self.print_line(link)))
 
