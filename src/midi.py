@@ -44,10 +44,7 @@ class MidiSender():
             await self.client.drain_output()
 
     def send_note(self,note):
-        if note == False:
-            self.log.critical("not sending note its False")
-        else:
-
+        if not note == False:
             note = note + 23
             if note == self.lastnote:
                 self.log.critical('not sending note (same as last): ' + str(note) + 'last: ' + str(self.lastnote)) 

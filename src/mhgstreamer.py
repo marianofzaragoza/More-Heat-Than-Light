@@ -118,6 +118,7 @@ class MhGstPlayer():
 
         elif cst == "TRANSMISSION" and nst == "BROKENCHANNEL":
             self.overlay(True)
+            self.playlist.send_specific_midi(20) 
             # enable overlay  (go to start of overlay video)
             self.cst = "BROKENCHANNEL"
 
@@ -132,6 +133,7 @@ class MhGstPlayer():
             self.pre_entanglement = False
             self.in_entanglement = False
             self.overlay(True)
+            self.playlist.send_specific_midi(20) 
             self.cst = "BROKENCHANNEL"
             #interrupt and start playing transmission
             self.interrupt_next(start=False, almostfinished=False, entanglement=False)
@@ -265,7 +267,6 @@ class MhGstPlayer():
         p = self.get_overlay_pad()
         active = p.get_property("alpha") 
         if onoff == True and active == 0:
-            self.playlist.send_specific_midi(20) 
         #and self.overlay_active == False:
             # should be enabled, but is not enabled
             self.overlayplayer.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
@@ -360,7 +361,7 @@ class MhGstPlayer():
             if self.in_entanglement == True:
                 uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
             else:
-                GLib.idle_add(lambda: self.playlist.send_midi())
+                self.playlist.send_midi()
                 uri = Gst.filename_to_uri(self.playlist.next(entanglement=False))
 
             #self.videoplayer.set_state(Gst.State.PLAYING) 
