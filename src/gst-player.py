@@ -322,12 +322,12 @@ class PlayerUi(Gtk.Window):
                 self.cstate = "receive"
                 value = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last")
                 rxtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
-                print('checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value) + 'phase: ' + str(bp))
+                print('checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value) + 'phase: ' + str(bp), 'pre: ' + str(self.player.pre_entanglement) +  'ent: ' + str(self.player.in_entanglement))
 
                 if (value == 127 and rxtime == entseconds)  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print('ENTANG, exact time match')
 
-                if ( value == 127 and rxtime > entseconds + 1 and rxtime < entseconds -1 )  and not self.player.in_entanglement and self.player.pre_entanglement:
+                if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 3 )  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print('ENTANG, plusminus time match')
  
                 if ((value == 127 and rxtime == entseconds) or ( value == 127 and rxtime < entseconds + 1 and rxtime > entseconds -1 )) and not self.player.in_entanglement and self.player.pre_entanglement:
