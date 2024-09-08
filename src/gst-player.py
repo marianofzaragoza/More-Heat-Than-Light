@@ -103,7 +103,7 @@ class PlayerUi(Gtk.Window):
 
         if self.dw:
             self.text_tempa = Gtk.Button(label="temp A")
-            self.text_tempa.get_style_context().add_class('red-background')
+            self.text_tempa.get_style_context()
             hbox.pack_start(self.text_tempa, True, True, 0)
 
             self.text_tempb = Gtk.Button(label="temp B")
@@ -248,7 +248,8 @@ class PlayerUi(Gtk.Window):
             beatno = await link.sync(float(eval(self.config.sync.syncbeat)), float(self.config.sync.offset))
 
             sstr = str(self.player.statemachine())
-            GLib.idle_add(lambda: self.text_sm.set_label('sm: ' + sstr))
+            if self.dw:
+                GLib.idle_add(lambda: self.text_sm.set_label('sm: ' + sstr))
 
             await asyncio.sleep(0)
 
