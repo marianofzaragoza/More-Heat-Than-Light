@@ -76,9 +76,11 @@ class PlayerUi(Gtk.Window):
         elif self.nodename == "test_vid":
             self.dw = True
             bar_up = True
- 
-        else:
+        elif self.nodename == "rivest":
             self.dw = True
+            bar_up = True
+        else:
+            self.dw = False
             bar_up = False
 
 
