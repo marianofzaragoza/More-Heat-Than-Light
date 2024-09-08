@@ -195,6 +195,14 @@ class MhGstPlayer():
         ps = self.playlist.get_playlist_state()
         self.osc.send_video_msg(ps)
 
+        '''
+        video_state = self.videoplayer.get_state(Gst.CLOCK_TIME_NONE)
+
+        if self.overlay_enabled:
+            overlay_state = self.overlayplayer.get_state(Gst.CLOCK_TIME_NONE)
+
+            print('video state: ' + str(video_state.state) + 'overlay state ' + str(overlay_state.state))
+        '''
 
         Gst.debug_bin_to_dot_file(self.videoplayer, Gst.DebugGraphDetails.ALL, 'gstdebug_videoplayer_' )
         Gst.debug_bin_to_dot_file(self.videomixer, Gst.DebugGraphDetails.ALL, 'gstdebug_videomixer_' + '3' )
