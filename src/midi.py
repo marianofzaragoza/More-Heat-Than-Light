@@ -56,6 +56,15 @@ class MidiSender():
                     self.client.event_output(event, port=self.output_port)
                     self.client.drain_output()
 
+    def send_note_nocheck(self,note):
+            note = note + 23
+            self.log.critical('send_note'+ str(note))
+            if self.alsa:
+                event = NoteOnEvent(note=note)
+                self.client.event_output(event, port=self.output_port)
+                self.client.drain_output()
+
+
 
 
     def get_out_port(self): 
@@ -87,7 +96,7 @@ if __name__ == '__main__':
  
         while True:
             print('hello')
-            p.send_note(19)
+            p.send_note_nocheck(20)
  
             #asyncio.run(p.send_note_async(12))
             time.sleep(1)
