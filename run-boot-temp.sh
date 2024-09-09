@@ -12,9 +12,9 @@ case `hostname` in
   debian)
     ./run.sh src/test_midi.py
     ;;
-  alice-vid)
-    ./run.sh src/test_midi.py
-    ;;
+#  alice-vid)
+#    ./run.sh src/test_midi.py
+#    ;;
   alice)
     ./run.sh src/tempsender.py
     ;;

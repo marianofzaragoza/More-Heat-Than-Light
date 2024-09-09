@@ -80,7 +80,7 @@ class PlayerUi(Gtk.Window):
             self.dw = True
             bar_up = True
         else:
-            self.dw = True
+            self.dw = False
             bar_up = False
 
 
