@@ -80,7 +80,7 @@ class PlayerUi(Gtk.Window):
             self.dw = True
             bar_up = True
         else:
-            self.dw = True
+            self.dw = False
             bar_up = False
 
 
@@ -338,7 +338,8 @@ class PlayerUi(Gtk.Window):
                 if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 3 )  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print('ENTANG, plusminus time match')
  
-                if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 2 )  and not self.player.in_entanglement and self.player.pre_entanglement:
+                #if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 2 )  and not self.player.in_entanglement and self.player.pre_entanglement:
+                if (value == 127 and rxtime == entseconds)  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print("ENTANGLEMENT")
                     self.player.playlist.send_specific_midi(19) 
                     #self.tempsender.send_temp(cancel_entanglement=True)

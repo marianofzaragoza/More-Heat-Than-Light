@@ -1,7 +1,9 @@
+* midi blocks mainloop???? i think
 * disable mouse cursor
 * fullscreen desktop background
 * fix message receive check of entanglement
 * figure out what to do after 1 time entanglement finishes playing
+
 * DONE check if files exist before playing
 * DONE convert framerate in conversion pipeline
 
