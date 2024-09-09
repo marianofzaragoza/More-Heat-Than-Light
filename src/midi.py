@@ -23,32 +23,38 @@ class MidiSender():
         logging.setLoggerClass(mhlog.Logger)
         self.log = mhlog.getLog("playerui", self)
         self.log.setLevel(logging.WARN)
-       
-        self.client = SequencerClient("mhplayer")
-        self.output_port = self.client.create_port("output", READ_PORT)
-        
-        self.cport = self.get_out_port()
-        if self.cport:
-            self.output_port.connect_to(self.cport)
-
+        self.alsa = True
+        try:
+            self.client = SequencerClient("mhplayer")
+            self.output_port = self.client.create_port("output", READ_PORT)
+            
+            self.cport = self.get_out_port()
+            if self.cport:
+                self.output_port.connect_to(self.cport)
+        except alsa_midi.exceptions.ALSAError:
+            self.log.critical('alsa broken')
+            self.alsa = False
         self.log.info('hello from midi')
         
     async def send_note_async(self,note):
         self.log.info('send_note_async'+ str(note))
-        event = NoteOnEvent(note=note)
-        await self.client.event_output(event, port=self.output_port)
-        await self.client.drain_output()
+        if self.alsa:
+            event = NoteOnEvent(note=note)
+            await self.client.event_output(event, port=self.output_port)
+            await self.client.drain_output()
 
     def send_note(self,note):
-        note = note + 23
-        if note == self.lastnote:
-            self.log.info('not sending note (same as last): ' + str(note)) 
-        else:
-            self.log.info('send_note'+ str(note))
-            event = NoteOnEvent(note=note)
-            self.client.event_output(event, port=self.output_port)
-            self.client.drain_output()
-            self.lastnote = note
+        if not note == False:
+            note = note + 23
+            if note == self.lastnote:
+                self.log.critical('not sending note (same as last): ' + str(note) + 'last: ' + str(self.lastnote)) 
+            else:
+                self.log.critical('send_note'+ str(note))
+                self.lastnote = note
+                if self.alsa:
+                    event = NoteOnEvent(note=note)
+                    self.client.event_output(event, port=self.output_port)
+                    self.client.drain_output()
 
 
 
@@ -81,7 +87,7 @@ if __name__ == '__main__':
  
         while True:
             print('hello')
-            p.send_note(19)
+            p.send_note(20)
  
             #asyncio.run(p.send_note_async(12))
             time.sleep(1)

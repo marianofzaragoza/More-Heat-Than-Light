@@ -2,6 +2,14 @@
 #
 #
 set -eux
+
+mkdir -p /home/user/media/moreheat/logs
+mkdir -p /home/user/media/moreheat/debug
+mkdir -p /home/user/media/moreheat/csv
+
+
+
+sudo apt install -y dbus*
 sudo usermod -aG lp user
 sudo apt install -y vim git cmake libgirepository1.0-dev   gir1.2-gst-plugins-bad-1.0 gir1.2-gst-plugins-base-1.0 gir1.2-gst-rtsp-server-1.0 gir1.2-gstreamer-1.0 libgstrtspserver-1.0-0
 sudo apt install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gtk-doc-tools

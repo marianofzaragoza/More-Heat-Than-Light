@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw
 import time
 import random
 from config import DynamicConfigIni
+import binascii
 
 class Printer():
     def __init__(self):
@@ -305,13 +306,17 @@ class Printer():
                     #else:
                     #    img.putpixel((t, 0), (255, 255, 255))
         raster = StarTSPImage.imageToRaster(img, cut=False)
-        self.printer = open(self.devfile, "wb")
-        self.printer.write(raster) 
-        self.printer.close()
+        try:
+            self.printer = open(self.devfile, "wb")
+            self.printer.write(raster) 
+            self.printer.close()
+        except FileNotFoundError:
+            print("printer not connected")
+            print(binascii.hexlify(raster))
 
     def check_time_and_print(self, last_print_time_stamp, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
         check_time = time.time()
-        if check_time - last_print_time_stamp > 0:
+        if check_time - last_print_time_stamp >  3:
             self.print_pixel_line(a_temp, b_temp, entanglement, broken_channel, text_matrix, counter)
             self.last_print_time_stamp = check_time
             self.counter = self.counter + 1

@@ -7,6 +7,7 @@ import config
 import gspread
 import pandas as pd
 import random
+import os
 class Videochooser():
     def __init__(self, gsheet=False):
         logging.setLoggerClass(mhlog.Logger)
@@ -17,16 +18,23 @@ class Videochooser():
         self.tempsfile = str(srcdir) + '/temperaturas.dataframe'
         self.videofile = str(srcdir) + '/finaledits.dataframe'
         self.statesfile = str(srcdir) + '/states.dataframe'
-
+        
+        self.last_filename = 'startup'
 
         self.config = DynamicConfigIni()
+        self.videodir = self.config.playlist.videodir_final
+
+
         self.nodename = self.config.DEFAULT.nodename  # Access the nodename
         if gsheet:
             self.log.critical("loading data from gsheet, takes some seconds....")
             self.load_data_gsheet()
         else:
             self.load_data_file()
- 
+
+
+
+
     def load_data_gsheet(self):
         try:
             gc = gspread.service_account()
@@ -46,6 +54,7 @@ class Videochooser():
             return True
         except Exception as e:
             self.log.critical("gsheet not working" + str(e))
+            self.load_data_file()
             return False
 
     def dataframe_to_code(self, df):
@@ -161,48 +170,57 @@ class Videochooser():
                 midi = self.note_from_cat(n, c)
                 print(c + ' : ' + str(midi) + ' '  + str(self.filenames_from_cat(n, c)))
 
-    def get_broken_channel_file(self, node):
-        return "BROKENCHANNEL_" + node + '.mov'
+    def get_broken_channel_file(self, channel):
+        self.log.critical('bc0 ' + channel)
+        return "BROKENCHANNEL_" + channel + '.mov'
 
-    def get_random_file(self, node, temp_a, temp_b):
+    def get_random_file(self, node, temp_a, temp_b, entanglement=False):
             state = self.state_from_temp(temp_a, temp_b)
             if node == 'A':
                 temp = temp_a
             elif node == 'B':
                 temp = temp_b
             else:
-                self.log.critical(f'midi: node {node} has no known channel configured, using A')
+                #self.log.critical(f'midi: node {node} has no known channel configured, using A')
                 temp = temp_a
-     
-            if state == "TRANSMISSION" or state == "BROKENCHANNEL":
+ 
+            if (state == "ENTANGLEMENT" and entanglement==True) or (self.last_filename == "ENTANGLEMENT.mov" and state == "ENTANGLEMENT"):
+                filename = 'ENTANGLEMENT.mov'
+ 
+            elif (state == "TRANSMISSION" or state == "BROKENCHANNEL" or state == "ENTANGLEMENT") and entanglement == False:
                 cat = self.cat_from_temp(temp)
                 filenames = self.filenames_from_cat(node, cat)
                 try:
                     filename = random.choice(filenames)
                 except IndexError as e:
-                    self.log.critical("no video found for: " + node + ' at: ' + str(temp_a) + ' bt:' + str(temp_b) + ' state: ' + state + 'cat: ' + cat)
+                    self.log.info("no video found for: " + node + ' at: ' + str(temp_a) + ' bt:' + str(temp_b) + ' state: ' + state + ' cat: ' + cat)
                     filename = 'VIDEO_MISSING.mov'
-            elif state == "ENTANGLEMENT":
-                filename = 'ENTANGLEMENT.mov'
+
+            if not os.path.isfile(self.videodir + '/' + filename):
+                self.log.critical('file missing: ' + filename)
+                filename = 'VIDEO_MISSING.mov'
+            self.last_filename == filename
             return filename
 
     def get_midi_note(self, node, temp_a, temp_b):
+            print("get midi note")
             state = self.state_from_temp(temp_a, temp_b)
             if node == 'A':
                 temp = temp_a
             elif node == 'B':
                 temp = temp_b
             else:
-                self.log.critical(f'midi: node {node} has no known channel configured, using A')
+                #self.log.critical(f'midi: node {node} has no known channel configured, using A')
                 temp = temp_a
      
             if state == "TRANSMISSION":
                 cat = self.cat_from_temp(temp)
                 note = self.note_from_cat(node, cat)
+                print("got note " + str(note))
             elif state == "ENTANGLEMENT":
-                note = 19
+                note = False
             elif state == "BROKENCHANNEL":
-                note = 20
+                note = False
             return note
 
 
