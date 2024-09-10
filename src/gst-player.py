@@ -185,6 +185,14 @@ class PlayerUi(Gtk.Window):
         #gtk stuff
         self.init_gui() 
         self.show_all()
+        #cursor = gtk.gdk.Cursor.
+        #self.set_cursor(gtk.gdk.Cursor(Gdk.CursorType.BLANK_CURSOR))
+        #gtk_widget_set_cursor_from_name(window, "pointer");
+        display = Gdk.Display.get_default()
+        window = self.drawingarea.get_property('window')
+        cursor = Gdk.Cursor.new_for_display(display, Gdk.CursorType.BLANK_CURSOR) 
+        Gdk.Window.set_cursor(window, cursor)
+
         self.xid = self.drawingarea.get_property('window').get_xid()
         self.osc = OscSender()
 

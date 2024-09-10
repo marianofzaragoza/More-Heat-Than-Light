@@ -11,6 +11,7 @@ streaming stopped, reason not-linked (-1)
 2024-09-10 12:47:52,597 [CRITICAL] MhGstPlayer: EOS received from <__gi__.GstPlayBin3 object at 0x7f48ce39ddc0 (GstPlayBin3 at 0x313e480)> [MainThread] (mhgstreamer.py:314) 
 2024-09-10 12:47:52,597 [CRITICAL] MhGstPlayer: unknown eos [MainThread] (mhgstreamer.py:326) 
 
+* mhplay starts too soon when rebooting
  
 * midi blocks mainloop???? i think
 * disable mouse cursor
