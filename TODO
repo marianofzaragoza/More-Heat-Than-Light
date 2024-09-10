@@ -1,3 +1,17 @@
+* gstreamer error handler:
+ 2024-09-10 10:10:46,533 [CRITICAL] MhGstPlayer: playbinvideo about to finish,  playlist: file:///home/user/media/moreheat/Table00010711_V1-0031.mov [MainThread] (mhgstreamer.py:369) 
+ERROR: qtdemux3529 : gst-stream-error-quark: Internal data stream error. (1)
+Debug info: ../gst/isomp4/qtdemux.c(6937): gst_qtdemux_loop (): /GstPlayBin3:playbin_video/GstURIDecodeBin3:uridecodebin3/GstURISourceBin:urisourcebin3410/GstParseBin:parsebin3529/GstQTDemux:qtdemux3529:
+streaming stopped, reason not-linked (-1)
+
+2024-09-10 12:47:52,587 [CRITICAL] MidiSender: not sending note (same as last): 27last: 27 [MainThread] (midi.py:50) 
+2024-09-10 12:47:52,594 [CRITICAL] MhGstPlayer: playbinvideo about to finish,  playlist: file:///home/user/media/moreheat/A004_04290945_C003.mov [MainThread] (mhgstreamer.py:369) 
+2024-09-10 12:47:52,596 [CRITICAL] MhGstPlayer: EOS received from <__gi__.GstPlayBin3 object at 0x7f48ce39df40 (GstPlayBin3 at 0x313e110)> [MainThread] (mhgstreamer.py:314) 
+2024-09-10 12:47:52,597 [CRITICAL] MhGstPlayer: unknown eos [MainThread] (mhgstreamer.py:326) 
+2024-09-10 12:47:52,597 [CRITICAL] MhGstPlayer: EOS received from <__gi__.GstPlayBin3 object at 0x7f48ce39ddc0 (GstPlayBin3 at 0x313e480)> [MainThread] (mhgstreamer.py:314) 
+2024-09-10 12:47:52,597 [CRITICAL] MhGstPlayer: unknown eos [MainThread] (mhgstreamer.py:326) 
+
+ 
 * midi blocks mainloop???? i think
 * disable mouse cursor
 * fullscreen desktop background

@@ -323,7 +323,8 @@ class MhGstPlayer():
         elif name == "playbin_video":
             self.log.critial("playbinvideo ,  playlist: " + str(uri))
         else:
-            self.log.critical("unknown eos")
+            self.log.critical("unknown eos" + str(name) + ' ' + str(uri))
+            self.mt_on_about_to_finish(msg.src)
             #uri = Gst.filename_to_uri(self.hdfile)
 
 
