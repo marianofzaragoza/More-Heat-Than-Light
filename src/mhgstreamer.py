@@ -285,7 +285,7 @@ class MhGstPlayer():
         videomixer = Gst.parse_launch(
            "intervideosrc name=video_src_1 channel=channel_video ! queue  !  clocksync sync-to-first=true sync=true !  videoconvert ! queue ! videoscale !  video/x-raw,width=1920,height=1080,framerate=24/1 ! queue name=videoplayer ! videomix. " +
             "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! clocksync sync-to-first=true sync=true ! videoconvert ! queue ! videoscale ! video/x-raw,width=1920,height=1080,framerate=24/1 ! queue name=overlayplayer ! videomix. " +
-            "glvideomixer " + 
+            "glvideomixer background=1 " + 
             "sink_0::alpha=1 "+
             "sink_0::blend-constant-color-alpha=0 "+
             "sink_0::blend-function-src-alpha=14 "+
