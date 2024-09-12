@@ -361,6 +361,9 @@ class MhGstPlayer():
 
             #self.videoplayer.set_state(Gst.State.NULL) 
             if self.in_entanglement == True:
+                # FIXME: this is just a test
+                in_entanglement = False
+
                 uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
             else:
                 self.playlist.send_midi()
