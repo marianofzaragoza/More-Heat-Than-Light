@@ -1,3 +1,14 @@
+* state machine in aalink loop
+  > what with about-to-finish and eos??, maybe state machine sets a next video variable that gets picked up
+  > sets next midi variable (for about-to-finish)
+  > what about network -> begin of loop, receive, end send, so other nodes are always 1 cycle begind on messages
+  > sending 
+  > gui update end of loop
+
+* tempsender on alice and bob  is sending to slow???/
+
+* cursor over buttons is not being hidden
+
 * gstreamer error handler:
  2024-09-10 10:10:46,533 [CRITICAL] MhGstPlayer: playbinvideo about to finish,  playlist: file:///home/user/media/moreheat/Table00010711_V1-0031.mov [MainThread] (mhgstreamer.py:369) 
 ERROR: qtdemux3529 : gst-stream-error-quark: Internal data stream error. (1)
