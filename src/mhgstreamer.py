@@ -314,7 +314,7 @@ class MhGstPlayer():
         self.log.critical("EOS received from " + str(msg.src))
         pb = msg.src
         name = pb.get_property("name")
-        name = pb.get_property("uri")
+        uri = pb.get_property("uri")
 
         if name == "playbin_overlay":
             self.log.critical("playbinoverlay eos")
@@ -322,6 +322,7 @@ class MhGstPlayer():
             #uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
             self.log.critial("playbinvideo ,  playlist: " + str(uri))
+            self.mt_on_about_to_finish(msg.src)
         else:
             self.log.critical("unknown eos" + str(name) + ' ' + str(uri))
             self.mt_on_about_to_finish(msg.src)
@@ -466,6 +467,25 @@ class MhGstPlayer():
                         print("ERROR: Seeking query failed")
         '''
 
+    def on_error(self, bus, msg):
+        self.log.critical('Error {}: {}, {}'.format(msg.src.name, *msg.parse_error()))
+        GLib.idle_add(lambda: self.fix_error(msg.src))
+
+
+    def fix_error(self, element):
+        self.log.critical('bad thing happened, trying to fix')
+        sys.exit(12)
+        self.videoplayer.set_state(Gst.State.NULL)
+        self.videoplayer = self.create_pb('_video', self.tfile)
+        if self.in_entanglement == True:
+            uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
+        else:
+            self.playlist.send_midi()
+            uri = Gst.filename_to_uri(self.playlist.next(entanglement=False))
+        self.videoplayer.set_state(Gst.State.PLAYING)
+
+
+   
     def create_pb(self, name, file):
         uri = Gst.filename_to_uri(file)
 
@@ -476,7 +496,7 @@ class MhGstPlayer():
 
         bus = pb.get_bus()
         bus.add_signal_watch()
-        #bus.connect("message::error", self.on_error)
+        bus.connect("message::error", self.on_error)
         bus.connect("message::eos", self.on_eos)
         bus.connect("message::state-changed", self.on_state_changed)
         #bus.connect("message::application", self.on_application_message)

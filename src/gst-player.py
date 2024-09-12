@@ -248,6 +248,10 @@ class PlayerUi(Gtk.Window):
         rxtime = 999999
         while True:
             beatno = await link.sync(float(eval(self.config.sync.syncbeat)), float(self.config.sync.offset))
+           
+            #if beatno > 100 < 150:
+            #    # test fix error
+            #    self.player.fix_error(self.player)
 
             sstr = str(self.player.statemachine())
             if self.dw:
@@ -330,8 +334,7 @@ class PlayerUi(Gtk.Window):
                 self.cstate = "receive"
                 value = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last")
                 rxtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
-                print('checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value) + 'phase: ' + str(bp), 'pre: ' + str(self.player.pre_entanglement) +  'ent: ' + str(self.player.in_entanglement))
-
+                print('b: ' + str(beatno)  +'checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value) + 'phase: ' + str(bp), 'pre: ' + str(self.player.pre_entanglement) +  'ent: ' + str(self.player.in_entanglement))
                 if (value == 127 and rxtime == entseconds)  and not self.player.in_entanglement and self.player.pre_entanglement:
                     print('ENTANG, exact time match')
 
