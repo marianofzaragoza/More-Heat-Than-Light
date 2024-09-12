@@ -1,0 +1,15 @@
+127.0.0.1	localhost
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+
+127.0.0.1 debian
+
+192.168.172.235   bob-vid
+192.168.172.185   alice-vid
+192.168.172.153   bob
+192.168.172.111   carol
+192.168.172.101   alice
+192.168.172.249   stroom
+
+
