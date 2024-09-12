@@ -322,7 +322,14 @@ class MhGstPlayer():
             #uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
             self.log.critial("playbinvideo ,  playlist: " + str(uri))
-            self.mt_on_about_to_finish(msg.src)
+            if self.in_entanglement == True:
+                # FIXME: this is just a test
+                #in_entanglement = False
+                msg.src.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
+                self.log.critical('EOS entanglemtn') 
+                #FIXME: this is just a test
+            else: 
+                self.mt_on_about_to_finish(msg.src)
         else:
             self.log.critical("unknown eos" + str(name) + ' ' + str(uri))
             self.mt_on_about_to_finish(msg.src)
@@ -362,9 +369,10 @@ class MhGstPlayer():
             #self.videoplayer.set_state(Gst.State.NULL) 
             if self.in_entanglement == True:
                 # FIXME: this is just a test
-                in_entanglement = False
-
-                uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
+                #in_entanglement = False
+                self.log.critical('about to finish entanglemtn') 
+                #FIXME: this is just a test
+                #uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
             else:
                 self.playlist.send_midi()
                 uri = Gst.filename_to_uri(self.playlist.next(entanglement=False))
