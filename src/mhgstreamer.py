@@ -90,7 +90,7 @@ class MhGstPlayer():
             return
 
         self.state = new
-        print("State changed from {0} to {1}".format(
+        self.log.critical("State changed from {0} to {1}".format(
             Gst.Element.state_get_name(old), Gst.Element.state_get_name(new)))
 
         #if old == Gst.State.PAUSED and new == Gst.State.PAUSED:
