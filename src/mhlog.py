@@ -27,11 +27,17 @@ class Logger(logging.Logger):
   def __init__(self, name, level=logging.NOTSET):
     super().__init__(name, level)
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    ch.setLevel(logging.CRITICAL)
 
     ch.setFormatter(CustomFormatter())
 
     self.addHandler(ch)
+
+    # log to file
+    file_handler = logging.FileHandler(filename='debug/mh.log')
+    file_handler.setFormatter(CustomFormatter())
+    file_handler.setLevel(logging.INFO)
+    self.addHandler(file_handler)
 
     self.extra_info = None
 
