@@ -15,8 +15,10 @@ case `hostname` in
     #
     while true
     do
-      sleep 10
+      aconnect -l
       aconnect 'MIDI Mix':'MIDI Mix MIDI 1' 'mhtemp':'output'
+      aconnect -l
+      sleep 3
     done
     ;;
 

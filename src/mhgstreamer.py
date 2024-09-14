@@ -90,7 +90,7 @@ class MhGstPlayer():
             return
 
         self.state = new
-        print("State changed from {0} to {1}".format(
+        self.log.critical("State changed from {0} to {1}".format(
             Gst.Element.state_get_name(old), Gst.Element.state_get_name(new)))
 
         #if old == Gst.State.PAUSED and new == Gst.State.PAUSED:
@@ -285,7 +285,7 @@ class MhGstPlayer():
         videomixer = Gst.parse_launch(
            "intervideosrc name=video_src_1 channel=channel_video ! queue  !  clocksync sync-to-first=true sync=true !  videoconvert ! queue ! videoscale !  video/x-raw,width=1920,height=1080,framerate=24/1 ! queue name=videoplayer ! videomix. " +
             "intervideosrc name=video_src_2 channel=channel_overlay ! queue ! clocksync sync-to-first=true sync=true ! videoconvert ! queue ! videoscale ! video/x-raw,width=1920,height=1080,framerate=24/1 ! queue name=overlayplayer ! videomix. " +
-            "glvideomixer " + 
+            "glvideomixer background=1 " + 
             "sink_0::alpha=1 "+
             "sink_0::blend-constant-color-alpha=0 "+
             "sink_0::blend-function-src-alpha=14 "+
@@ -314,7 +314,7 @@ class MhGstPlayer():
         self.log.critical("EOS received from " + str(msg.src))
         pb = msg.src
         name = pb.get_property("name")
-        name = pb.get_property("uri")
+        uri = pb.get_property("uri")
 
         if name == "playbin_overlay":
             self.log.critical("playbinoverlay eos")
@@ -322,8 +322,17 @@ class MhGstPlayer():
             #uri = Gst.filename_to_uri(self.playlist.get_overlay())
         elif name == "playbin_video":
             self.log.critial("playbinvideo ,  playlist: " + str(uri))
+            if self.in_entanglement == True:
+                # FIXME: this is just a test
+                #in_entanglement = False
+                msg.src.seek_simple(Gst.Format.TIME,  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0 * Gst.SECOND)
+                self.log.critical('EOS entanglemtn') 
+                #FIXME: this is just a test
+            else: 
+                self.mt_on_about_to_finish(msg.src)
         else:
-            self.log.critical("unknown eos")
+            self.log.critical("unknown eos" + str(name) + ' ' + str(uri))
+            self.mt_on_about_to_finish(msg.src)
             #uri = Gst.filename_to_uri(self.hdfile)
 
 
@@ -359,7 +368,11 @@ class MhGstPlayer():
 
             #self.videoplayer.set_state(Gst.State.NULL) 
             if self.in_entanglement == True:
-                uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
+                # FIXME: this is just a test
+                #in_entanglement = False
+                self.log.critical('about to finish entanglemtn') 
+                #FIXME: this is just a test
+                #uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
             else:
                 self.playlist.send_midi()
                 uri = Gst.filename_to_uri(self.playlist.next(entanglement=False))
@@ -465,6 +478,25 @@ class MhGstPlayer():
                         print("ERROR: Seeking query failed")
         '''
 
+    def on_error(self, bus, msg):
+        self.log.critical('Error {}: {}, {}'.format(msg.src.name, *msg.parse_error()))
+        GLib.idle_add(lambda: self.fix_error(msg.src))
+
+
+    def fix_error(self, element):
+        self.log.critical('bad thing happened, trying to fix')
+        sys.exit(12)
+        self.videoplayer.set_state(Gst.State.NULL)
+        self.videoplayer = self.create_pb('_video', self.tfile)
+        if self.in_entanglement == True:
+            uri = Gst.filename_to_uri(self.playlist.next(entanglement=True))
+        else:
+            self.playlist.send_midi()
+            uri = Gst.filename_to_uri(self.playlist.next(entanglement=False))
+        self.videoplayer.set_state(Gst.State.PLAYING)
+
+
+   
     def create_pb(self, name, file):
         uri = Gst.filename_to_uri(file)
 
@@ -475,7 +507,7 @@ class MhGstPlayer():
 
         bus = pb.get_bus()
         bus.add_signal_watch()
-        #bus.connect("message::error", self.on_error)
+        bus.connect("message::error", self.on_error)
         bus.connect("message::eos", self.on_eos)
         bus.connect("message::state-changed", self.on_state_changed)
         #bus.connect("message::application", self.on_application_message)

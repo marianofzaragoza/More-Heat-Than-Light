@@ -80,7 +80,7 @@ class PlayerUi(Gtk.Window):
             self.dw = True
             bar_up = True
         else:
-            self.dw = True
+            self.dw = False
             bar_up = False
 
 
@@ -248,6 +248,10 @@ class PlayerUi(Gtk.Window):
         rxtime = 999999
         while True:
             beatno = await link.sync(float(eval(self.config.sync.syncbeat)), float(self.config.sync.offset))
+           
+            #if beatno > 100 < 150:
+            #    # test fix error
+            #    self.player.fix_error(self.player)
 
             sstr = str(self.player.statemachine())
             if self.dw:
@@ -330,16 +334,16 @@ class PlayerUi(Gtk.Window):
                 self.cstate = "receive"
                 value = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last")
                 rxtime = self.tempsender.get_stats(self.playlist.get_other_node(), "entanglement", "last_seconds")
-                print('checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value) + 'phase: ' + str(bp), 'pre: ' + str(self.player.pre_entanglement) +  'ent: ' + str(self.player.in_entanglement))
-
+                print('b: ' + str(beatno)  +'checktime: ' + str(entseconds) + 'rxtime other: ' + str(rxtime) + ' value: ' + str(value) + 'phase: ' + str(bp), 'pre: ' + str(self.player.pre_entanglement) +  'ent: ' + str(self.player.in_entanglement))
                 if (value == 127 and rxtime == entseconds)  and not self.player.in_entanglement and self.player.pre_entanglement:
-                    print('ENTANG, exact time match')
+                    self.log.critical('ENTANG, exact time match')
 
                 if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 3 )  and not self.player.in_entanglement and self.player.pre_entanglement:
-                    print('ENTANG, plusminus time match')
+                    self.log.critical('ENTANG, plusminus time match')
  
-                if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 2 )  and not self.player.in_entanglement and self.player.pre_entanglement:
-                    print("ENTANGLEMENT")
+                #if ( value == 127 and rxtime < entseconds + 2 and rxtime > entseconds - 2 )  and not self.player.in_entanglement and self.player.pre_entanglement:
+                if (value == 127 and rxtime == entseconds)  and not self.player.in_entanglement and self.player.pre_entanglement:
+                    self.log.critical("ENTANGLEMENT")
                     self.player.playlist.send_specific_midi(19) 
                     #self.tempsender.send_temp(cancel_entanglement=True)
 
@@ -352,9 +356,9 @@ class PlayerUi(Gtk.Window):
                 await asyncio.sleep(0)
                 boole, pos3 = self.player.videoplayer.query_position(Gst.Format.TIME)
                 await asyncio.sleep(0)
-                print( str(pos1) + ' ' + str(pos2) + ' ' + str(pos3))
+                self.log.critical( str(pos1) + ' ' + str(pos2) + ' ' + str(pos3))
                 if pos1 == pos2 and pos2 == pos3:
-                    print("the player is stuck")
+                    self.log.critical("the player is stuck")
                     self.player.videoplayer.set_state(Gst.State.NULL)
                     await asyncio.sleep(0)
                     self.player.videoplayer.set_state(Gst.State.PLAYING)

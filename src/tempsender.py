@@ -239,7 +239,7 @@ if __name__ == "__main__":
                     ts.log.info('received: ' + str(data))
             
     
-            print('last from debian: ' + str(ts.get_stats("debian", "temperature", "last")))
+            #print('last from debian: ' + str(ts.get_stats("debian", "temperature", "last")))
             print('last from alice: ' + str(ts.get_stats("alice", "temperature", "last")))
             print('last from bob: ' + str(ts.get_stats("bob", "temperature", "last")))
 
@@ -288,7 +288,7 @@ if __name__ == "__main__":
             #print('adsf')
             #ts.socket.send(b"hello2")
             #ts.socket.recv()
-            time.sleep(0.5)
+            time.sleep(0.1)
 
 
 

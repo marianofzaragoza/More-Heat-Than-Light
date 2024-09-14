@@ -9,12 +9,18 @@ cd /home/user/src/More-Heat-Than-Light/
 
 case `hostname` in
 
+  alice-vid)
+    DISPLAY=:0 unclutter
+    ;;
+  bob-vid)
+    DISPLAY=:0 unclutter
+    ;;
   debian)
     ./run.sh src/test_midi.py
     ;;
-  alice-vid)
-    ./run.sh src/test_midi.py
-    ;;
+#  alice-vid)
+#    ./run.sh src/test_midi.py
+#    ;;
   alice)
     ./run.sh src/tempsender.py
     ;;
