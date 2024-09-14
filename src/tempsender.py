@@ -288,7 +288,7 @@ if __name__ == "__main__":
             #print('adsf')
             #ts.socket.send(b"hello2")
             #ts.socket.recv()
-            time.sleep(0.5)
+            time.sleep(0.1)
 
 
 
