@@ -13,7 +13,10 @@ from aalink import Link
 class PrinterReceiver():
     async def print_line(self, link):
         while True:
-            beat = await link.sync(self.print_interval)
+            #beat = await link.sync(self.print_interval)
+            beatno = await link.sync(6, offset=0)
+            print('bang')
+
             self.print_on_clock()
             #print('print', beat) 
 
@@ -74,6 +77,7 @@ class PrinterReceiver():
         loop = asyncio.get_event_loop()
         link = Link(120, loop)
         link.quantum = 12
+        link.start_stop_sync_enabled = True
         link.enabled = True
         loop.run_until_complete(asyncio.gather(self.receive_msg(link), self.print_line(link)))
 

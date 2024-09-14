@@ -1,3 +1,4 @@
+* reconnect midi ports when macmini was rebooted
 * disable mouse cursor
 * fullscreen desktop background
 * fix message receive check of entanglement

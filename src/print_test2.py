@@ -316,7 +316,7 @@ class Printer():
 
     def check_time_and_print(self, last_print_time_stamp, a_temp, b_temp, entanglement, broken_channel, text_matrix, counter):
         check_time = time.time()
-        if check_time - last_print_time_stamp >  3:
+        if check_time - last_print_time_stamp >  1:
             self.print_pixel_line(a_temp, b_temp, entanglement, broken_channel, text_matrix, counter)
             self.last_print_time_stamp = check_time
             self.counter = self.counter + 1
