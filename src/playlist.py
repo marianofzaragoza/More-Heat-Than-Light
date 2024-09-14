@@ -30,11 +30,11 @@ class Playlist():
         if self.nodename == self.conf.playlist.vida_node:
             self.othernode = self.conf.playlist.vidb_node
             self.channel = 'A'
-            self.gsheet = True
+            self.gsheet = False
         elif self.nodename == self.conf.playlist.vidb_node:
             self.othernode = self.conf.playlist.vida_node
             self.channel = 'B'
-            self.gsheet = True
+            self.gsheet = False
         else:
             self.gsheet = False
             self.channel = 'A'
