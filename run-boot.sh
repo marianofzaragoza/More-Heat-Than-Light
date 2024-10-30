@@ -25,6 +25,19 @@ case `hostname` in
     #DISPLAY=:0 xrandr --output HDMI-0 --mode 1920x1200
     ./run.sh src/gst-player.py
     ;;
+  alice)
+    #DISPLAY=:0 xrandr --output HDMI-0 --mode 1920x1200
+    ./run.sh src/templogger.py
+    ;;
+   bob)
+    #DISPLAY=:0 xrandr --output HDMI-0 --mode 1920x1200
+    ./run.sh src/templogger.py
+    ;;
+   carol)
+    #DISPLAY=:0 xrandr --output HDMI-0 --mode 1920x1200
+    ./run.sh src/templogger.py
+    ;;
+ 
   *)
     echo -n "unknown"
     sleep 360

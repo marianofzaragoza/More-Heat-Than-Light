@@ -308,9 +308,10 @@ class Printer():
         raster = StarTSPImage.imageToRaster(img, cut=False)
         try:
             self.printer = open(self.devfile, "wb")
+            print("printing on printer")
             self.printer.write(raster) 
-            self.printer.close()
-        except FileNotFoundError:
+            self.printer.close() 
+        except (FileNotFoundError, OSError):
             print("printer not connected")
             print(binascii.hexlify(raster))
 

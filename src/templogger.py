@@ -14,6 +14,7 @@ with open ('debug/temperatures.csv','a') as csvfile:
         bt = ts.get_stats("bob", "temperature", "last") 
         date = datetime.now()
         writer.writerow([date, at, bt])
+        csvfile.flush()
         time.sleep(0.5)
 
 
